@@ -5,11 +5,12 @@ from nl_to_fol import *
 from phidias.Types import *
 import configparser
 import math
-from datetime import datetime
 from difflib import SequenceMatcher
 import pyttsx3
 import winsound
 import itertools
+from owlready2 import *
+from datetime import datetime
 
 
 config = configparser.ConfigParser()
@@ -44,8 +45,6 @@ GEN_EXTRA_POS = config.get('GEN', 'EXTRA_GEN_POS').split(", ")
 parser = Parse(VERBOSE)
 m = ManageFols(VERBOSE, LANGUAGE)
 
-# Clauses Knowledge Base instantion
-kb_fol = FolKB([])
 
 # FOl Reasoning procedures
 class aggr_adj(Procedure): pass
@@ -211,7 +210,7 @@ class say(Action):
         # setting TTS engine
         engine = pyttsx3.init()
         voices = engine.getProperty('voices')
-        engine.setProperty('voice', voices[2].id)
+        engine.setProperty('voice', voices[1].id)
         engine.setProperty('rate', 150)
 
         engine.say(text)
@@ -246,30 +245,21 @@ class set_wait(Action):
 
 class eval_cls(ActiveBelief):
     """ActiveBelief for Beliefs KB and Clauses KB interaction"""
-    def evaluate(self, arg1):
+    def evaluate(self, arg1, arg2, arg3):
 
-        utterance = str(arg1).split("'")[1]
+        subj = str(arg1).split("'")[1]
+        rel = str(arg2).split("'")[1]
+        obj = str(arg3).split("'")[1]
 
-        bc_result = kb_fol.ask(expr(utterance))
-        print("\n ---- NOMINAL REASONING ---\n")
-        print("Result: " + str(bc_result))
+        my_world = owlready2.World()
+        my_world.get_ontology("west.owl").load()  # path to the owl file is given here
 
-        if bc_result is False:
+        graph = my_world.as_rdflib_graph()
 
-            print("\n\n ---- NESTED REASONING ---")
-            candidates = []
+        result = list(graph.query("ASK WHERE {<http://test/west.owl#"+subj+"> <http://www.w3.org/1999/02/22-rdf-syntax-ns#"+rel+"> <http://test/west.owl#"+obj+">.}"))
+        print(result)
 
-            nested_result = kb_fol.nested_ask(expr(utterance), candidates)
-            print("Result: " + str(nested_result))
-
-            if nested_result is None:
-                return True
-            elif nested_result is False:
-                return False
-            else:
-                return True
-        else:
-            return True
+        return result[0]
 
 
 class lemma_in_syn(ActiveBelief):

@@ -134,7 +134,7 @@ result = list(graph.query("""Select ?p WHERE {<http://test/west.owl#Colonel_West
 for i in result:
     print(i)
 
-result = list(graph.query("""ASK WHERE {<http://test/west.owl#Colonel_West> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test/west.owl#American_NN>.}"""))
+result = list(graph.query("ASK WHERE {<http://test/west.owl#Colonel_West> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test/west.owl#Criminal_NN>.}"))
 print(result)
 
 
