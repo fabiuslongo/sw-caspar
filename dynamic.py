@@ -1,7 +1,10 @@
 from owlready2 import *
 
-new_world = owlready2.World()
-my_onto = new_world.get_ontology("west.owl").load()
+try:
+    my_onto = get_ontology("west.owl").load()
+except IOError:
+    my_onto = get_ontology("http://test/west.owl")
+
 
 
 with my_onto:
@@ -79,9 +82,6 @@ with my_onto:
 
     print("\nIndividuals list:\n")
 
-    for c in my_obj:
-        print(c)
-
 
     print("\nAssertions list:\n")
 
@@ -117,26 +117,25 @@ with my_onto:
 #my_onto.save(file="west.owl", format="rdfxml")
 
 
-
 with my_onto:
-  sync_reasoner() #sincronizziamo il ragionatore e mettiamo le inferenze dentro l'ontologia onto
+  sync_reasoner_pellet() #sincronizziamo il ragionatore e mettiamo le inferenze dentro l'ontologia onto
   my_onto.save(file="west.owl", format="rdfxml")
   pass
 
 
 print("SPARQL")
 
-my_world = World()
+my_world = owlready2.World()
 my_world.get_ontology("west.owl").load()  # path to the owl file is given here
 
 graph = my_world.as_rdflib_graph()
-result = list(graph.query("""Select ?p WHERE {?p <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test/west#Criminal_NN> .}"""))
+
+result = list(graph.query("""Select ?p WHERE {<http://test/west.owl#Colonel_West> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?p .}"""))
 for i in result:
     print(i)
 
-result = list(graph.query("""ASK WHERE {<http://test/west#Colonel_West> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test/west#Criminal_NN>.}"""))
-for r in result:
-    print(r)
+result = list(graph.query("""ASK WHERE {<http://test/west.owl#Colonel_West> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test/west.owl#American_NN>.}"""))
+print(result)
 
 
 

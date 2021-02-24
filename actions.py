@@ -1,8 +1,7 @@
 from parse_en import *
 from nl_to_fol import *
-import sys
-sys.path.insert(0, "../logic")
-from logic.logic import *
+
+
 from phidias.Types import *
 import configparser
 import math
@@ -10,6 +9,7 @@ from datetime import datetime
 from difflib import SequenceMatcher
 import pyttsx3
 import winsound
+import itertools
 
 
 config = configparser.ConfigParser()

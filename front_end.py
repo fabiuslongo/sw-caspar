@@ -1,9 +1,8 @@
 from phidias.Lib import *
 from actions import *
 
-#from sensors import *
-#from sensors_azure import *
-from sensors_google import *
+from sensors import *
+
 
 # Clauses KB manual feeding beliefs
 class FEED(Reactor): pass
