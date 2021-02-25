@@ -19,12 +19,9 @@ config.read('config.ini')
 cnt = itertools.count(1)
 dav = itertools.count(1)
 
-
-
-
-VERBOSE = config.getboolean('NL_TO_FOL', 'VERBOSE')
-LANGUAGE = config.get('NL_TO_FOL', 'LANGUAGE')
-ASSIGN_RULES_ADMITTED = config.getboolean('NL_TO_FOL', 'ASSIGN_RULES_ADMITTED')
+VERBOSE = config.getboolean('PARSING', 'VERBOSE')
+LANGUAGE = config.get('PARSING', 'LANGUAGE')
+ASSIGN_RULES_ADMITTED = config.getboolean('PARSING', 'ASSIGN_RULES_ADMITTED')
 
 WAIT_TIME = config.getint('AGENT', 'WAIT_TIME')
 LOG_ACTIVE = config.getboolean('AGENT', 'LOG_ACTIVE')
@@ -36,32 +33,15 @@ INCLUDE_PRP_POS = config.getboolean('POS', 'INCLUDE_PRP_POS')
 INCLUDE_ADV_POS = config.getboolean('POS', 'INCLUDE_ADV_POS')
 OBJ_JJ_TO_NOUN = config.getboolean('POS', 'OBJ_JJ_TO_NOUN')
 
-GEN_PREP = config.getboolean('GEN', 'GEN_PREP')
-GEN_ADJ = config.getboolean('GEN', 'GEN_ADJ')
-GEN_ADV = config.getboolean('GEN', 'GEN_ADV')
-GEN_EXTRA = config.getboolean('GEN', 'GEN_EXTRA')
-GEN_EXTRA_POS = config.get('GEN', 'EXTRA_GEN_POS').split(", ")
-
 parser = Parse(VERBOSE)
 m = ManageFols(VERBOSE, LANGUAGE)
 
 
-# FOl Reasoning procedures
-class aggr_adj(Procedure): pass
-class aggr_adv(Procedure): pass
-class aggr_nouns(Procedure): pass
-class mod_to_gnd(Procedure): pass
-class gnd_prep_obj(Procedure): pass
-class prep_to_gnd(Procedure): pass
-class finalize_clause(Procedure): pass
-class parse(Procedure): pass
-class process_clause(Procedure): pass
-class finalize_gnd(Procedure): pass
-class apply_adv(Procedure): pass
-class actions_to_clauses(Procedure): pass
-class gnd_actions(Procedure): pass
-class new_def_clause(Procedure): pass
+
+# Ontology creation procedures
+class create_onto(Procedure): pass
 class process_rule(Procedure): pass
+class process_onto(Procedure): pass
 
 # Reactive procedures - direct commands
 class parse_command(Procedure): pass
@@ -278,23 +258,14 @@ class lemma_in_syn(ActiveBelief):
         return False
 
 
-class preprocess_clause(Action):
+class preprocess_onto(Action):
     """Producting beliefs to feed the Definite Clauses Builder"""
 
     def execute(self, *args):
-        gen_mask = str(args[0]())
-        mode = str(args[1]())
-        type = str(args[2]())
+        type = str(args[0]())
 
-        print("\n--------- NEW GENERALIZATION ---------\n ")
-        print("gen_mask: " + gen_mask)
-        print("mode: " + mode)
+        print("\n--------- NEW ONTOLOGY ---------\n ")
         print("type: " + type + "\n")
-
-        if mode == "ONE":
-            Gen_mode = False
-        else:
-            Gen_mode = True
 
         self.MAIN_NEG_PRESENT = False
 
@@ -375,109 +346,15 @@ class preprocess_clause(Action):
         # IMPLICATION CASES
         if dclause[1][0] == "==>":
 
-            mods = []
-
-            for v in dclause[2]:
-                if self.get_pos(v[0]) in GEN_EXTRA_POS and GEN_EXTRA is True:
-                    mods.append(v[0])
-                if self.get_pos(v[0]) == "IN" and GEN_PREP is True:
-                    mods.append(v[0])
-                elif self.get_pos(v[0]) in ['JJ', 'JJR', 'JJS'] and GEN_ADJ is True:
-                    mods.append(v[0])
-
-                elif self.get_pos(v[0]) in ['RB', 'RBR', 'RBS']:
-                    if GEN_ADV is True:
-                        mods.append(v[0])
-                    lemma = self.get_lemma(v[0])[:-2]
-                    if self.check_neg(lemma, LANGUAGE):
-                        print("\nNot a definite clause!")
-                        return
-
-            if gen_mask == "BASE":
-
-                print("\nmods: " + str(mods))
-                nmods = int(math.pow(2, len(mods))) - 1
-                print("\ngereralizations number: " + str(nmods) + "\n")
-
-                actual_mask = ""
-                for i in range(len(mods)):
-                    actual_mask = actual_mask + "0"
-                gen_mask = actual_mask
-
-                # creating dictionary
-                voc = {}
-                for i in range(len(mods)):
-                    if gen_mask[i] == '1':
-                        val = True
-                    else:
-                        val = False
-                    voc.update({mods[i]: val})
-
-                # triggering generalizations production
-                if len(mods) > 0 and Gen_mode is True:
-                    inc_mask = self.get_inc_mask(actual_mask)
-                    self.assert_belief(GEN_MASK(inc_mask))
-
-            elif gen_mask == "FULL":
-                # creating dictionary
-                voc = {}
-                for i in range(len(mods)):
-                    voc.update({mods[i]: True})
-
-            else:
-
-                # creating dictionary
-                voc = {}
-                full_true_voc = {}
-                for i in range(len(mods)):
-                    if gen_mask[i] == '1':
-                        val = True
-                    else:
-                        val = False
-                    voc.update({mods[i]: val})
-                    full_true_voc.update({mods[i]: True})
-
-                inc_mask = self.get_inc_mask(gen_mask)
-                if len(inc_mask) == len(gen_mask):
-                    self.assert_belief(GEN_MASK(inc_mask))
-
             print("\nPROCESSING LEFT HAND-SIDE...")
-            self.process_fol(dclause[0], "LEFT", voc)
+            self.process_fol(dclause[0], "LEFT")
 
             print("\nPROCESSING RIGHT HAND-SIDE...")
-            self.process_fol(dclause[2], "RIGHT", voc)
+            self.process_fol(dclause[2], "RIGHT")
 
         # FLAT CASES
         else:
-            mods = []
             nomain_negs = []
-            main_neg_index = 0
-            ent_root = self.get_ent_ROOT(deps)
-            dav_act = self.get_dav_rule(dclause, ent_root)
-            for v in dclause:
-                if self.get_pos(v[0]) in GEN_EXTRA_POS and GEN_EXTRA is True:
-                    mods.append(v[0])
-                elif self.get_pos(v[0]) == "IN" and GEN_PREP is True:
-                    mods.append(v[0])
-                elif (self.get_pos(v[0]) == "JJ" or self.get_pos(v[0]) == "JJS") and GEN_ADJ is True:
-                    mods.append(v[0])
-
-                if self.get_pos(v[0]) in ['RB', 'RBR', 'RBS']:
-                    lemma = self.get_lemma(v[0])[:-2]
-                    if self.check_neg(lemma, LANGUAGE):
-                        if v[1] == dav_act:
-                            self.MAIN_NEG_PRESENT = True
-                            self.assert_belief(RETRACT("ON"))
-                            main_neg_index = len(mods) - 1
-                            dclause.remove(v)
-                        else:
-                            if GEN_ADV is True:
-                                mods.append(v[0])
-                                nomain_negs.append(v)
-                    else:
-                        if GEN_ADV is True:
-                            mods.append(v[0])
-
             # every verb/adj will carry its non-main negative
             negs = {}
             for n in nomain_negs:
@@ -486,75 +363,9 @@ class preprocess_clause(Action):
                         if v not in nomain_negs:
                             negs.update({v[0]: n[0]})
 
-            # only reason
-            if gen_mask == "FULL":
-                # creating dictionary
-                voc = {}
-                for i in range(len(mods)):
-                    voc.update({mods[i]: True})
+            self.process_fol(dclause, "FLAT")
 
-            elif gen_mask == "BASE":
 
-                actual_mask = ""
-
-                if self.MAIN_NEG_PRESENT:
-                    for i in range(len(mods)):
-                        if i == main_neg_index:
-                            actual_mask = actual_mask + "0"
-                        else:
-                            actual_mask = actual_mask + "1"
-                else:
-                    for i in range(len(mods)):
-                        actual_mask = actual_mask + "0"
-
-                gen_mask = actual_mask
-
-                # creating vocabolary
-                voc = {}
-                for i in range(len(mods)):
-                    if gen_mask[i] == '1':
-                        val = True
-                    else:
-                        val = False
-                    voc.update({mods[i]: val})
-
-                # voc rectification for carrying negations, other negations = True
-                for nm in nomain_negs:
-                    voc[nm[0]] = True
-                for ng in negs:
-                    if ng in voc:
-                        voc[negs[ng]] = voc[ng]
-
-                nmods = int(math.pow(2, len(mods))) - 1
-                print("\ngereralizations number: " + str(nmods))
-
-                # triggering generalizations production
-                if len(mods) > 0 and Gen_mode and not self.MAIN_NEG_PRESENT:
-                    inc_mask = self.get_inc_mask(actual_mask)
-                    self.assert_belief(GEN_MASK(inc_mask))
-            else:
-
-                # creating vocabolary
-                voc = {}
-                for i in range(len(mods)):
-                    if gen_mask[i] == '1':
-                        val = True
-                    else:
-                        val = False
-                    voc.update({mods[i]: val})
-
-                # voc rectification for carrying negations, other negations = True
-                for nm in nomain_negs:
-                    voc[nm[0]] = True
-                for ng in negs:
-                    if ng in voc:
-                        voc[negs[ng]] = voc[ng]
-
-                inc_mask = self.get_inc_mask(gen_mask)
-                if len(inc_mask) == len(gen_mask):
-                    self.assert_belief(GEN_MASK(inc_mask))
-
-            self.process_fol(dclause, "FLAT", voc)
 
     def get_ent_ROOT(self, deps):
         for d in deps:
@@ -575,20 +386,6 @@ class preprocess_clause(Action):
                 return True
         return False
 
-    def get_inc_mask(self, n):
-        diff = str(bin(int(n, 2) + int("1", 2)))[2:]
-        delta = len(n) - len(diff)
-        for i in range(delta):
-            diff = "0" + diff
-        return diff
-
-    def get_dec_mask(self, n):
-        diff = str(bin(int(n, 2) - int("00001", 2)))[2:]
-        delta = len(n) - len(diff)
-        for i in range(delta):
-            diff = "0" + diff
-        return diff
-
     def get_nocount_lemma(self, lemma):
         lemma_nocount = ""
         total_lemma = lemma.split("_")
@@ -600,21 +397,13 @@ class preprocess_clause(Action):
                 lemma_nocount = total_lemma[i].split(':')[0][:-2] + ":" + total_lemma[i].split(':')[1] + "_" + lemma_nocount
         return lemma_nocount
 
-    def process_fol(self, vect_fol, id, voc):
-
-        print("\n------DICTIONARY------")
-        print(voc)
-        print("----------------------\n")
-
-        # actions-crossing var list
-        var_crossing = []
-        admissible_vars = ['x']
+    def process_fol(self, vect_fol, id):
 
         # prepositions
         for v in vect_fol:
             if len(v) == 3:
                 label = self.get_nocount_lemma(v[0])
-                if GEN_PREP is False or id == "LEFT":
+                if id == "LEFT":
                     if INCLUDE_PRP_POS:
                         lemma = label
                     else:
@@ -622,12 +411,8 @@ class preprocess_clause(Action):
 
                     self.assert_belief(PREP(str(id), v[1], lemma, v[2]))
                     print("PREP(" + str(id) + ", " + v[1] + ", " + lemma + ", " + v[2] + ")")
-                    if v[1] not in admissible_vars:
-                        admissible_vars.append(v[1])
-                    if v[2] not in admissible_vars:
-                        admissible_vars.append(v[2])
 
-                elif v[0] in voc and voc[v[0]] is True:
+                else:
                     if INCLUDE_PRP_POS:
                         lemma = label
                     else:
@@ -635,54 +420,20 @@ class preprocess_clause(Action):
 
                     self.assert_belief(PREP(str(id), v[1], lemma, v[2]))
                     print("PREP(" + str(id) + ", " + v[1] + ", " + lemma + ", " + v[2] + ")")
-                    if v[1] not in admissible_vars:
-                        admissible_vars.append(v[1])
-                    if v[2] not in admissible_vars:
-                        admissible_vars.append(v[2])
+
 
         # actions
         for v in vect_fol:
-            ACTION_ASSERTED = False
             if len(v) == 4:
                 label = self.get_nocount_lemma(v[0])
-                pos = self.get_pos(v[0])
                 if INCLUDE_ACT_POS:
                     lemma = label
                 else:
                     lemma = parser.get_lemma(label)
 
-                if GEN_EXTRA is True and pos in GEN_EXTRA_POS:
-                    if (v[0] in voc and voc[v[0]] is True):
-                        self.assert_belief(ACTION(str(id), lemma, v[1], v[2], v[3]))
-                        print("ACTION(" + str(id) + ", " + lemma + ", " + v[1] + ", " + v[2] + ", " + v[3] + ")")
-                        ACTION_ASSERTED = True
-                else:
-                    self.assert_belief(ACTION(str(id), lemma, v[1], v[2], v[3]))
-                    print("ACTION(" + str(id) + ", " + lemma + ", " + v[1] + ", " + v[2] + ", " + v[3] + ")")
-                    ACTION_ASSERTED = True
+                self.assert_belief(ACTION(str(id), lemma, v[1], v[2], v[3]))
+                print("ACTION(" + str(id) + ", " + lemma + ", " + v[1] + ", " + v[2] + ", " + v[3] + ")")
 
-                if ACTION_ASSERTED:
-                    # check for var action crossing
-                    if v[2] in var_crossing:
-                        self.assert_belief(ACT_CROSS_VAR(str(id), v[2], lemma))
-                        print("ACT_CROSS_VAR(" + str(id) + ")")
-                    else:
-                        if v[2] != "__":
-                            var_crossing.append(v[2])
-
-                    if v[3] in var_crossing:
-                        self.assert_belief(ACT_CROSS_VAR(str(id), v[3], lemma))
-                        print("ACT_CROSS_VAR(" + str(id) + ")")
-                    else:
-                        if v[3] != "__":
-                            var_crossing.append(v[3])
-
-                    if v[1] not in admissible_vars:
-                        admissible_vars.append(v[1])
-                    if v[2] not in admissible_vars:
-                        admissible_vars.append(v[2])
-                    if v[3] not in admissible_vars:
-                        admissible_vars.append(v[3])
 
         # nouns
         for v in vect_fol:
@@ -694,58 +445,54 @@ class preprocess_clause(Action):
                     else:
                         lemma = parser.get_lemma(label)
 
-                    if v[1] in admissible_vars:
-                        self.assert_belief(GND(str(id), v[1], lemma))
-                        print("GND(" + str(id) + ", " + v[1] + ", " + lemma + ")")
+                    self.assert_belief(GND(str(id), v[1], lemma))
+                    print("GND(" + str(id) + ", " + v[1] + ", " + lemma + ")")
 
         # adjectives, adverbs
         for v in vect_fol:
             if self.get_pos(v[0]) in ['JJ', 'JJR', 'JJS']:
                 label = self.get_nocount_lemma(v[0])
-                if GEN_ADJ is False or id == "LEFT":
-
+                if id == "LEFT":
                     if INCLUDE_ADJ_POS:
                         lemma = label
                     else:
                         lemma = parser.get_lemma(label)
 
-                    if v[1] in admissible_vars:
-                        self.assert_belief(ADJ(str(id), v[1], lemma))
-                        print("ADJ(" + str(id) + ", " + v[1] + ", " + lemma + ")")
+                    self.assert_belief(ADJ(str(id), v[1], lemma))
+                    print("ADJ(" + str(id) + ", " + v[1] + ", " + lemma + ")")
 
-                elif v[0] in voc and voc[v[0]] is True:
+                else:
                     if INCLUDE_ADJ_POS:
                         lemma = label
                     else:
                         lemma = parser.get_lemma(label)
 
-                    if v[1] in admissible_vars:
-                        self.assert_belief(ADJ(str(id), v[1], lemma))
-                        print("ADJ(" + str(id) + ", " + v[1] + ", " + lemma + ")")
+                    self.assert_belief(ADJ(str(id), v[1], lemma))
+                    print("ADJ(" + str(id) + ", " + v[1] + ", " + lemma + ")")
 
             elif self.get_pos(v[0]) in ['RB', 'RBR', 'RBS', 'RP']:
 
                 label = self.get_nocount_lemma(v[0])
 
-                if GEN_ADV is False or id == "LEFT":
+                if id == "LEFT":
                     if INCLUDE_ADV_POS:
                         lemma = label
                     else:
                         lemma = parser.get_lemma(label)
 
-                    if v[1] in admissible_vars:
-                        self.assert_belief(ADV(str(id), v[1], lemma))
-                        print("ADV(" + str(id) + ", " + v[1] + ", " + lemma + ")")
+                    self.assert_belief(ADV(str(id), v[1], lemma))
+                    print("ADV(" + str(id) + ", " + v[1] + ", " + lemma + ")")
 
-                elif v[0] in voc and voc[v[0]] is True:
+                else:
                     if INCLUDE_ADV_POS:
                         lemma = label
                     else:
                         lemma = parser.get_lemma(label)
 
-                    if v[1] in admissible_vars:
-                        self.assert_belief(ADV(str(id), v[1], lemma))
-                        print("ADV(" + str(id) + ", " + v[1] + ", " + lemma + ")")
+                    self.assert_belief(ADV(str(id), v[1], lemma))
+                    print("ADV(" + str(id) + ", " + v[1] + ", " + lemma + ")")
+
+
 
     def get_pos(self, s):
         first = s.split('_')[0]
@@ -765,13 +512,6 @@ class retract_clause(Action):
 
     def execute(self, *args):
         sentence = args[0]()
-        mf = parser.morph(sentence)
-        print("\n" + mf)
-
-        def_clause = expr(mf)
-
-        if def_clause in kb_fol.clauses:
-            kb_fol.retract(def_clause)
 
 
 class new_clause(Action):
@@ -780,10 +520,7 @@ class new_clause(Action):
     def execute(self, *args):
         sentence = args[0]()
 
-        mf = parser.morph(sentence)
-        print("\n", mf)
-        def_clause = expr(mf)
-        kb_fol.nested_tell(def_clause)
+
 
 
 class reason(Action):
@@ -792,29 +529,7 @@ class reason(Action):
     def execute(self, *args):
         definite_clause = args[0]()
 
-        q = parser.morph(definite_clause)
-        print("Query: " + q)
-        print("OCCUR_CHECK: ", exec_occur_check)
 
-        bc_result = kb_fol.ask(expr(q))
-        print("\n ---- NOMINAL REASONING ---\n")
-        print("Result: " + str(bc_result))
-        print("Backward-Chaining Query time: ", parser.get_comp_time())
-
-        if bc_result is not False:
-            self.assert_belief(ANSWER("True, by nominal reasoning"))
-        else:
-
-            print("\n\n ---- NESTED REASONING ---")
-            candidates = []
-
-            nested_result = kb_fol.nested_ask(expr(q), candidates)
-            print("\nResult: ", nested_result)
-
-            if nested_result is False:
-                self.assert_belief(ANSWER("False, by nominal and nested reasoning"))
-            else:
-                self.assert_belief(ANSWER("True, by nested reasoning"))
 
 
 
@@ -1594,19 +1309,6 @@ class feed_precross(Action):
         self.assert_belief(PRE_CROSS(id, precross_dav, new_precross_arg))
 
 
-class show_fol_kb(Action):
-    """Show Clauses KB"""
-    def execute(self):
-        print("\n" + str(len(kb_fol.clauses)) + " clauses in Clauses KB:\n")
-        for cls in kb_fol.clauses:
-            print(cls)
-
-
-class clear_clauses_kb(Action):
-    """Clear Clauses KB"""
-    def execute(self):
-        print("\nClauses KB initialized.")
-        kb_fol.clauses = []
 
 
 

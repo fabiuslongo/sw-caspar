@@ -1,6 +1,5 @@
 from phidias.Lib import *
 from actions import *
-
 from sensors import *
 
 
@@ -34,10 +33,7 @@ q() >> [+QUERY("The Colonel West is a criminal")]
 # Start agent command
 go() >> [show_line("Starting Caspar..."), set_wait(), HotwordDetect().start, say("system ready")]
 
-# show Clauses kb
-s() >> [show_fol_kb()]
-# initialize Clauses Kb
-c() >> [clear_clauses_kb()]
+
 
 # Azure
 #l() >> [+STT("Listen.")]
@@ -51,8 +47,8 @@ s2() >> [simulate_sensor("Be", "Temperature", "25")]
 # testing rules
 +FEED(X) >> [reset_ct(), parse_rules(X, "DISOK"), parse_deps(), feed_mst(), +PROCESS_STORED_MST("OK"), log("Feed",X), show_ct(), +LISTEN("TEST")]
 +QUERY(X) >> [reset_ct(), parse_rules(X, "DISOK"), parse_deps(), feed_mst(), +PROCESS_STORED_MST("OK"), log("Query",X), show_ct(), +REASON("TEST")]
-+PROCESS_STORED_MST("OK") / LISTEN("TEST") >> [show_line("\nGot it.\n"), +GEN_MASK("BASE"), new_def_clause("MORE", "NOMINAL"), process_rule(), -LISTEN("TEST")]
-+PROCESS_STORED_MST("OK") / REASON("TEST") >> [show_line("\nGot it.\n"), +GEN_MASK("FULL"), new_def_clause("ONE", "NOMINAL"), -REASON("TEST")]
++PROCESS_STORED_MST("OK") / LISTEN("TEST") >> [show_line("\nGot it.\n"), +GEN_MASK("BASE"), create_onto("NOMINAL"), process_rule(), -LISTEN("TEST")]
++PROCESS_STORED_MST("OK") / REASON("TEST") >> [show_line("\nGot it.\n"), +GEN_MASK("FULL"), create_onto("NOMINAL"), -REASON("TEST")]
 
 
 # Hotwords processing
@@ -74,22 +70,21 @@ s2() >> [simulate_sensor("Be", "Temperature", "25")]
 +ANSWER(X) / (WAKE("ON")) >> [UtteranceDetect().stop, say(X), UtteranceDetect().start]
 
 # Query KB
-+PROCESS_STORED_MST("OK") / (WAKE("ON") & REASON("ON")) >> [show_line("\nGot it.\n"), +GEN_MASK("FULL"), new_def_clause("ONE", "NOMINAL")]
++PROCESS_STORED_MST("OK") / (WAKE("ON") & REASON("ON")) >> [show_line("\nGot it.\n"), create_onto("NOMINAL")]
 
-# Nominal clauses assertion --> single: FULL", "ONE" ---  multiple: "BASE", "MORE"
-+PROCESS_STORED_MST("OK") / (WAKE("ON") & LISTEN("ON")) >> [show_line("\nGot it.\n"), +GEN_MASK("BASE"), new_def_clause("MORE", "NOMINAL"), process_rule()]
-# processing rules --> single: FULL", "ONE" ---  multiple: "BASE", "MORE"
-process_rule() / IS_RULE("TRUE") >> [show_line("\n------> rule detected!\n"), -IS_RULE("TRUE"), +GEN_MASK("BASE"), new_def_clause("MORE", "RULE")]
+# Nominal ontology assertion --> single: FULL", "ONE" ---  multiple: "BASE", "MORE"
++PROCESS_STORED_MST("OK") / (WAKE("ON") & LISTEN("ON")) >> [show_line("\nGot it.\n"), +GEN_MASK("BASE"), create_onto("NOMINAL"), process_rule()]
+# processing rule
+process_rule() / IS_RULE("TRUE") >> [show_line("\n------> rule detected!\n"), -IS_RULE("TRUE"), create_onto("RULE")]
 
-# Generalization assertion
-new_def_clause(M, T) / GEN_MASK("BASE") >> [-GEN_MASK("BASE"), preprocess_clause("BASE", M, T), parse(), process_clause(), new_def_clause(M, T)]
-new_def_clause(M, T) / GEN_MASK(Y) >> [-GEN_MASK(Y), preprocess_clause(Y, M, T), parse(), process_clause(), new_def_clause(M, T)]
-new_def_clause(M, T) / WAIT(W) >> [show_line("\n------------- Done.\n"), Timer(W).start]
+# Ontology creation
+create_onto(T) >> [preprocess_onto(T), process_onto(), show_line("\n------------- Done.\n"), Timer(W).start]
+
 
 
 # Reactive Reasoning
-+STT(X) / WAKE("ON") >> [reset_ct(), UtteranceDetect().stop, -WAKE("ON"), show_line("\nProcessing domotic command...\n"), parse_rules(X, "NODIS"), parse_deps(), feed_mst(), assert_command(X), parse_command(), parse_routine(), HotwordDetect().start]
-+STT(X) / WAKE("TEST") >> [reset_ct(), -WAKE("TEST"), show_line("\nProcessing domotic command...\n"), parse_rules(X, "NODIS"), parse_deps(), feed_mst(), assert_command(X), parse_command(), parse_routine()]
++STT(X) / WAKE("ON") >> [reset_ct(), UtteranceDetect().stop, -WAKE("ON"), show_line("\nProcessing domotic command...\n"), parse_rules(X, "NODIS"), parse_deps(), feed_mst(), assert_command(X), parse_command(), parse_routine(), log("Command",X), HotwordDetect().start]
++STT(X) / WAKE("TEST") >> [reset_ct(), -WAKE("TEST"), show_line("\nProcessing domotic command...\n"), parse_rules(X, "NODIS"), parse_deps(), feed_mst(), assert_command(X), parse_command(), parse_routine(), log("Command (offline)",X)]
 
 +TIMEOUT("ON") / (WAKE("ON") & LISTEN("ON") & REASON("ON")) >> [show_line("\nReturning to idle state...\n"), -WAKE("ON"), -LISTEN("ON"), -REASON("ON"), UtteranceDetect().stop, HotwordDetect().start]
 +TIMEOUT("ON") / (WAKE("ON") & REASON("ON")) >> [show_line("\nReturning to idle state...\n"), -REASON("ON"), -WAKE("ON"), UtteranceDetect().stop, HotwordDetect().start]
