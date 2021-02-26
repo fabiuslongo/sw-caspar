@@ -9,8 +9,45 @@ from difflib import SequenceMatcher
 import pyttsx3
 import winsound
 import itertools
-from owlready2 import *
 from datetime import datetime
+
+
+from owlready2 import *
+
+try:
+    my_onto = get_ontology("west.owl").load()
+except IOError:
+    my_onto = get_ontology("http://test/west.owl")
+
+
+
+with my_onto:
+ class Verb(Thing):
+     pass
+
+ class Adjective(Thing):
+       pass
+
+ class Entity(Thing):
+     pass
+
+ class Preposition(Thing):
+       pass
+
+ class hasAdj(ObjectProperty):
+      pass
+
+ class hasObject(ObjectProperty):
+      pass
+
+ class hasSubject(ObjectProperty):
+      pass
+
+ class hasPrep(ObjectProperty):
+      pass
+
+my_onto.save(file="west.owl", format="rdfxml")
+
 
 
 config = configparser.ConfigParser()
@@ -42,6 +79,7 @@ m = ManageFols(VERBOSE, LANGUAGE)
 class create_onto(Procedure): pass
 class process_rule(Procedure): pass
 class process_onto(Procedure): pass
+class create_ent(Procedure): pass
 
 # Reactive procedures - direct commands
 class parse_command(Procedure): pass
@@ -145,12 +183,6 @@ class LEFT_CLAUSE(Belief): pass
 class DEF_CLAUSE(Belief): pass
 # remain
 class REMAIN(Belief): pass
-# preposition accumlator
-class PRE_CROSS(Belief): pass
-# Modificators number
-class GEN_MASK(Belief): pass
-# Actions crossing var
-class ACT_CROSS_VAR(Belief): pass
 
 # parse rule beliefs
 class DEP(Belief): pass
@@ -220,7 +252,7 @@ class set_wait(Action):
         self.assert_belief(WAIT(WAIT_TIME))
         if LOG_ACTIVE:
             with open("log.txt", "a") as myfile:
-                myfile.write("\n\n------ NEW SESSION ------ "+str(datetime.now().strftime("%d/%m/%Y %H:%M:%S")))
+                myfile.write("\n\n------ NEW SESSION ------ "+str(datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")))
 
 
 class eval_cls(ActiveBelief):
@@ -521,16 +553,11 @@ class new_clause(Action):
         sentence = args[0]()
 
 
-
-
 class reason(Action):
     """Query the Clauses KB with Backward-Chaining, and if it fails with Nested Reasoning"""
 
     def execute(self, *args):
         definite_clause = args[0]()
-
-
-
 
 
 class assert_command(Action):
@@ -843,55 +870,6 @@ class simulate_sensor(Action):
 # ---------------------- Definite Clauses Builder section
 
 
-class join_clauses(Action):
-    """Merging two definite clauses driven by subj-obj in one definite clause"""
-    def execute(self, arg1, arg2, arg3, arg4):
-        clause1 = str(arg1).split("'")[3]
-        clause2 = str(arg2).split("'")[3]
-        verb = str(arg3).split("'")[3]
-        common_var = str(arg4).split("'")[3]
-
-        print("\nclause1: ", clause1)
-        print("clause2: ", clause2)
-        print("verb: ", verb)
-        print("common_var: ", common_var)
-
-        match = SequenceMatcher(None, clause1, clause2).find_longest_match(0, len(clause1), 0, len(clause2))
-        common = clause1[match.a: match.a + match.size]
-
-        print("match: ", match)
-        print("common: ", common)
-
-        while common[0] == "(" or common[0] == ")" or common[0] == "," or common[0] == " ":
-            common = common[1:]
-
-        num_par_open = common.count("(")
-        print("num_par_open: ", num_par_open)
-        num_par_closed = common.count(")")
-        print("num_par_closed: ", num_par_closed)
-
-        while common[-1] != ")":
-            common = common[:len(common) - 1]
-
-        print("common cleaned: ", common)
-
-        while num_par_open < num_par_closed:
-            common = common[:len(common) - 1]
-            num_par_open = common.count("(")
-            num_par_closed = common.count(")")
-
-        print("common fixed: ", common)
-
-        if str(clause1).find(verb) == -1:
-            new_clause = clause1.replace(common, clause2)
-        else:
-            new_clause = clause2.replace(common, clause1)
-
-        print(new_clause)
-
-        self.assert_belief(DEF_CLAUSE(new_clause))
-
-
 class aggregate(Action):
     """join a couple of advectives (or adverbs) beliefs in one"""
     def execute(self, arg0, arg1, arg2, arg3, arg4):
@@ -1173,50 +1151,6 @@ class conjunct_left_clauses(Action):
         self.assert_belief(LEFT_CLAUSE(clauses_conjunction))
 
 
-class create_remain(Action):
-    """Creating a remain belief"""
-    def execute(self, arg1, arg2, arg3):
-
-        id = str(arg1).split("'")[3]
-        var = str(arg2).split("'")[3]
-        label = str(arg3).split("'")[3]
-
-        pn_label = self.get_par_number(label)
-
-        t = label.split(" ")
-        if len(t) > 1:
-            token1 = t[0][:-1]  # first token, without comma
-
-            pn_token1 = self.get_par_number(token1)  # first token right-parentesys number
-
-            if pn_token1 == 0:
-                token1 = token1 + "(" + var + ")"
-            else:
-                token1 = token1[:-pn_token1] + "(" + var + ")"
-
-            for i in range(pn_token1):
-                token1 = token1 + ")"
-
-            new_label = token1 + ", " + t[1][:-pn_label]
-
-        else:
-            if pn_label == 0:
-                new_label = label + "(" + var + ")"
-            else:
-                new_label = label[:-pn_label] + "(" + var + ")"
-
-        for i in range(pn_label):
-            new_label = new_label + ")"
-
-        self.assert_belief(REMAIN(id, new_label))
-
-    def get_par_number(self, s):
-        count = 0
-        while (s[len(s) - (count + 1)] == ")"):
-            count = count + 1
-        return count
-
-
 class no_dav(ActiveBelief):
     """Check for davidsonian variable"""
     def evaluate(self, x):
@@ -1262,51 +1196,21 @@ class merge_act(Action):
         return count
 
 
-class create_precross(Action):
-    """Creating a precross belief"""
-    def execute(self, arg1, arg2, arg3, arg4, arg5, arg6, arg7):
-
-        id = str(arg1).split("'")[3]
-        verb_act_merged = str(arg2).split("'")[3]
-        dav_act_merged = str(arg3).split("'")[3]
-        subj_act_merged = str(arg4).split("'")[3]
-        obj_act_merged = str(arg5).split("'")[3]
-
-        prep_label = str(arg6).split("'")[3]
-        prep_obj = str(arg7).split("'")[3]
-
-        pn_label = self.get_par_number(verb_act_merged)
-
-        if pn_label > 0:
-            act_merged = prep_label + "(" + verb_act_merged[:-pn_label] + "(" + subj_act_merged + ", " + obj_act_merged + ")"
-        else:
-            act_merged = prep_label + "(" + verb_act_merged + "(" + subj_act_merged + ", " + obj_act_merged + ")"
-
-        for i in range(pn_label):
-            act_merged = act_merged + ")"
-        act_merged = act_merged + ", " + prep_obj + ")"
-
-        self.assert_belief(PRE_CROSS(id, dav_act_merged, act_merged))
-
-    def get_par_number(self, s):
-        count = 0
-        while (s[len(s) - (count + 1)] == ")"):
-            count = count + 1
-        return count
+# ---------------------- Ontology creation Section
 
 
-class feed_precross(Action):
-    """Creating a precross belief"""
-    def execute(self, arg1, arg2, arg3, arg4, arg5):
-        id = str(arg1).split("'")[3]
-        precross_dav = str(arg2).split("'")[3]
-        precross_arg = str(arg3).split("'")[3]
-        prep_label = str(arg4).split("'")[3]
-        prep_obj = str(arg5).split("'")[3]
+class createSubEntity(Action):
+    """Creating a subclass of the class Entity"""
+    def execute(self, arg):
 
-        new_precross_arg = prep_label + "(" + precross_arg + ", " + prep_obj + ")"
+        ent = str(arg).split("'")[3]
+        print(arg)
 
-        self.assert_belief(PRE_CROSS(id, precross_dav, new_precross_arg))
+        with my_onto:
+            types.new_class(ent, (Entity,))
+        my_onto.save(file="west.owl", format="rdfxml")
+
+
 
 
 

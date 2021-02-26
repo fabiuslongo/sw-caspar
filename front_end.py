@@ -47,8 +47,8 @@ s2() >> [simulate_sensor("Be", "Temperature", "25")]
 # testing rules
 +FEED(X) >> [reset_ct(), parse_rules(X, "DISOK"), parse_deps(), feed_mst(), +PROCESS_STORED_MST("OK"), log("Feed",X), show_ct(), +LISTEN("TEST")]
 +QUERY(X) >> [reset_ct(), parse_rules(X, "DISOK"), parse_deps(), feed_mst(), +PROCESS_STORED_MST("OK"), log("Query",X), show_ct(), +REASON("TEST")]
-+PROCESS_STORED_MST("OK") / LISTEN("TEST") >> [show_line("\nGot it.\n"), +GEN_MASK("BASE"), create_onto("NOMINAL"), process_rule(), -LISTEN("TEST")]
-+PROCESS_STORED_MST("OK") / REASON("TEST") >> [show_line("\nGot it.\n"), +GEN_MASK("FULL"), create_onto("NOMINAL"), -REASON("TEST")]
++PROCESS_STORED_MST("OK") / LISTEN("TEST") >> [show_line("\nGot it.\n"), create_onto("NOMINAL"), process_rule(), -LISTEN("TEST")]
++PROCESS_STORED_MST("OK") / REASON("TEST") >> [show_line("\nGot it.\n"), create_onto("NOMINAL"), -REASON("TEST")]
 
 
 # Hotwords processing
@@ -73,7 +73,7 @@ s2() >> [simulate_sensor("Be", "Temperature", "25")]
 +PROCESS_STORED_MST("OK") / (WAKE("ON") & REASON("ON")) >> [show_line("\nGot it.\n"), create_onto("NOMINAL")]
 
 # Nominal ontology assertion --> single: FULL", "ONE" ---  multiple: "BASE", "MORE"
-+PROCESS_STORED_MST("OK") / (WAKE("ON") & LISTEN("ON")) >> [show_line("\nGot it.\n"), +GEN_MASK("BASE"), create_onto("NOMINAL"), process_rule()]
++PROCESS_STORED_MST("OK") / (WAKE("ON") & LISTEN("ON")) >> [show_line("\nGot it.\n"), create_onto("NOMINAL"), process_rule()]
 # processing rule
 process_rule() / IS_RULE("TRUE") >> [show_line("\n------> rule detected!\n"), -IS_RULE("TRUE"), create_onto("RULE")]
 
