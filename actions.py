@@ -80,6 +80,8 @@ class create_onto(Procedure): pass
 class process_rule(Procedure): pass
 class process_onto(Procedure): pass
 class create_ent(Procedure): pass
+class create_adj(Procedure): pass
+
 
 # Reactive procedures - direct commands
 class parse_command(Procedure): pass
@@ -1204,13 +1206,21 @@ class createSubEntity(Action):
     def execute(self, arg):
 
         ent = str(arg).split("'")[3]
-        print(arg)
+        print(ent)
 
-        with my_onto:
-            types.new_class(ent, (Entity,))
+        types.new_class(ent, (Entity,))
         my_onto.save(file="west.owl", format="rdfxml")
 
 
+class createSubAdj(Action):
+    """Creating a subclass of the class Entity"""
+    def execute(self, arg):
+
+        ent = str(arg).split("'")[3]
+        print(ent)
+
+        types.new_class(ent, (Adjective,))
+        my_onto.save(file="west.owl", format="rdfxml")
 
 
 
