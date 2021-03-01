@@ -81,6 +81,8 @@ class process_rule(Procedure): pass
 class process_onto(Procedure): pass
 class create_ent(Procedure): pass
 class create_adj(Procedure): pass
+class create_verb(Procedure): pass
+class aggr_ent(Procedure): pass
 
 
 # Reactive procedures - direct commands
@@ -1201,26 +1203,56 @@ class merge_act(Action):
 # ---------------------- Ontology creation Section
 
 
+
+class aggrEntity(Action):
+    """aggregate two entity beliefs in one"""
+    def execute(self, arg1, arg2, arg3, arg4):
+
+        id = str(arg1).split("'")[3]
+        var = str(arg2).split("'")[3]
+        label1 = str(arg3).split("'")[3]
+        label2 = str(arg4).split("'")[3]
+
+        conc_label = label1 + "_" + label2
+        self.assert_belief(GND(id, var, conc_label))
+
+
+
 class createSubEntity(Action):
     """Creating a subclass of the class Entity"""
     def execute(self, arg):
 
         ent = str(arg).split("'")[3]
         print(ent)
-
         types.new_class(ent, (Entity,))
-        my_onto.save(file="west.owl", format="rdfxml")
 
 
 class createSubAdj(Action):
-    """Creating a subclass of the class Entity"""
+    """Creating a subclass of the class Adjective"""
+    def execute(self, arg):
+
+        ent = str(arg).split("'")[3]
+        print(ent)
+        types.new_class(ent, (Adjective,))
+
+
+class createSubVerb(Action):
+    """Creating a subclass of the class Verb"""
     def execute(self, arg):
 
         ent = str(arg).split("'")[3]
         print(ent)
 
-        types.new_class(ent, (Adjective,))
+        types.new_class(ent, (Verb,))
+
+
+class saveOnto(Action):
+    """Creating a subclass of the class Verb"""
+    def execute(self):
+
         my_onto.save(file="west.owl", format="rdfxml")
+
+
 
 
 
