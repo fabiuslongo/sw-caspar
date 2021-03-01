@@ -5,7 +5,7 @@ from actions import *
 
 # ONTOLOGY BUILDER
 
-process_onto() >> [aggr_ent(), create_ent(), create_adj(), create_verb(), saveOnto()]
+process_onto() >> [aggr_ent(), create_ent(), create_adj(), create_prep(), create_verb(), saveOnto()]
 
 """
 parse() >> [aggr_adj(), aggr_adv(), aggr_nouns(), mod_to_gnd(), gnd_prep_obj(), prep_to_gnd(), gnd_actions(), apply_adv(), actions_to_clauses(), finalize_gnd()]
@@ -23,6 +23,9 @@ create_ent() >> [show_line("\nentity creation done.")]
 
 create_adj() / ADJ("FLAT", X, Y) >> [show_line("\ncreating adjective: ", Y), -ADJ("FLAT", X, Y), createSubAdj(Y), create_adj()]
 create_adj() >> [show_line("\nadjective creation done.")]
+
+create_prep() / PREP("FLAT", X, Y, Z) >> [show_line("\ncreating prep: ", Y), -PREP("FLAT", X, Y, Z), createSubPrep(Y), create_prep()]
+create_prep() >> [show_line("\nprep creation done.")]
 
 create_verb() / ACTION("FLAT", X, Y, Z, W) >> [show_line("\ncreating verb: ", X), -ACTION("FLAT", X, Y, Z, W), createSubVerb(X), create_verb()]
 create_verb() >> [show_line("\nverb creation done.")]

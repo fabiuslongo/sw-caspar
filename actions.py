@@ -82,6 +82,7 @@ class process_onto(Procedure): pass
 class create_ent(Procedure): pass
 class create_adj(Procedure): pass
 class create_verb(Procedure): pass
+class create_prep(Procedure): pass
 class aggr_ent(Procedure): pass
 
 
@@ -1244,6 +1245,16 @@ class createSubVerb(Action):
         print(ent)
 
         types.new_class(ent, (Verb,))
+
+
+class createSubPrep(Action):
+    """Creating a subclass of the class Verb"""
+    def execute(self, arg):
+
+        ent = str(arg).split("'")[3]
+        print(ent)
+
+        types.new_class(ent, (Preposition,))
 
 
 class saveOnto(Action):
