@@ -1214,7 +1214,7 @@ class aggrEntity(Action):
         label1 = str(arg3).split("'")[3]
         label2 = str(arg4).split("'")[3]
 
-        conc_label = label1 + "_" + label2
+        conc_label = label2 + "_" + label1
         self.assert_belief(GND(id, var, conc_label))
 
 
@@ -1225,26 +1225,90 @@ class createSubEntity(Action):
 
         ent = str(arg).split("'")[3]
         print(ent)
-        types.new_class(ent, (Entity,))
+        new_sub = types.new_class(ent, (Entity,))
+        new_sub(self.clean_from_POS(ent))
+
+    def clean_from_POS(self, ent):
+
+        pre_clean = ent.split("_")
+        cleaned = []
+        for s in pre_clean:
+            cleaned.append(s.split(":")[0])
+
+        cleaned = "_".join(cleaned)
+        return cleaned
 
 
-class createSubAdj(Action):
-    """Creating a subclass of the class Adjective"""
-    def execute(self, arg):
 
-        ent = str(arg).split("'")[3]
-        print(ent)
-        types.new_class(ent, (Adjective,))
+class applyAdj(Action):
+    """create an entity and apply an adj to it"""
+    def execute(self, arg1, arg2):
+
+        adj_str = str(arg1).split("'")[3]
+        print(adj_str)
+        # subclass
+        adj = types.new_class(adj_str, (Adjective,))
+        # adjective individual
+        new_adj_ind = adj(self.clean_from_POS(adj_str))
+
+        ent_str = str(arg2).split("'")[3]
+        print(ent_str)
+        # subclass
+        new_sub = types.new_class(ent_str, (Entity,))
+
+        # entity individual
+        new_ind = new_sub(self.clean_from_POS(ent_str))
+
+        # individual entity - hasAdj - adjective individual
+        new_ind.hasAdj = [new_adj_ind]
+
+    def clean_from_POS(self, ent):
+        pre_clean = ent.split("_")
+        cleaned = []
+        for s in pre_clean:
+            cleaned.append(s.split(":")[0])
+
+        cleaned = "_".join(cleaned)
+        return cleaned
+
 
 
 class createSubVerb(Action):
     """Creating a subclass of the class Verb"""
-    def execute(self, arg):
+    def execute(self, arg1, arg2, arg3):
 
-        ent = str(arg).split("'")[3]
-        print(ent)
+        verb_str = str(arg1).split("'")[3]
+        print(verb_str)
+        subj_str = str(arg2).split("'")[3]
+        print(subj_str)
+        obj_str = str(arg3).split("'")[3]
+        print(obj_str)
 
-        types.new_class(ent, (Verb,))
+        # subclasses
+        new_sub_verb = types.new_class(verb_str, (Verb,))
+        new_sub_subj = types.new_class(subj_str, (Entity,))
+        new_sub_obj = types.new_class(obj_str, (Entity,))
+
+        # entities individual
+        new_ind_verb = new_sub_verb(self.clean_from_POS(verb_str))
+        new_ind_subj = new_sub_subj(self.clean_from_POS(subj_str))
+        new_ind_obj = new_sub_obj(self.clean_from_POS(obj_str))
+
+        # individual entity - hasSubject - subject individual
+        new_ind_verb.hasSubject = [new_ind_subj]
+        # individual entity - hasObject - Object individual
+        new_ind_verb.hasObject = [new_ind_obj]
+
+
+
+    def clean_from_POS(self, ent):
+        pre_clean = ent.split("_")
+        cleaned = []
+        for s in pre_clean:
+            cleaned.append(s.split(":")[0])
+
+        cleaned = "_".join(cleaned)
+        return cleaned
 
 
 class createSubPrep(Action):

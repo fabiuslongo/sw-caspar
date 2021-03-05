@@ -82,6 +82,9 @@ with my_onto:
 
     print("\nIndividuals list:\n")
 
+    for i in my_obj:
+        print(i)
+
 
     print("\nAssertions list:\n")
 
