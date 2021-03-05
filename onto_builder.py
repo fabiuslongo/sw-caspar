@@ -15,14 +15,15 @@ aggr_adj() / (ADJ(I, X, L) & ADJ(I, X, M) & neq(L, M)) >> [show_line("\naggregat
 aggr_adj() / ADJ(I, X, L) >> [show_line("\nAdjectives aggregation done")]
 """
 
+
 aggr_ent() / (GND(X, Y, Z) & GND(X, Y, K) & neq(Z, K)) >> [show_line("\naggregating entity: ", Y), -GND(X, Y, Z), -GND(X, Y, K), aggrEntity(X, Y, Z, K), aggr_ent()]
 aggr_ent() >> [show_line("\nentities aggregation done.")]
 
+create_adj() / (ADJ("FLAT", X, Y) & GND("FLAT", S, Y)) >> [show_line("\ncreating entity+adjective: ", Y), -ADJ("FLAT", X, Y), createSubAdj(Y), create_adj()]
+create_adj() >> [show_line("\nadjective creation done.")]
+
 create_ent() / GND("FLAT", X, Y) >> [show_line("\ncreating entity: ", Y), -GND("FLAT", X, Y), createSubEntity(Y), create_ent()]
 create_ent() >> [show_line("\nentity creation done.")]
-
-create_adj() / ADJ("FLAT", X, Y) >> [show_line("\ncreating adjective: ", Y), -ADJ("FLAT", X, Y), createSubAdj(Y), create_adj()]
-create_adj() >> [show_line("\nadjective creation done.")]
 
 create_prep() / PREP("FLAT", X, Y, Z) >> [show_line("\ncreating prep: ", Y), -PREP("FLAT", X, Y, Z), createSubPrep(Y), create_prep()]
 create_prep() >> [show_line("\nprep creation done.")]
