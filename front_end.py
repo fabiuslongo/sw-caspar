@@ -78,7 +78,7 @@ s2() >> [simulate_sensor("Be", "Temperature", "25")]
 process_rule() / IS_RULE("TRUE") >> [show_line("\n------> rule detected!\n"), -IS_RULE("TRUE"), create_onto("RULE")]
 
 # Ontology creation
-create_onto(T) >> [preprocess_onto(T), genID(), process_onto(), show_line("\n------------- Done.\n"), Timer(W).start]
+create_onto(T) >> [preprocess_onto(T), InitOnto(), process_onto(), show_line("\n------------- Done.\n"), Timer(W).start]
 
 
 

@@ -86,6 +86,7 @@ class create_adj(Procedure): pass
 class create_verb(Procedure): pass
 class create_prep(Procedure): pass
 class aggr_ent(Procedure): pass
+class create_rule(Procedure): pass
 
 
 # Reactive procedures - direct commands
@@ -186,6 +187,8 @@ class ADV(Belief): pass
 class ADJ(Belief): pass
 # id individual
 class ID(Belief): pass
+# rule accumulator
+class RULE(Belief): pass
 
 
 # left clause
@@ -1230,17 +1233,17 @@ class createSubEntity(Action):
     def execute(self, arg1, arg2):
 
         id_str = str(arg1).split("'")[3]
-        ent = str(arg2).split("'")[3]
-        print(ent)
+        ent = str(arg2).split("'")[3].replace(":", "-")
         new_sub = types.new_class(ent, (Entity,))
         new_sub(self.clean_from_POS(ent)+"."+id_str)
+        print(new_sub)
 
     def clean_from_POS(self, ent):
 
         pre_clean = ent.split("_")
         cleaned = []
         for s in pre_clean:
-            cleaned.append(s.split(":")[0])
+            cleaned.append(s.split("-")[0])
 
         cleaned = "_".join(cleaned)
         return cleaned
@@ -1254,14 +1257,14 @@ class applyAdj(Action):
         id_str = str(arg1).split("'")[3]
         print(id_str)
 
-        adj_str = str(arg2).split("'")[3]
+        adj_str = str(arg2).split("'")[3].replace(":", "-")
         print(adj_str)
         # creating subclass adjective
         adj = types.new_class(adj_str, (Adjective,))
         # adjective individual
         new_adj_ind = adj(self.clean_from_POS(adj_str)+"."+id_str)
 
-        ent_str = str(arg3).split("'")[3]
+        ent_str = str(arg3).split("'")[3].replace(":", "-")
         print(ent_str)
 
         # creating subclass entity
@@ -1276,7 +1279,7 @@ class applyAdj(Action):
         pre_clean = ent.split("_")
         cleaned = []
         for s in pre_clean:
-            cleaned.append(s.split(":")[0])
+            cleaned.append(s.split("-")[0])
 
         cleaned = "_".join(cleaned)
         return cleaned
@@ -1289,11 +1292,11 @@ class createSubVerb(Action):
 
         id_str = str(arg1).split("'")[3]
         print(id_str)
-        verb_str = str(arg2).split("'")[3]
+        verb_str = str(arg2).split("'")[3].replace(":", "-")
         print(verb_str)
-        subj_str = str(arg3).split("'")[3]
+        subj_str = str(arg3).split("'")[3].replace(":", "-")
         print(subj_str)
-        obj_str = str(arg4).split("'")[3]
+        obj_str = str(arg4).split("'")[3].replace(":", "-")
         print(obj_str)
 
 
@@ -1318,7 +1321,7 @@ class createSubVerb(Action):
         pre_clean = ent.split("_")
         cleaned = []
         for s in pre_clean:
-            cleaned.append(s.split(":")[0])
+            cleaned.append(s.split("-")[0])
 
         cleaned = "_".join(cleaned)
         return cleaned
@@ -1328,7 +1331,7 @@ class createSubPrep(Action):
     """Creating a subclass of the class Verb"""
     def execute(self, arg):
 
-        ent = str(arg).split("'")[3]
+        ent = str(arg).split("'")[3].replace(":", "-")
         print(ent)
 
         types.new_class(ent, (Preposition,))
@@ -1341,7 +1344,7 @@ class saveOnto(Action):
         my_onto.save(file="west.owl", format="rdfxml")
 
 
-class genID(Action):
+class InitOnto(Action):
     """Generating sentence id individual"""
     def execute(self):
 
@@ -1349,6 +1352,8 @@ class genID(Action):
         id_ind = str(dateTimeObj.microsecond)
 
         self.assert_belief(ID(id_ind))
+        self.assert_belief(RULE(""))
+
 
 
 
