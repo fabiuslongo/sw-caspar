@@ -2,8 +2,10 @@ from owlready2 import *
 
 try:
     my_onto = get_ontology("west.owl").load()
+    print("\nLoading existing owl...")
 except IOError:
     my_onto = get_ontology("http://test/west.owl")
+    print("\nCreating new owl...")
 
 
 
@@ -126,6 +128,7 @@ with my_onto:
   pass
 
 
+
 print("SPARQL")
 
 my_world = owlready2.World()
@@ -133,13 +136,13 @@ my_world.get_ontology("west.owl").load()  # path to the owl file is given here
 
 graph = my_world.as_rdflib_graph()
 
-result = list(graph.query("""Select ?p WHERE {<http://test/west.owl#Colonel_West> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?p .}"""))
+result = list(graph.query("""Select ?p WHERE {<http://test/west.owl#Colonel_West_NNP> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?p .}"""))
+
 for i in result:
     print(i)
 
 result = list(graph.query("ASK WHERE {<http://test/west.owl#Colonel_West> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test/west.owl#Criminal_NN>.}"))
 print(result)
-
 
 
 

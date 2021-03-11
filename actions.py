@@ -16,8 +16,10 @@ from owlready2 import *
 
 try:
     my_onto = get_ontology("west.owl").load()
+    print("\nLoading existing owl...")
 except IOError:
     my_onto = get_ontology("http://test/west.owl")
+    print("\nCreating new owl...")
 
 
 
@@ -182,6 +184,10 @@ class GND(Belief): pass
 class ADV(Belief): pass
 # adjective
 class ADJ(Belief): pass
+# id individual
+class ID(Belief): pass
+
+
 # left clause
 class LEFT_CLAUSE(Belief): pass
 # definite clause
@@ -1221,12 +1227,13 @@ class aggrEntity(Action):
 
 class createSubEntity(Action):
     """Creating a subclass of the class Entity"""
-    def execute(self, arg):
+    def execute(self, arg1, arg2):
 
-        ent = str(arg).split("'")[3]
+        id_str = str(arg1).split("'")[3]
+        ent = str(arg2).split("'")[3]
         print(ent)
         new_sub = types.new_class(ent, (Entity,))
-        new_sub(self.clean_from_POS(ent))
+        new_sub(self.clean_from_POS(ent)+"."+id_str)
 
     def clean_from_POS(self, ent):
 
@@ -1242,22 +1249,25 @@ class createSubEntity(Action):
 
 class applyAdj(Action):
     """create an entity and apply an adj to it"""
-    def execute(self, arg1, arg2):
+    def execute(self, arg1, arg2, arg3):
 
-        adj_str = str(arg1).split("'")[3]
+        id_str = str(arg1).split("'")[3]
+        print(id_str)
+
+        adj_str = str(arg2).split("'")[3]
         print(adj_str)
-        # subclass
+        # creating subclass adjective
         adj = types.new_class(adj_str, (Adjective,))
         # adjective individual
-        new_adj_ind = adj(self.clean_from_POS(adj_str))
+        new_adj_ind = adj(self.clean_from_POS(adj_str)+"."+id_str)
 
-        ent_str = str(arg2).split("'")[3]
+        ent_str = str(arg3).split("'")[3]
         print(ent_str)
-        # subclass
-        new_sub = types.new_class(ent_str, (Entity,))
 
-        # entity individual
-        new_ind = new_sub(self.clean_from_POS(ent_str))
+        # creating subclass entity
+        new_sub = types.new_class(ent_str, (Entity,))
+        # creating entity individual
+        new_ind = new_sub(self.clean_from_POS(ent_str)+"."+id_str)
 
         # individual entity - hasAdj - adjective individual
         new_ind.hasAdj = [new_adj_ind]
@@ -1275,14 +1285,17 @@ class applyAdj(Action):
 
 class createSubVerb(Action):
     """Creating a subclass of the class Verb"""
-    def execute(self, arg1, arg2, arg3):
+    def execute(self, arg1, arg2, arg3, arg4):
 
-        verb_str = str(arg1).split("'")[3]
+        id_str = str(arg1).split("'")[3]
+        print(id_str)
+        verb_str = str(arg2).split("'")[3]
         print(verb_str)
-        subj_str = str(arg2).split("'")[3]
+        subj_str = str(arg3).split("'")[3]
         print(subj_str)
-        obj_str = str(arg3).split("'")[3]
+        obj_str = str(arg4).split("'")[3]
         print(obj_str)
+
 
         # subclasses
         new_sub_verb = types.new_class(verb_str, (Verb,))
@@ -1290,9 +1303,9 @@ class createSubVerb(Action):
         new_sub_obj = types.new_class(obj_str, (Entity,))
 
         # entities individual
-        new_ind_verb = new_sub_verb(self.clean_from_POS(verb_str))
-        new_ind_subj = new_sub_subj(self.clean_from_POS(subj_str))
-        new_ind_obj = new_sub_obj(self.clean_from_POS(obj_str))
+        new_ind_verb = new_sub_verb(self.clean_from_POS(verb_str)+"."+id_str)
+        new_ind_subj = new_sub_subj(self.clean_from_POS(subj_str)+"."+id_str)
+        new_ind_obj = new_sub_obj(self.clean_from_POS(obj_str)+"."+id_str)
 
         # individual entity - hasSubject - subject individual
         new_ind_verb.hasSubject = [new_ind_subj]
@@ -1328,6 +1341,14 @@ class saveOnto(Action):
         my_onto.save(file="west.owl", format="rdfxml")
 
 
+class genID(Action):
+    """Generating sentence id individual"""
+    def execute(self):
+
+        dateTimeObj = datetime.datetime.now()
+        id_ind = str(dateTimeObj.microsecond)
+
+        self.assert_belief(ID(id_ind))
 
 
 
