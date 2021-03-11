@@ -1213,6 +1213,69 @@ class merge_act(Action):
 # ---------------------- Ontology creation Section
 
 
+class NotNull(ActiveBelief):
+    """check if arg is not null"""
+    def evaluate(self, arg):
+
+        a = str(arg).split("'")[3]
+        if len(a) == 0:
+            return False
+        else:
+            return True
+
+
+
+class declareRule(Action):
+    """fills a rule with a verbal action"""
+    def execute(self, arg1):
+
+        rule_str = str(arg1).split("'")[3]
+
+        # Asserting SWRL rule
+        rule = Imp()
+        rule.set_as_rule(rule_str)
+
+
+class fillActRule(Action):
+    """fills a rule with a verbal action"""
+    def execute(self, arg1, arg2, arg3, arg4):
+
+        verb = str(arg1).split("'")[3].replace(":", "-")
+        dav = str(arg2).split("'")[3]
+        subj = str(arg3).split("'")[3]
+        obj = str(arg4).split("'")[3]
+
+        r = "hasSubject(?"+dav+", ?"+subj+"), hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+")"
+        print("rule: ", r)
+        self.assert_belief(RULE(r))
+
+
+class fillGndRule(Action):
+    """fills a rule with a ground"""
+    def execute(self, arg1, arg2, arg3):
+
+        r = str(arg1).split("'")[3]
+        var = str(arg2).split("'")[3]
+        value = str(arg3).split("'")[3].replace(":", "-")
+
+        r = r + ", "+value+"(?"+var+")"
+        print("rule: ", r)
+        self.assert_belief(RULE(r))
+
+
+class fillPrepRule(Action):
+    """fills a rule with a preposition"""
+    def execute(self, arg1, arg2, arg3, arg4):
+
+        r = str(arg1).split("'")[3]
+        var_master = str(arg2).split("'")[3]
+        value = str(arg3).split("'")[3].replace(":", "-")
+        var_slave = str(arg4).split("'")[3]
+
+        r = r + ", hasPrep(?"+var_master+", "+var_slave+"), "+value+"(?"+var_slave+")"
+        print("rule: ", r)
+        self.assert_belief(RULE(r))
+
 
 class aggrEntity(Action):
     """aggregate two entity beliefs in one"""

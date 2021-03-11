@@ -5,10 +5,10 @@ from actions import *
 
 # ONTOLOGY BUILDER
 
-process_onto() / ID(I) >> [aggr_ent(), create_verb(), create_adj(), create_ent(), create_prep(), saveOnto(), create_rule(), -ID(I)]
+process_onto() / ID(I) >> [aggr_ent(), create_verb(), create_adj(), create_ent(), create_prep(), create_rule(), saveOnto(), -ID(I)]
 
 
-
+# flats
 
 aggr_ent() / (GND(X, Y, Z) & GND(X, Y, K) & neq(Z, K)) >> [show_line("\naggregating entity: ", Y), -GND(X, Y, Z), -GND(X, Y, K), aggrEntity(X, Y, Z, K), aggr_ent()]
 aggr_ent() >> [show_line("\nentities aggregation done.")]
@@ -27,8 +27,14 @@ create_prep() >> [show_line("\nprep creation done.")]
 create_verb() / (ACTION("FLAT", V, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating verb: ", V), -ACTION("FLAT", V, D, X, Y), createSubVerb(I, V, K, J), create_verb()]
 create_verb() >> [show_line("\nverb creation done.")]
 
-create_rule() / (ACTION("LEFT", V, E, X, Y) & RULE(R)) >> [show_line("\nupdating rule: ", V), -ACTION("LEFT", V, E, X, Y), create_rule()]
-create_rule() / RULE(R) >> [show_line("\nrule update completed."), -RULE(R)]
+
+# implications
+
+create_rule() / (ACTION("LEFT", V, E, X, Y) & RULE(R)) >> [show_line("\nupdating rule: ", V), -ACTION("LEFT", V, E, X, Y), -RULE(R), fillActRule(V, E, X, Y), create_rule()]
+create_rule() / (GND('LEFT', X, Y) & RULE(R)) >> [show_line("\nupdating rule: ", Y), -GND('LEFT', X, Y), -RULE(R), fillGndRule(R, X, Y), create_rule()]
+create_rule() / (PREP('LEFT', E, X, Y) & RULE(R)) >> [show_line("\nupdating rule: ", Y), -PREP('LEFT', E, X, Y), -RULE(R), fillPrepRule(R, E, X, Y), create_rule()]
+
+create_rule() / (RULE(R) & NotNull(R)) >> [show_line("\nrule declaration completed."), -RULE(R), declareRule(R)]
 
 
 
