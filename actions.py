@@ -87,7 +87,7 @@ class create_verb(Procedure): pass
 class create_prep(Procedure): pass
 class aggr_ent(Procedure): pass
 class create_rule(Procedure): pass
-
+class finalize_rule(Procedure): pass
 
 # Reactive procedures - direct commands
 class parse_command(Procedure): pass
@@ -305,7 +305,7 @@ class lemma_in_syn(ActiveBelief):
 
 
 class preprocess_onto(Action):
-    """Producting beliefs to feed the Definite Clauses Builder"""
+    """Producting beliefs to feed the Ontology Builder"""
 
     def execute(self, *args):
         type = str(args[0]())
@@ -372,6 +372,7 @@ class preprocess_onto(Action):
             else:
                 dclause = vect_LR_fol[:]
                 dclause[1] = ["==>"]
+                self.assert_belief(RULE("->"))
         else:
             # RULE CASE
             ent_root = self.get_ent_ROOT(deps)
@@ -1213,15 +1214,16 @@ class merge_act(Action):
 # ---------------------- Ontology creation Section
 
 
-class NotNull(ActiveBelief):
-    """check if arg is not null"""
+class WFR(ActiveBelief):
+    """check if R is a Well Formed Rule"""
     def evaluate(self, arg):
 
-        a = str(arg).split("'")[3]
-        if len(a) == 0:
-            return False
-        else:
+        rule = str(arg).split("'")[3]
+
+        if rule[0] != "-" and rule[-1] != ">":
             return True
+        else:
+            return False
 
 
 
@@ -1231,50 +1233,89 @@ class declareRule(Action):
 
         rule_str = str(arg1).split("'")[3]
 
+        print("FINALE: ", rule_str)
+
         # Asserting SWRL rule
-        rule = Imp()
-        rule.set_as_rule(rule_str)
+        with my_onto:
+            rule_finale = Imp()
+            rule_finale.set_as_rule(rule_str)
 
 
 class fillActRule(Action):
     """fills a rule with a verbal action"""
-    def execute(self, arg1, arg2, arg3, arg4):
+    def execute(self, arg0, arg1, arg2, arg3, arg4, arg5):
 
-        verb = str(arg1).split("'")[3].replace(":", "-")
-        dav = str(arg2).split("'")[3]
-        subj = str(arg3).split("'")[3]
-        obj = str(arg4).split("'")[3]
+        hans_side = str(arg0).split("'")[3]
+        rule = str(arg1).split("'")[3]
+        verb = str(arg2).split("'")[3].replace(":", "-")
+        dav = str(arg3).split("'")[3]
+        subj = str(arg4).split("'")[3]
+        obj = str(arg5).split("'")[3]
 
-        r = "hasSubject(?"+dav+", ?"+subj+"), hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+")"
-        print("rule: ", r)
-        self.assert_belief(RULE(r))
+        if hans_side == "LEFT":
+            if rule[0] == "-":
+                rule = "hasSubject(?"+dav+", ?"+subj+"), hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+") "+rule
+            else:
+                rule = "hasSubject(?"+dav+", ?"+subj+"), hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+"), "+rule
+        else:
+            if rule[-1] == ">":
+                rule = rule + " hasSubject(?"+dav+", ?"+subj+"), hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+")"
+            else:
+                rule = rule + ", hasSubject(?"+dav+", ?"+subj+"), hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+")"
+
+        print("rule: ", rule)
+        self.assert_belief(RULE(rule))
 
 
 class fillGndRule(Action):
     """fills a rule with a ground"""
-    def execute(self, arg1, arg2, arg3):
+    def execute(self, arg0, arg1, arg2, arg3):
 
-        r = str(arg1).split("'")[3]
+        hans_side = str(arg0).split("'")[3]
+        rule = str(arg1).split("'")[3]
         var = str(arg2).split("'")[3]
         value = str(arg3).split("'")[3].replace(":", "-")
 
-        r = r + ", "+value+"(?"+var+")"
-        print("rule: ", r)
-        self.assert_belief(RULE(r))
+        if hans_side == "LEFT":
+            if rule[0] == "-":
+                rule = value+"(?"+var+") "+rule
+            else:
+                rule = value +"(?"+var+"), "+rule
+        else:
+            if rule[-1] == ">":
+                rule = rule+" "+value+"(?"+var+")"
+            else:
+                rule = rule+", "+value+"(?"+var+")"
+
+        print("rule: ", rule)
+        self.assert_belief(RULE(rule))
 
 
 class fillPrepRule(Action):
     """fills a rule with a preposition"""
-    def execute(self, arg1, arg2, arg3, arg4):
+    def execute(self, arg0, arg1, arg2, arg3, arg4):
 
-        r = str(arg1).split("'")[3]
+        hand_side = str(arg0).split("'")[3]
+        rule = str(arg1).split("'")[3]
         var_master = str(arg2).split("'")[3]
         value = str(arg3).split("'")[3].replace(":", "-")
         var_slave = str(arg4).split("'")[3]
 
-        r = r + ", hasPrep(?"+var_master+", "+var_slave+"), "+value+"(?"+var_slave+")"
-        print("rule: ", r)
-        self.assert_belief(RULE(r))
+        new_index_var = str(next(cnt))
+
+        if hand_side == "LEFT":
+            if rule[0] == "-":
+                rule = "hasPrep(?"+var_master+", ?x"+new_index_var+"), "+value+"(?x"+new_index_var+"), hasObject(?x"+new_index_var+", ?"+var_slave+") "+rule
+            else:
+                rule = "hasPrep(?"+var_master+", ?x"+new_index_var+"), "+value+"(?x"+new_index_var+"), hasObject(?x"+new_index_var+", ?"+var_slave+"), " + rule
+        else:
+            if rule[-1] == ">":
+                rule = rule+" hasPrep(?"+var_master+", ?x"+new_index_var+"), "+value+"(?x"+new_index_var+"), hasObject(?x"+new_index_var+", ?"+var_slave+")"
+            else:
+                rule = rule+", hasPrep(?"+var_master+", ?x"+new_index_var+"), "+value+"(?x"+new_index_var+"), hasObject(?x"+new_index_var+", ?"+var_slave+")"
+
+        print("rule: ", rule)
+        self.assert_belief(RULE(rule))
 
 
 class aggrEntity(Action):
@@ -1403,7 +1444,6 @@ class createSubPrep(Action):
 class saveOnto(Action):
     """Creating a subclass of the class Verb"""
     def execute(self):
-
         my_onto.save(file="west.owl", format="rdfxml")
 
 
@@ -1415,7 +1455,7 @@ class InitOnto(Action):
         id_ind = str(dateTimeObj.microsecond)
 
         self.assert_belief(ID(id_ind))
-        self.assert_belief(RULE(""))
+
 
 
 
