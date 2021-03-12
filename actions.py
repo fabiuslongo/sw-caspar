@@ -4,8 +4,6 @@ from nl_to_fol import *
 
 from phidias.Types import *
 import configparser
-import math
-from difflib import SequenceMatcher
 import pyttsx3
 import winsound
 import itertools
@@ -173,8 +171,6 @@ class COND_PRE_MOD(Belief): pass
 class SENSOR(Belief): pass
 class START_ROUTINE(Reactor): pass
 
-# clause
-class CLAUSE(Belief): pass
 # action
 class ACTION(Belief): pass
 # preposition
@@ -190,13 +186,6 @@ class ID(Belief): pass
 # rule accumulator
 class RULE(Belief): pass
 
-
-# left clause
-class LEFT_CLAUSE(Belief): pass
-# definite clause
-class DEF_CLAUSE(Belief): pass
-# remain
-class REMAIN(Belief): pass
 
 # parse rule beliefs
 class DEP(Belief): pass
@@ -882,335 +871,6 @@ class simulate_sensor(Action):
 
 
 
-# ---------------------- Definite Clauses Builder section
-
-
-class aggregate(Action):
-    """join a couple of advectives (or adverbs) beliefs in one"""
-    def execute(self, arg0, arg1, arg2, arg3, arg4):
-
-        type = str(arg0).split("'")[1]
-        id = str(arg1).split("'")[3]
-        var = str(arg2).split("'")[3]
-        label1 = str(arg3).split("'")[3]
-        label2 = str(arg4).split("'")[3]
-
-        if len(label1.split('_')) > 1:
-            conc_label = label1 + "_" + label2
-        else:
-            conc_label = label2 + "_" + label1
-
-        if type == "ADJ":
-            self.assert_belief(ADJ(id, var, conc_label))
-
-        elif type == "ADV":
-            self.assert_belief(ADV(id, var, conc_label))
-        else:
-            self.assert_belief(GND(id, var, conc_label))
-
-    def get_arg(self, arg):
-        s = arg.split("'")
-        return s[3]
-
-    def get_pos(self, s):
-        first = s.split('_')[0]
-        s_list = first.split(':')
-        if len(s_list) > 1:
-            return s_list[1]
-        else:
-            return s_list[0]
-
-
-class merge(Action):
-    """Merge a ground belief into a modificator argument"""
-    def execute(self, arg1, arg2, arg3, arg4):
-        id = str(arg1).split("'")[3]
-        var = str(arg2).split("'")[3]
-        adj = str(arg3).split("'")[3]
-        noun = str(arg4).split("'")[3]
-
-        new_label = adj + "(" + noun + ")"
-        self.assert_belief(GND(id, var, new_label))
-
-
-class ground_prep(Action):
-    """Ground an object preposition belief"""
-    def execute(self, arg1, arg2, arg3, arg4, arg5):
-
-        id = str(arg1).split("'")[3]
-        var = str(arg2).split("'")[3]
-        prep_label = str(arg3).split("'")[3]
-        var_ground = str(arg4).split("'")[3]
-        label_ground = str(arg5).split("'")[3]
-
-        pn = self.get_par_number(label_ground)
-        if pn == 0:
-            new_object = label_ground + "(" + var_ground + ")"
-        else:
-            ls = label_ground.split(' ')
-            if len(ls) > 1:
-                new_object = label_ground
-            else:
-                new_object = label_ground[:-pn] + "(" + var_ground + ")"
-                for i in range(pn):
-                    new_object = new_object + ")"
-
-        self.assert_belief(PREP(id, var, prep_label, new_object))
-
-    def get_par_number(self, s):
-        count = 0
-        while (s[len(s) - (count + 1)] == ")"):
-            count = count + 1
-        return count
-
-
-class int_preps_tognd(Action):
-    """Merge two preposition belief in a ground beliefs"""
-    def execute(self, arg1, arg2, arg3, arg4, arg5, arg6):
-        id = str(arg1).split("'")[3]
-        var_ground_est = str(arg2).split("'")[3]
-        var_ground_int = str(arg3).split("'")[3]
-        prep_est_label = str(arg4).split("'")[3]
-        prep_int_object = str(arg5).split("'")[3]
-        ground_label = str(arg6).split("'")[3]
-
-        new_label = prep_est_label + "(" + ground_label + "(" + var_ground_est + "), " + prep_int_object + "(" + var_ground_int + "))"
-        self.assert_belief(GND(id, var_ground_est, new_label))
-
-
-class gprep_to_ground(Action):
-    """Apply an object-grounded preposition belief to a ground belief"""
-    def execute(self, arg1, arg2, arg3, arg4, arg5):
-        id = str(arg1).split("'")[3]
-        var_prep_ground = str(arg2).split("'")[3]
-        prep_label = str(arg3).split("'")[3]
-        prep_object = str(arg4).split("'")[3]
-        ground_label = str(arg5).split("'")[3]
-
-        new_label = prep_label + "(" + ground_label + ", " + prep_object + ")"
-        self.assert_belief(GND(id, var_prep_ground, new_label))
-
-
-class adv_to_action(Action):
-    """Apply an adverb to an action label"""
-    def execute(self, arg1, arg2, arg3, arg4, arg5, arg6):
-        id = str(arg1).split("'")[3]
-        verb = str(arg2).split("'")[3]
-        dav = str(arg3).split("'")[3]
-        subj = str(arg4).split("'")[3]
-        obj = str(arg5).split("'")[3]
-        adv_label = str(arg6).split("'")[3]
-
-        new_verb = adv_label + "(" + verb + ")"
-
-        self.assert_belief(ACTION(id, new_verb, dav, subj, obj))
-
-
-class act_to_clause(Action):
-    """Turn a grounded action into a clause"""
-    def execute(self, arg1, arg2, arg3, arg4, arg5):
-
-        id = str(arg1).split("'")[3]
-        verb = str(arg2).split("'")[3]
-        dav = str(arg3).split("'")[3]
-        subj = str(arg4).split("'")[3]
-        obj = str(arg5).split("'")[3]
-
-        pn = self.get_par_number(verb)
-        if pn == 0:
-            action = verb + "(" + subj + ", " + obj + ")"
-        else:
-            action = verb[:-pn] + "(" + subj + ", " + obj + ")"
-            for i in range(pn):
-                action = action + ")"
-
-        self.assert_belief(CLAUSE(id, dav, action))
-
-    def get_par_number(self, s):
-        count = 0
-        while (s[len(s) - (count + 1)] == ")"):
-            count = count + 1
-        return count
-
-
-class ground_subj_act(Action):
-    """Ground a subject action"""
-    def execute(self, arg1, arg2, arg3, arg4, arg5, arg6):
-
-        id = str(arg1).split("'")[3]
-        verb = str(arg2).split("'")[3]
-
-        dav = str(arg3).split("'")[3]
-        subj = str(arg4).split("'")[3]
-        obj = str(arg5).split("'")[3]
-        ground_label = str(arg6).split("'")[3]
-
-        pn_label = self.get_par_number(ground_label)
-        t = ground_label.split(" ")
-
-        if len(t) > 1:  # prep applied to ground case
-
-            token1 = t[0][:-1]  # first token, without comma
-            pn_token1 = self.get_par_number(token1)  # first token right-parentesys number
-
-            if pn_token1 == 0:
-                token1 = token1 + "(" + subj + ")"
-            else:
-                token1 = token1[:-pn_token1] + "(" + subj + ")"
-
-            for i in range(pn_token1):
-                token1 = token1 + ")"
-
-            rem = ' '.join(t[1:])
-
-            new_subj = token1 + ", " + rem[:-pn_label]
-
-        else:
-            if pn_label == 0:
-                new_subj = ground_label + "(" + subj + ")"
-            else:
-                new_subj = ground_label[:-pn_label] + "(" + subj + ")"
-
-        for i in range(pn_label):
-            new_subj = new_subj + ")"
-
-        self.assert_belief(ACTION(id, verb, dav, new_subj, obj))
-
-    def get_par_number(self, s):
-        count = 0
-        while (s[len(s) - (count + 1)] == ")"):
-            count = count + 1
-        return count
-
-
-class ground_obj_act(Action):
-    """Ground an object action"""
-    def execute(self, arg1, arg2, arg3, arg4, arg5, arg6):
-
-        id = str(arg1).split("'")[3]
-        verb = str(arg2).split("'")[3]
-
-        dav = str(arg3).split("'")[3]
-        subj = str(arg4).split("'")[3]
-        obj = str(arg5).split("'")[3]
-        ground_label = str(arg6).split("'")[3]
-
-        pn_label = self.get_par_number(ground_label)
-
-        t = ground_label.split(" ")
-        if len(t) > 1:
-            token1 = t[0][:-1]  # first token, without comma
-
-            pn_token1 = self.get_par_number(token1)  # first token right-parentesys number
-
-            if pn_token1 == 0:
-                token1 = token1 + "(" + obj + ")"
-            else:
-                token1 = token1[:-pn_token1] + "(" + obj + ")"
-
-            for i in range(pn_token1):
-                token1 = token1 + ")"
-
-            rem = ' '.join(t[1:])
-            new_obj = token1 + ", " + rem[:-pn_label]
-
-        else:
-            if pn_label == 0:
-                new_obj = ground_label + "(" + obj + ")"
-            else:
-                new_obj = ground_label[:-pn_label] + "(" + obj + ")"
-
-        for i in range(pn_label):
-            new_obj = new_obj + ")"
-
-        self.assert_belief(ACTION(id, verb, dav, subj, new_obj))
-
-    def get_par_number(self, s):
-        count = 0
-        while (s[len(s) - (count + 1)] == ")"):
-            count = count + 1
-        return count
-
-
-class prep_to_clause(Action):
-    """Applying a prep to a clause"""
-    def execute(self, arg1, arg2, arg3, arg4, arg5):
-        id = str(arg1).split("'")[3]
-        dav = str(arg2).split("'")[3]
-        clause = str(arg3).split("'")[3]
-        prep_label = str(arg4).split("'")[3]
-        prep_obj = str(arg5).split("'")[3]
-
-        new_clause = prep_label + "(" + clause + ", " + prep_obj + ")"
-
-        self.assert_belief(CLAUSE(id, dav, new_clause))
-
-
-class join_hand_sides(Action):
-    """Join left and right hand sides into a definite clause"""
-    def execute(self, arg1, arg2):
-        lhs = str(arg1).split("'")[3]
-        rhs = str(arg2).split("'")[3]
-
-        new_clause = lhs + " ==> " + rhs
-        self.assert_belief(DEF_CLAUSE(new_clause))
-
-
-class conjunct_left_clauses(Action):
-    """Joining left hand sides literals of a definite clause"""
-    def execute(self, arg1, arg2):
-        left_clause1 = str(arg1).split("'")[3]
-        left_clause2 = str(arg2).split("'")[3]
-
-        clauses_conjunction = left_clause1 + " & " + left_clause2
-        self.assert_belief(LEFT_CLAUSE(clauses_conjunction))
-
-
-class no_dav(ActiveBelief):
-    """Check for davidsonian variable"""
-    def evaluate(self, x):
-
-        var = str(x).split("'")[3]
-        # Check for davidsonian
-        if var[0] == 'e' or var[0] == 'd':
-            return False
-        else:
-            return True
-
-
-class merge_act(Action):
-    """Merge two actions into one via davidsonian variable"""
-    def execute(self, arg1, arg2, arg3, arg4, arg5, arg6, arg7):
-
-        id = str(arg1).split("'")[3]
-
-        verb_act_merged = str(arg2).split("'")[3]
-        subj_act_merged = str(arg3).split("'")[3]
-        obj_act_merged = str(arg4).split("'")[3]
-
-        verb_act_merging = str(arg5).split("'")[3]
-        dav_act_merging = str(arg6).split("'")[3]
-        subj_act_merging = str(arg7).split("'")[3]
-
-        pn_label = self.get_par_number(verb_act_merged)
-
-        if pn_label > 0:
-            new_obj = verb_act_merged[:-pn_label] + "(" + subj_act_merged + ", " + obj_act_merged + ")"
-        else:
-            new_obj = verb_act_merged + "(" + subj_act_merged + ", " + obj_act_merged + ")"
-
-        for i in range(pn_label):
-            new_obj = new_obj + ")"
-
-        self.assert_belief(ACTION(id, verb_act_merging, dav_act_merging, subj_act_merging, new_obj))
-
-    def get_par_number(self, s):
-        count = 0
-        while (s[len(s) - (count + 1)] == ")"):
-            count = count + 1
-        return count
-
-
 # ---------------------- Ontology creation Section
 
 
@@ -1236,23 +896,26 @@ class declareRule(Action):
         print("FINALE: ", rule_str)
 
         # Asserting SWRL rule
-        with my_onto:
-            rule_finale = Imp()
-            rule_finale.set_as_rule(rule_str)
+        #rule_finale = Imp()
+        #rule_finale.set_as_rule(rule_str)
 
 
 class fillActRule(Action):
     """fills a rule with a verbal action"""
     def execute(self, arg0, arg1, arg2, arg3, arg4, arg5):
 
-        hans_side = str(arg0).split("'")[3]
-        rule = str(arg1).split("'")[3]
+        rule = str(arg0).split("'")[3]
+        hand_side = str(arg1).split("'")[3]
         verb = str(arg2).split("'")[3].replace(":", "-")
         dav = str(arg3).split("'")[3]
         subj = str(arg4).split("'")[3]
         obj = str(arg5).split("'")[3]
 
-        if hans_side == "LEFT":
+        # creating subclass of verb
+        new_sub_verb = types.new_class(verb, (Verb,))
+        print(new_sub_verb)
+
+        if hand_side == "LEFT":
             if rule[0] == "-":
                 rule = "hasSubject(?"+dav+", ?"+subj+"), hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+") "+rule
             else:
@@ -1276,6 +939,10 @@ class fillGndRule(Action):
         var = str(arg2).split("'")[3]
         value = str(arg3).split("'")[3].replace(":", "-")
 
+        # creating subclass of entity
+        new_sub_entity = types.new_class(value, (Entity,))
+        print(new_sub_entity)
+
         if hans_side == "LEFT":
             if rule[0] == "-":
                 rule = value+"(?"+var+") "+rule
@@ -1291,6 +958,37 @@ class fillGndRule(Action):
         self.assert_belief(RULE(rule))
 
 
+class fillAdjRule(Action):
+    """fills a rule with a ground"""
+    def execute(self, arg0, arg1, arg2, arg3):
+
+        hand_side = str(arg0).split("'")[3]
+        rule = str(arg1).split("'")[3]
+        var = str(arg2).split("'")[3]
+        value = str(arg3).split("'")[3].replace(":", "-")
+
+        # creating subclass of verb
+        new_sub_adjective = types.new_class(value, (Adjective,))
+        print(new_sub_adjective)
+
+        new_index_var = str(next(cnt))
+
+        if hand_side == "LEFT":
+            if rule[0] == "-":
+                rule = "hasAdj(?"+var+", ?x"+new_index_var+"), "+value+"(?"+new_index_var+") "+rule
+            else:
+                rule = "hasAdj(?"+var+", ?x"+new_index_var+"), " +value +"(?"+new_index_var+"), "+rule
+        else:
+            if rule[-1] == ">":
+                rule = rule+" hasAdj(?"+var+", ?x"+new_index_var+"), "+value+"(?"+new_index_var+")"
+            else:
+                rule = rule+", hasAdj(?"+var+", ?x"+new_index_var+"), "+value+"(?"+new_index_var+")"
+
+        print("rule: ", rule)
+        self.assert_belief(RULE(rule))
+
+
+
 class fillPrepRule(Action):
     """fills a rule with a preposition"""
     def execute(self, arg0, arg1, arg2, arg3, arg4):
@@ -1300,6 +998,10 @@ class fillPrepRule(Action):
         var_master = str(arg2).split("'")[3]
         value = str(arg3).split("'")[3].replace(":", "-")
         var_slave = str(arg4).split("'")[3]
+
+        # creating subclass of preposition
+        new_sub_prep = types.new_class(value, (Preposition,))
+        print(new_sub_prep)
 
         new_index_var = str(next(cnt))
 

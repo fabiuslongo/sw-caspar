@@ -44,15 +44,19 @@ print(Preposition)
 
 with my_onto:
     my_new_classes = []
-    my_new_classes.append(types.new_class("Sell-VBZ", (Action,)))
-    my_new_classes.append(types.new_class("Hostile-JJ", (Adjective,)))
-    my_new_classes.append(types.new_class("American-NN", (Entity,)))
-    my_new_classes.append(types.new_class("Colonel_West-NNP", (Entity,)))
-    my_new_classes.append(types.new_class("Criminal-NN", (Entity,)))
-    my_new_classes.append(types.new_class("Cuba-NNP", (Entity,)))
-    my_new_classes.append(types.new_class("Nation-NN", (Entity,)))
-    my_new_classes.append(types.new_class("Weapon-NNPS", (Entity,)))
-    my_new_classes.append(types.new_class("To-IN", (Preposition,)))
+    my_new_classes.append(types.new_class("Sell.VBZ", (Action,)))
+    my_new_classes.append(types.new_class("Hostile.JJ", (Adjective,)))
+    my_new_classes.append(types.new_class("American.NN", (Entity,)))
+    my_new_classes.append(types.new_class("Colonel_West.NNP", (Entity,)))
+    my_new_classes.append(types.new_class("Criminal.NN", (Entity,)))
+    my_new_classes.append(types.new_class("Cuba.NNP", (Entity,)))
+    my_new_classes.append(types.new_class("Nation.NN", (Entity,)))
+    my_new_classes.append(types.new_class("Weapon.NNS", (Entity,)))
+    my_new_classes.append(types.new_class("To.IN", (Preposition,)))
+    my_new_classes.append(types.new_class("American.NNP", (Entity,)))
+    my_new_classes.append(types.new_class("Be.VBZ", (Action,)))
+
+
 
 
     print("\nSubclasses list:\n")
@@ -114,7 +118,8 @@ with my_onto:
     rule = Imp()
     #rule.set_as_rule("hasSubject(?x2, ?x1), American_NN(?x1), Weapon_NNPS(?x3), hasObject(?x2, ?x3), Sell_VBZ(?x2), hasPrep(?x2, ?x4), To_IN(?x4), hasObject(?x4, ?x5), Nation_NN(?x5), hasAdj(?x5, ?x6), Hostile_JJ(?x6) -> Criminal_NN(?x1)")
 
-    rule.set_as_rule("hasPrep(?e5, ?x15), To-IN(?x15), hasObject(?x15, ?x14), Hostile-JJ(?x14), Nation-NN(?x14), Weapon-NNS(?x11), American-NNP(?x10), hasSubject(?e5, ?x10), hasObject(?e5, ?x11), Sell-VBZ(?e5) -> hasSubject(?e2, ?x3), hasObject(?e2, ?x4), Be-VBZ(?e2), hasSubject(?e4, ?x7), hasObject(?e4, ?x8), Sell-VBZ(?e4), hasSubject(?e6, ?x12), hasObject(?e6, ?x13), Be-VBZ(?e6), Colonel-NNP_West-NNP(?x3), Colonel-NNP_West-NNP(?x7), American-NNP(?x12), Criminal-NN(?x13)")
+    rule.set_as_rule("hasPrep(?e1, ?x7), To.IN(?x7), hasObject(?x7, ?x5), hasAdj(?x5, ?x6), Hostile.JJ(?6), Nation.NN(?x5), Weapon.NNS(?x2), American.NNP(?x1), hasSubject(?e1, ?x1), hasObject(?e1, ?x2), Sell.VBZ(?e1) -> hasSubject(?e2, ?x3), hasObject(?e2, ?x4), Be.VBZ(?e2), American.NNP(?x3), Criminal.NN(?x4)")
+
 
 
     print("\nRule")

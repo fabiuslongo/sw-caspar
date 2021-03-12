@@ -29,9 +29,9 @@ create_verb() >> [show_line("\nverb creation done.")]
 
 # implications
 
-create_rule() / (ACTION(H, V, E, X, Y) & RULE(R)) >> [show_line("\nupdating rule with action: ", V), -ACTION(H, V, E, X, Y), -RULE(R), fillActRule(H, R, V, E, X, Y), create_rule()]
+create_rule() / (ACTION(H, V, E, X, Y) & RULE(R)) >> [show_line("\nupdating rule with action: ", V), -ACTION(H, V, E, X, Y), -RULE(R), fillActRule(R, H, V, E, X, Y), create_rule()]
 create_rule() / (GND(H, X, Y) & RULE(R)) >> [show_line("\nupdating rule with gnd: ", Y), -GND(H, X, Y), -RULE(R), fillGndRule(H, R, X, Y), create_rule()]
-create_rule() / (ADJ(H, X, Y) & RULE(R)) >> [show_line("\nupdating rule with adj: ", Y), -ADJ(H, X, Y), -RULE(R), fillGndRule(H, R, X, Y), create_rule()]
+create_rule() / (ADJ(H, X, Y) & RULE(R)) >> [show_line("\nupdating rule with adj: ", Y), -ADJ(H, X, Y), -RULE(R), fillAdjRule(H, R, X, Y), create_rule()]
 
 create_rule() / (PREP(H, E, X, Y) & RULE(R)) >> [show_line("\nupdating rule with prep: ", X), -PREP(H, E, X, Y), -RULE(R), fillPrepRule(H, R, E, X, Y), create_rule()]
 
