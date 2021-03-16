@@ -5,7 +5,7 @@ from actions import *
 
 # ONTOLOGY BUILDER
 
-process_onto() / ID(I) >> [aggr_ent(), create_verb(), create_adj(), create_ent(), create_prep(), create_rule(), finalize_rule(), saveOnto(), -ID(I)]
+process_onto() / ID(I) >> [aggr_ent(), create_adj(), create_gnd_prep(), create_prep(), create_verb(), create_rule(), finalize_rule(), saveOnto(), -ID(I)]
 
 
 # flats
@@ -13,17 +13,16 @@ process_onto() / ID(I) >> [aggr_ent(), create_verb(), create_adj(), create_ent()
 aggr_ent() / (GND(X, Y, Z) & GND(X, Y, K) & neq(Z, K)) >> [show_line("\naggregating entity: ", Y), -GND("FLAT", Y, Z), -GND("FLAT", Y, K), aggrEntity(X, Y, Z, K), aggr_ent()]
 aggr_ent() >> [show_line("\nentities aggregation done.")]
 
-
 create_adj() / (ADJ("FLAT", X, Y) & GND("FLAT", X, S) & ID(I)) >> [show_line("\ncreating entity+adjective: ", Y), -ADJ("FLAT", X, Y), applyAdj(I, Y, S), create_adj()]
 create_adj() >> [show_line("\nadjective creation done.")]
 
-create_ent() / (GND("FLAT", X, Y) & ID(I)) >> [show_line("\ncreating entity: ", Y), -GND("FLAT", X, Y), createSubEntity(I, Y), create_ent()]
-create_ent() >> [show_line("\nentity creation done.")]
-
-create_prep() / PREP("FLAT", X, Y, Z) >> [show_line("\ncreating prep: ", Y), -PREP("FLAT", X, Y, Z), createSubPrep(Y), create_prep()]
+create_prep() / (ACTION("FLAT", V, D, X, Y) & PREP("FLAT", D, K, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating verb prep: ", K), -PREP("FLAT", D, K, Z), -GND("FLAT", Z, S), createSubPrep(I, V, K, S), create_prep()]
 create_prep() >> [show_line("\nprep creation done.")]
 
-create_verb() / (ACTION("FLAT", V, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating verb: ", V), -ACTION("FLAT", V, D, X, Y), createSubVerb(I, V, K, J), create_verb()]
+create_gnd_prep() / (GND("FLAT", X, K) & PREP("FLAT", X, Y, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating gnd prep: ", Y), -PREP("FLAT", K, Y, Z), -GND("FLAT", Z, S), createSubGndPrep(I, K, Y, S), create_prep()]
+create_gnd_prep() >> [show_line("\nprep creation done.")]
+
+create_verb() / (ACTION("FLAT", V, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating verb: ", V), -ACTION("FLAT", V, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubVerb(I, V, K, J), create_verb()]
 create_verb() >> [show_line("\nverb creation done.")]
 
 

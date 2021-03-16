@@ -116,10 +116,15 @@ with my_onto:
 
     # Asserting SWRL rule
     rule = Imp()
+
+    r = "hasPrep(?e1, ?x7), To.IN(?x7), hasObject(?x7, ?x5), hasAdj(?x5, ?x6), Hostile.JJ(?6), Nation.NN(?x5), Weapon.NNS(?x2), American.NNP(?x1), hasSubject(?e1, ?x1), hasObject(?e1, ?x2), Sell.VBZ(?e1) -> hasSubject(?e2, ?x3), hasObject(?e2, ?x4), Be.VBZ(?e2), American.NNP(?x3), Criminal.NN(?x4)"
+
+
     #rule.set_as_rule("hasSubject(?x2, ?x1), American_NN(?x1), Weapon_NNPS(?x3), hasObject(?x2, ?x3), Sell_VBZ(?x2), hasPrep(?x2, ?x4), To_IN(?x4), hasObject(?x4, ?x5), Nation_NN(?x5), hasAdj(?x5, ?x6), Hostile_JJ(?x6) -> Criminal_NN(?x1)")
 
-    rule.set_as_rule("hasPrep(?e1, ?x7), To.IN(?x7), hasObject(?x7, ?x5), hasAdj(?x5, ?x6), Hostile.JJ(?6), Nation.NN(?x5), Weapon.NNS(?x2), American.NNP(?x1), hasSubject(?e1, ?x1), hasObject(?e1, ?x2), Sell.VBZ(?e1) -> hasSubject(?e2, ?x3), hasObject(?e2, ?x4), Be.VBZ(?e2), American.NNP(?x3), Criminal.NN(?x4)")
+    #rule.set_as_rule("hasPrep(?e1, ?x7), To.IN(?x7), hasObject(?x7, ?x5), hasAdj(?x5, ?x6), Hostile.JJ(?6), Nation.NN(?x5), Weapon.NNS(?x2), American.NNP(?x1), hasSubject(?e1, ?x1), hasObject(?e1, ?x2), Sell.VBZ(?e1) -> hasSubject(?e2, ?x3), hasObject(?e2, ?x4), Be.VBZ(?e2), American.NNP(?x3), Criminal.NN(?x4)")
 
+    rule.set_as_rule(r)
 
 
     print("\nRule")

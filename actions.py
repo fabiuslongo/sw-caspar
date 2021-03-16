@@ -79,9 +79,9 @@ m = ManageFols(VERBOSE, LANGUAGE)
 class create_onto(Procedure): pass
 class process_rule(Procedure): pass
 class process_onto(Procedure): pass
-class create_ent(Procedure): pass
 class create_adj(Procedure): pass
 class create_verb(Procedure): pass
+class create_gnd_prep(Procedure): pass
 class create_prep(Procedure): pass
 class aggr_ent(Procedure): pass
 class create_rule(Procedure): pass
@@ -896,8 +896,9 @@ class declareRule(Action):
         print("FINALE: ", rule_str)
 
         # Asserting SWRL rule
-        #rule_finale = Imp()
-        #rule_finale.set_as_rule(rule_str)
+        with my_onto:
+           rule = Imp()
+           rule.set_as_rule(rule_str)
 
 
 class fillActRule(Action):
@@ -906,7 +907,7 @@ class fillActRule(Action):
 
         rule = str(arg0).split("'")[3]
         hand_side = str(arg1).split("'")[3]
-        verb = str(arg2).split("'")[3].replace(":", "-")
+        verb = str(arg2).split("'")[3].replace(":", ".")
         dav = str(arg3).split("'")[3]
         subj = str(arg4).split("'")[3]
         obj = str(arg5).split("'")[3]
@@ -937,7 +938,8 @@ class fillGndRule(Action):
         hans_side = str(arg0).split("'")[3]
         rule = str(arg1).split("'")[3]
         var = str(arg2).split("'")[3]
-        value = str(arg3).split("'")[3].replace(":", "-")
+        value = str(arg3).split("'")[3].replace(":", ".")
+
 
         # creating subclass of entity
         new_sub_entity = types.new_class(value, (Entity,))
@@ -965,7 +967,8 @@ class fillAdjRule(Action):
         hand_side = str(arg0).split("'")[3]
         rule = str(arg1).split("'")[3]
         var = str(arg2).split("'")[3]
-        value = str(arg3).split("'")[3].replace(":", "-")
+        value = str(arg3).split("'")[3].replace(":", ".")
+
 
         # creating subclass of verb
         new_sub_adjective = types.new_class(value, (Adjective,))
@@ -996,7 +999,7 @@ class fillPrepRule(Action):
         hand_side = str(arg0).split("'")[3]
         rule = str(arg1).split("'")[3]
         var_master = str(arg2).split("'")[3]
-        value = str(arg3).split("'")[3].replace(":", "-")
+        value = str(arg3).split("'")[3].replace(":", ".")
         var_slave = str(arg4).split("'")[3]
 
         # creating subclass of preposition
@@ -1034,27 +1037,6 @@ class aggrEntity(Action):
 
 
 
-class createSubEntity(Action):
-    """Creating a subclass of the class Entity"""
-    def execute(self, arg1, arg2):
-
-        id_str = str(arg1).split("'")[3]
-        ent = str(arg2).split("'")[3].replace(":", "-")
-        new_sub = types.new_class(ent, (Entity,))
-        new_sub(self.clean_from_POS(ent)+"."+id_str)
-        print(new_sub)
-
-    def clean_from_POS(self, ent):
-
-        pre_clean = ent.split("_")
-        cleaned = []
-        for s in pre_clean:
-            cleaned.append(s.split("-")[0])
-
-        cleaned = "_".join(cleaned)
-        return cleaned
-
-
 
 class applyAdj(Action):
     """create an entity and apply an adj to it"""
@@ -1063,14 +1045,14 @@ class applyAdj(Action):
         id_str = str(arg1).split("'")[3]
         print(id_str)
 
-        adj_str = str(arg2).split("'")[3].replace(":", "-")
+        adj_str = str(arg2).split("'")[3].replace(":", ".")
         print(adj_str)
         # creating subclass adjective
         adj = types.new_class(adj_str, (Adjective,))
         # adjective individual
         new_adj_ind = adj(self.clean_from_POS(adj_str)+"."+id_str)
 
-        ent_str = str(arg3).split("'")[3].replace(":", "-")
+        ent_str = str(arg3).split("'")[3].replace(":", ".")
         print(ent_str)
 
         # creating subclass entity
@@ -1098,13 +1080,12 @@ class createSubVerb(Action):
 
         id_str = str(arg1).split("'")[3]
         print(id_str)
-        verb_str = str(arg2).split("'")[3].replace(":", "-")
+        verb_str = str(arg2).split("'")[3].replace(":", ".")
         print(verb_str)
-        subj_str = str(arg3).split("'")[3].replace(":", "-")
+        subj_str = str(arg3).split("'")[3].replace(":", ".")
         print(subj_str)
-        obj_str = str(arg4).split("'")[3].replace(":", "-")
+        obj_str = str(arg4).split("'")[3].replace(":", ".")
         print(obj_str)
-
 
         # subclasses
         new_sub_verb = types.new_class(verb_str, (Verb,))
@@ -1134,13 +1115,74 @@ class createSubVerb(Action):
 
 
 class createSubPrep(Action):
-    """Creating a subclass of the class Verb"""
-    def execute(self, arg):
+    """Creating a subclass of depending action preposition"""
+    def execute(self, arg0, arg1, arg2, arg3):
 
-        ent = str(arg).split("'")[3].replace(":", "-")
-        print(ent)
+        id_str = str(arg0).split("'")[3]
+        verb = str(arg1).split("'")[3].replace(":", ".")
+        prep = str(arg2).split("'")[3].replace(":", ".")
+        ent = str(arg3).split("'")[3].replace(":", ".")
 
-        types.new_class(ent, (Preposition,))
+        # Creating subclass of Verb and individual
+        new_sub_verb = types.new_class(verb, (Verb,))
+        new_ind_verb = new_sub_verb(self.clean_from_POS(verb)+"."+id_str)
+
+        # Creating subclass of Preposition and individual
+        new_sub_prep = types.new_class(prep, (Preposition,))
+        new_ind_prep = new_sub_prep(self.clean_from_POS(prep) + "." + id_str)
+
+        # Creating subclass of Entity and individual
+        new_sub_ent = types.new_class(ent, (Entity,))
+        new_ind_ent = new_sub_ent(self.clean_from_POS(ent) + "." + id_str)
+
+        # Creating objects properties
+        new_ind_verb.hasPrep = [new_ind_prep]
+        new_ind_prep.hasObject = [new_ind_ent]
+
+    def clean_from_POS(self, ent):
+        pre_clean = ent.split("_")
+        cleaned = []
+        for s in pre_clean:
+            cleaned.append(s.split("-")[0])
+
+        cleaned = "_".join(cleaned)
+        return cleaned
+
+
+
+class createSubGndPrep(Action):
+    """Creating a subclass of depending gnd preposition"""
+    def execute(self, arg0, arg1, arg2, arg3):
+
+        id_str = str(arg0).split("'")[3]
+        ent_master = str(arg1).split("'")[3].replace(":", ".")
+        prep = str(arg2).split("'")[3].replace(":", ".")
+        ent_slave = str(arg3).split("'")[3].replace(":", ".")
+
+        # Creating subclasses of Entity and individuals
+        new_sub_ent_master = types.new_class(ent_master, (Entity,))
+        new_ind_ent_master = new_sub_ent_master(self.clean_from_POS(ent_master) + "." + id_str)
+        new_sub_ent_slave = types.new_class(ent_slave, (Entity,))
+        new_ind_ent_slave = new_sub_ent_slave(self.clean_from_POS(ent_slave) + "." + id_str)
+
+        # Creating subclass of Preposition and individual
+        new_sub_prep = types.new_class(prep, (Preposition,))
+        new_ind_prep = new_sub_prep(self.clean_from_POS(prep) + "." + id_str)
+
+        # Creating objects properties
+        new_ind_ent_master.hasPrep = [new_ind_prep]
+        new_ind_prep.hasObject = [new_ind_ent_slave]
+
+    def clean_from_POS(self, ent):
+        pre_clean = ent.split("_")
+        cleaned = []
+        for s in pre_clean:
+            cleaned.append(s.split("-")[0])
+
+        cleaned = "_".join(cleaned)
+        return cleaned
+
+
 
 
 class saveOnto(Action):
