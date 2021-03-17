@@ -5,7 +5,7 @@ from actions import *
 
 # ONTOLOGY BUILDER
 
-process_onto() / ID(I) >> [aggr_ent(), create_adj(), create_gnd_prep(), create_prep(), create_verb(), create_rule(), finalize_rule(), saveOnto(), -ID(I)]
+process_onto() / ID(I) >> [aggr_ent(), create_adj(), create_gnd_prep(), create_prep(), create_verb(), create_rule(), saveOnto(), finalize_rule(), -ID(I)]
 
 
 # flats

@@ -8,46 +8,44 @@ import pyttsx3
 import winsound
 import itertools
 from datetime import datetime
-
-
 from owlready2 import *
+
 
 try:
     my_onto = get_ontology("west.owl").load()
     print("\nLoading existing owl...")
 except IOError:
-    my_onto = get_ontology("http://test/west.owl")
-    print("\nCreating new owl...")
-
+    my_onto = get_ontology("http://test.org/west.owl")
+    print("\nCreating new owl file...")
+    print("\nPlease Re-Run SW-Caspar.")
+    my_onto.save(file="west.owl", format="rdfxml")
+    exit()
 
 
 with my_onto:
- class Verb(Thing):
-     pass
+    class Verb(Thing):
+        pass
 
- class Adjective(Thing):
-       pass
+    class Adjective(Thing):
+        pass
 
- class Entity(Thing):
-     pass
+    class Entity(Thing):
+        pass
 
- class Preposition(Thing):
-       pass
+    class Preposition(Thing):
+        pass
 
- class hasAdj(ObjectProperty):
-      pass
+    class hasAdj(ObjectProperty):
+        pass
 
- class hasObject(ObjectProperty):
-      pass
+    class hasObject(ObjectProperty):
+        pass
 
- class hasSubject(ObjectProperty):
-      pass
+    class hasSubject(ObjectProperty):
+        pass
 
- class hasPrep(ObjectProperty):
-      pass
-
-my_onto.save(file="west.owl", format="rdfxml")
-
+    class hasPrep(ObjectProperty):
+        pass
 
 
 config = configparser.ConfigParser()
@@ -390,15 +388,6 @@ class preprocess_onto(Action):
 
         # FLAT CASES
         else:
-            nomain_negs = []
-            # every verb/adj will carry its non-main negative
-            negs = {}
-            for n in nomain_negs:
-                for v in dclause:
-                    if v[1] == n[1]:
-                        if v not in nomain_negs:
-                            negs.update({v[0]: n[0]})
-
             self.process_fol(dclause, "FLAT")
 
 
@@ -541,27 +530,6 @@ class preprocess_onto(Action):
     def get_lemma(self, s):
         s_list = s.split(':')
         return s_list[0]
-
-
-class retract_clause(Action):
-    """Retract a clause from the Clauses KB"""
-
-    def execute(self, *args):
-        sentence = args[0]()
-
-
-class new_clause(Action):
-    """Assert a clause in the Clauses KB"""
-
-    def execute(self, *args):
-        sentence = args[0]()
-
-
-class reason(Action):
-    """Query the Clauses KB with Backward-Chaining, and if it fails with Nested Reasoning"""
-
-    def execute(self, *args):
-        definite_clause = args[0]()
 
 
 class assert_command(Action):
@@ -888,17 +856,17 @@ class WFR(ActiveBelief):
 
 
 class declareRule(Action):
-    """fills a rule with a verbal action"""
+    """assert an SWRL rule"""
     def execute(self, arg1):
-
         rule_str = str(arg1).split("'")[3]
 
         print("FINALE: ", rule_str)
 
-        # Asserting SWRL rule
         with my_onto:
            rule = Imp()
            rule.set_as_rule(rule_str)
+           sync_reasoner_pellet()
+           my_onto.save(file="west.owl", format="rdfxml")
 
 
 class fillActRule(Action):
@@ -1036,8 +1004,6 @@ class aggrEntity(Action):
         self.assert_belief(GND(id, var, conc_label))
 
 
-
-
 class applyAdj(Action):
     """create an entity and apply an adj to it"""
     def execute(self, arg1, arg2, arg3):
@@ -1071,7 +1037,6 @@ class applyAdj(Action):
 
         cleaned = "_".join(cleaned)
         return cleaned
-
 
 
 class createSubVerb(Action):
@@ -1149,7 +1114,6 @@ class createSubPrep(Action):
         return cleaned
 
 
-
 class createSubGndPrep(Action):
     """Creating a subclass of depending gnd preposition"""
     def execute(self, arg0, arg1, arg2, arg3):
@@ -1181,8 +1145,6 @@ class createSubGndPrep(Action):
 
         cleaned = "_".join(cleaned)
         return cleaned
-
-
 
 
 class saveOnto(Action):

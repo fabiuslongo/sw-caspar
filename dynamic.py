@@ -10,29 +10,29 @@ except IOError:
 
 
 with my_onto:
- class Action(Thing):
-     pass
+    class Action(Thing):
+        pass
 
- class Adjective(Thing):
+    class Adjective(Thing):
+        pass
+
+    class Entity(Thing):
+        pass
+
+    class Preposition(Thing):
+        pass
+
+    class hasAdj(ObjectProperty):
+        pass
+
+    class hasObject(ObjectProperty):
        pass
 
- class Entity(Thing):
-     pass
-
- class Preposition(Thing):
+    class hasSubject(ObjectProperty):
        pass
 
- class hasAdj(ObjectProperty):
-      pass
-
- class hasObject(ObjectProperty):
-      pass
-
- class hasSubject(ObjectProperty):
-      pass
-
- class hasPrep(ObjectProperty):
-      pass
+    class hasPrep(ObjectProperty):
+       pass
 
 
 
@@ -136,9 +136,11 @@ with my_onto:
 
 
 with my_onto:
-  sync_reasoner_pellet() #sincronizziamo il ragionatore e mettiamo le inferenze dentro l'ontologia onto
-  my_onto.save(file="west.owl", format="rdfxml")
-  pass
+   sync_reasoner_pellet() #sincronizziamo il ragionatore e mettiamo le inferenze dentro l'ontologia onto
+   my_onto.save(file="west.owl", format="rdfxml")
+   pass
+
+
 
 
 
