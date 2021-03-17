@@ -12,13 +12,13 @@ from owlready2 import *
 
 
 try:
-    my_onto = get_ontology("west.owl").load()
+    my_onto = get_ontology("world.owl").load()
     print("\nLoading existing owl...")
 except IOError:
-    my_onto = get_ontology("http://test.org/west.owl")
+    my_onto = get_ontology("http://test.org/world.owl")
     print("\nCreating new owl file...")
     print("\nPlease Re-Run SW-Caspar.")
-    my_onto.save(file="west.owl", format="rdfxml")
+    my_onto.save(file="world.owl", format="rdfxml")
     exit()
 
 
@@ -374,6 +374,7 @@ class preprocess_onto(Action):
 
             vect_LR_fol_plus_isa = m.build_isa_fol(positive_vect_LR_fol, deps)
             dclause = m.isa_fol_to_clause(vect_LR_fol_plus_isa)
+            self.assert_belief(RULE("->"))
 
         print("\nAfter dealing case:\n" + str(dclause))
 
@@ -389,8 +390,6 @@ class preprocess_onto(Action):
         # FLAT CASES
         else:
             self.process_fol(dclause, "FLAT")
-
-
 
     def get_ent_ROOT(self, deps):
         for d in deps:
@@ -854,7 +853,6 @@ class WFR(ActiveBelief):
             return False
 
 
-
 class declareRule(Action):
     """assert an SWRL rule"""
     def execute(self, arg1):
@@ -866,7 +864,7 @@ class declareRule(Action):
            rule = Imp()
            rule.set_as_rule(rule_str)
            sync_reasoner_pellet()
-           my_onto.save(file="west.owl", format="rdfxml")
+           my_onto.save(file="world.owl", format="rdfxml")
 
 
 class fillActRule(Action):
@@ -1150,7 +1148,7 @@ class createSubGndPrep(Action):
 class saveOnto(Action):
     """Creating a subclass of the class Verb"""
     def execute(self):
-        my_onto.save(file="west.owl", format="rdfxml")
+        my_onto.save(file="world.owl", format="rdfxml")
 
 
 class InitOnto(Action):
