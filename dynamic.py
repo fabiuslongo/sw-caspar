@@ -53,7 +53,6 @@ with my_onto:
     my_new_classes.append(types.new_class("Nation.NN", (Entity,)))
     my_new_classes.append(types.new_class("Weapon.NNS", (Entity,)))
     my_new_classes.append(types.new_class("To.IN", (Preposition,)))
-    my_new_classes.append(types.new_class("American.NNP", (Entity,)))
     my_new_classes.append(types.new_class("Be.VBZ", (Action,)))
 
     print("\nSubclasses list:\n")
@@ -119,12 +118,12 @@ with my_onto:
     print("body: ", rule.body)
     print("head: ", rule.head)
 
-#my_onto.save(file="west.owl", format="rdfxml")
+my_onto.save(file="west0.owl", format="rdfxml")
 
 
 with my_onto:
    sync_reasoner_pellet() #sincronizziamo il ragionatore e mettiamo le inferenze dentro l'ontologia onto
-   my_onto.save(file="west0.owl", format="rdfxml")
+   #my_onto.save(file="west0.owl", format="rdfxml")
 
 
 print("SPARQL")
