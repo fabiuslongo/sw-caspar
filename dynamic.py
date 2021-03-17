@@ -1,10 +1,10 @@
 from owlready2 import *
 
 try:
-    my_onto = get_ontology("west.owl").load()
+    my_onto = get_ontology("west0.owl").load()
     print("\nLoading existing owl...")
 except IOError:
-    my_onto = get_ontology("http://test/west.owl")
+    my_onto = get_ontology("http://test/west0.owl")
     print("\nCreating new owl...")
 
 
@@ -56,9 +56,6 @@ with my_onto:
     my_new_classes.append(types.new_class("American.NNP", (Entity,)))
     my_new_classes.append(types.new_class("Be.VBZ", (Action,)))
 
-
-
-
     print("\nSubclasses list:\n")
 
     for c in my_new_classes:
@@ -91,7 +88,6 @@ with my_onto:
     for i in my_obj:
         print(i)
 
-
     print("\nAssertions list:\n")
 
     # Cuba hasAdj Hostile
@@ -116,16 +112,7 @@ with my_onto:
 
     # Asserting SWRL rule
     rule = Imp()
-
-    r = "hasPrep(?e1, ?x7), To.IN(?x7), hasObject(?x7, ?x5), hasAdj(?x5, ?x6), Hostile.JJ(?6), Nation.NN(?x5), Weapon.NNS(?x2), American.NNP(?x1), hasSubject(?e1, ?x1), hasObject(?e1, ?x2), Sell.VBZ(?e1) -> hasSubject(?e2, ?x3), hasObject(?e2, ?x4), Be.VBZ(?e2), American.NNP(?x3), Criminal.NN(?x4)"
-
-
-    #rule.set_as_rule("hasSubject(?x2, ?x1), American_NN(?x1), Weapon_NNPS(?x3), hasObject(?x2, ?x3), Sell_VBZ(?x2), hasPrep(?x2, ?x4), To_IN(?x4), hasObject(?x4, ?x5), Nation_NN(?x5), hasAdj(?x5, ?x6), Hostile_JJ(?x6) -> Criminal_NN(?x1)")
-
-    #rule.set_as_rule("hasPrep(?e1, ?x7), To.IN(?x7), hasObject(?x7, ?x5), hasAdj(?x5, ?x6), Hostile.JJ(?6), Nation.NN(?x5), Weapon.NNS(?x2), American.NNP(?x1), hasSubject(?e1, ?x1), hasObject(?e1, ?x2), Sell.VBZ(?e1) -> hasSubject(?e2, ?x3), hasObject(?e2, ?x4), Be.VBZ(?e2), American.NNP(?x3), Criminal.NN(?x4)")
-
-    rule.set_as_rule(r)
-
+    rule.set_as_rule("hasSubject(?x2, ?x1), American.NN(?x1), Weapon.NNS(?x3), hasObject(?x2, ?x3), Sell.VBZ(?x2), hasPrep(?x2, ?x4), To.IN(?x4), hasObject(?x4, ?x5), Nation.NN(?x5), hasAdj(?x5, ?x6), Hostile.JJ(?x6) -> Criminal.NN(?x1)")
 
     print("\nRule")
 
@@ -137,26 +124,22 @@ with my_onto:
 
 with my_onto:
    sync_reasoner_pellet() #sincronizziamo il ragionatore e mettiamo le inferenze dentro l'ontologia onto
-   my_onto.save(file="west.owl", format="rdfxml")
-   pass
-
-
-
+   my_onto.save(file="west0.owl", format="rdfxml")
 
 
 print("SPARQL")
 
 my_world = owlready2.World()
-my_world.get_ontology("west.owl").load()  # path to the owl file is given here
+my_world.get_ontology("west0.owl").load()  # path to the owl file is given here
 
 graph = my_world.as_rdflib_graph()
 
-result = list(graph.query("""Select ?p WHERE {<http://test/west.owl#Colonel_West_NNP> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?p .}"""))
+result = list(graph.query("""Select ?p WHERE {<http://test/west0.owl#Colonel_West> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?p .}"""))
 
 for i in result:
     print(i)
 
-result = list(graph.query("ASK WHERE {<http://test/west.owl#Colonel_West> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test/west.owl#Criminal_NN>.}"))
+result = list(graph.query("ASK WHERE {<http://test/west0.owl#Colonel_West> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test/west0.owl#Criminal.NN>.}"))
 print(result)
 
 
