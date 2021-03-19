@@ -10,7 +10,7 @@ process_onto() / ID(I) >> [aggr_ent(), create_adj(), create_gnd_prep(), create_p
 
 # flats
 
-aggr_ent() / (GND(X, Y, Z) & GND(X, Y, K) & neq(Z, K)) >> [show_line("\naggregating entity: ", Y), -GND("FLAT", Y, Z), -GND("FLAT", Y, K), aggrEntity(X, Y, Z, K), aggr_ent()]
+aggr_ent() / (GND(X, Y, Z) & GND(X, Y, K) & neq(Z, K)) >> [show_line("\naggregating entity: ", Y), -GND(X, Y, Z), -GND(X, Y, K), aggrEntity(X, Y, Z, K), aggr_ent()]
 aggr_ent() >> [show_line("\nentities aggregation done.")]
 
 create_adj() / (ADJ("FLAT", X, Y) & GND("FLAT", X, S) & ID(I)) >> [show_line("\ncreating entity+adjective: ", Y), -ADJ("FLAT", X, Y), applyAdj(I, Y, S), create_adj()]
@@ -19,7 +19,7 @@ create_adj() >> [show_line("\nadjective creation done.")]
 create_prep() / (ACTION("FLAT", V, D, X, Y) & PREP("FLAT", D, K, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating verb prep: ", K), -PREP("FLAT", D, K, Z), -GND("FLAT", Z, S), createSubPrep(I, V, K, S), create_prep()]
 create_prep() >> [show_line("\nprep creation done.")]
 
-create_gnd_prep() / (GND("FLAT", X, K) & PREP("FLAT", X, Y, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating gnd prep: ", Y), -PREP("FLAT", K, Y, Z), -GND("FLAT", Z, S), createSubGndPrep(I, K, Y, S), create_prep()]
+create_gnd_prep() / (GND("FLAT", X, K) & PREP("FLAT", X, Y, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating gnd prep: ", Y), -PREP("FLAT", X, Y, Z), -GND("FLAT", Z, S), createSubGndPrep(I, K, Y, S), create_prep()]
 create_gnd_prep() >> [show_line("\nprep creation done.")]
 
 create_verb() / (ACTION("FLAT", V, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating verb: ", V), -ACTION("FLAT", V, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubVerb(I, V, K, J), create_verb()]
@@ -32,7 +32,7 @@ create_rule() / (ACTION(H, V, E, X, Y) & RULE(R)) >> [show_line("\nupdating rule
 create_rule() / (GND(H, X, Y) & RULE(R)) >> [show_line("\nupdating rule with gnd: ", Y), -GND(H, X, Y), -RULE(R), fillGndRule(H, R, X, Y), create_rule()]
 create_rule() / (ADJ(H, X, Y) & RULE(R)) >> [show_line("\nupdating rule with adj: ", Y), -ADJ(H, X, Y), -RULE(R), fillAdjRule(H, R, X, Y), create_rule()]
 
-create_rule() / (PREP(H, E, X, Y) & RULE(R)) >> [show_line("\nupdating rule with prep: ", X), -PREP(H, E, X, Y), -RULE(R), fillPrepRule(H, R, E, X, Y), create_rule()]
+create_rule() / (PREP(H, E, X, Y) & RULE(R)) >> [show_line("\nupdating rule with prep: ", X), -RULE(R), -PREP(H, E, X, Y), fillPrepRule(H, R, E, X, Y), create_rule()]
 
 finalize_rule() / (RULE(R) & WFR(R)) >> [show_line("\nfinalizing well formed rule..."), -RULE(R), declareRule(R)]
 

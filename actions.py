@@ -944,14 +944,14 @@ class fillAdjRule(Action):
 
         if hand_side == "LEFT":
             if rule[0] == "-":
-                rule = "hasAdj(?"+var+", ?x"+new_index_var+"), "+value+"(?"+new_index_var+") "+rule
+                rule = value+"(?"+var+") "+rule
             else:
-                rule = "hasAdj(?"+var+", ?x"+new_index_var+"), " +value +"(?"+new_index_var+"), "+rule
+                rule = value +"(?"+var+"), "+rule
         else:
             if rule[-1] == ">":
-                rule = rule+" hasAdj(?"+var+", ?x"+new_index_var+"), "+value+"(?"+new_index_var+")"
+                rule = rule+", "+value+"(?"+var+")"
             else:
-                rule = rule+", hasAdj(?"+var+", ?x"+new_index_var+"), "+value+"(?"+new_index_var+")"
+                rule = rule+", "+value+"(?"+var+")"
 
         print("rule: ", rule)
         self.assert_belief(RULE(rule))
