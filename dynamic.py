@@ -123,7 +123,8 @@ my_onto.save(file="west0.owl", format="rdfxml")
 
 with my_onto:
    sync_reasoner_pellet() #sincronizziamo il ragionatore e mettiamo le inferenze dentro l'ontologia onto
-   #my_onto.save(file="west0.owl", format="rdfxml")
+   #close_world(Entity)
+   my_onto.save(file="west0.owl", format="rdfxml")
 
 
 print("SPARQL")
@@ -139,7 +140,11 @@ for i in result:
     print(i)
 
 result = list(graph.query("ASK WHERE {<http://test/west0.owl#Colonel_West> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test/west0.owl#Criminal.NN>.}"))
+
 print(result)
+
+a = issubclass(my_onto["<http://test/west0.owl#Colonel_West>"], my_onto["<http://test/west0.owl#Criminal.NN>"])
+print(a)
 
 
 
