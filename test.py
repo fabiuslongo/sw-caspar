@@ -31,8 +31,6 @@ with my_onto:
 
 
 
-
-
 ci1 = Contraindication()
 ci2 = Contraindication()
 ci3 = Contraindication()
@@ -66,7 +64,8 @@ with my_onto:
 
 close_world(Contraindication)
 close_world(Drug)
-#close_world(Disorder)
+
+print(issubclass(ConstitutiveHemorrhagicDisorder, Disorder))
 
 print(issubclass(HemorrhagicDisorder, DisorderOkWithAspirin))
 print(issubclass(AcquiredHemorrhagicDisorder, DisorderOkWithAspirin))
@@ -75,7 +74,5 @@ print(issubclass(ConstitutiveHemorrhagicDisorder, DisorderOkWithAspirin))
 print(issubclass(HemorrhagicDisorder, DisorderContraindicatingAspirin))
 print(issubclass(AcquiredHemorrhagicDisorder, DisorderContraindicatingAspirin))
 print(issubclass(ConstitutiveHemorrhagicDisorder, DisorderContraindicatingAspirin))
-
-print(issubclass(ConstitutiveHemorrhagicDisorder, Disorder))
 
 my_onto.save(file="drugs.owl", format="rdfxml")

@@ -83,6 +83,8 @@ class create_gnd_prep(Procedure): pass
 class create_prep(Procedure): pass
 class aggr_ent(Procedure): pass
 class create_rule(Procedure): pass
+class create_body(Procedure): pass
+class create_head(Procedure): pass
 class finalize_rule(Procedure): pass
 
 # Reactive procedures - direct commands
@@ -183,6 +185,8 @@ class ADJ(Belief): pass
 class ID(Belief): pass
 # rule accumulator
 class RULE(Belief): pass
+# subject accumulator
+class SUBJ(Belief): pass
 
 
 # parse rule beliefs

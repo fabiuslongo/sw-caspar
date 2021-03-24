@@ -5,7 +5,7 @@ from actions import *
 
 # ONTOLOGY BUILDER
 
-process_onto() / ID(I) >> [aggr_ent(), create_adj(), create_gnd_prep(), create_prep(), create_verb(), create_rule(), saveOnto(), finalize_rule(), -ID(I)]
+process_onto() / ID(I) >> [aggr_ent(), create_adj(), create_gnd_prep(), create_prep(), create_verb(), create_body(), saveOnto(), finalize_rule(), -ID(I)]
 
 
 # flats
@@ -28,13 +28,19 @@ create_verb() >> [show_line("\nverb creation done.")]
 
 # implications
 
-create_rule() / (ACTION(H, V, E, X, Y) & RULE(R)) >> [show_line("\nupdating rule with action: ", V), -ACTION(H, V, E, X, Y), -RULE(R), fillActRule(R, H, V, E, X, Y), create_rule()]
-create_rule() / (GND(H, X, Y) & RULE(R)) >> [show_line("\nupdating rule with gnd: ", Y), -GND(H, X, Y), -RULE(R), fillGndRule(H, R, X, Y), create_rule()]
-create_rule() / (ADJ(H, X, Y) & RULE(R)) >> [show_line("\nupdating rule with adj: ", Y), -ADJ(H, X, Y), -RULE(R), fillAdjRule(H, R, X, Y), create_rule()]
+create_body() / (ACTION("LEFT", V, E, X, Y) & RULE(R)) >> [show_line("\nupdating body with action: ", V), -ACTION("LEFT", V, E, X, Y), -RULE(R), +SUBJ(S), fillActRule(R, "LEFT", V, E, X, Y), create_body()]
 
-create_rule() / (PREP(H, E, X, Y) & RULE(R)) >> [show_line("\nupdating rule with prep: ", X), -RULE(R), -PREP(H, E, X, Y), fillPrepRule(H, R, E, X, Y), create_rule()]
+create_body() / (GND("LEFT", X, Y) & RULE(R) & SUBJ(X)) >> [show_line("\nupdating body with gnd: ", Y), -GND("LEFT", X, Y), -RULE(R), -SUBJ(X), +SUBJ(X, Y), fillGndRule("LEFT", R, X, Y), create_body()]
+create_body() / (GND("LEFT", X, Y) & RULE(R)) >> [show_line("\nupdating body with gnd: ", Y), -GND("LEFT", X, Y), -RULE(R), fillGndRule("LEFT", R, X, Y), create_body()]
+
+create_body() / (ADJ("LEFT", X, Y) & RULE(R)) >> [show_line("\nupdating body with adj: ", Y), -ADJ("LEFT", X, Y), -RULE(R), fillAdjRule("LEFT", R, X, Y), create_body()]
+create_body() / (PREP("LEFT", E, X, Y) & RULE(R)) >> [show_line("\nupdating body with prep: ", X), -RULE(R), -PREP("LEFT", E, X, Y), fillPrepRule("LEFT", R, E, X, Y), create_body()]
+
+create_head() / (ACTION("RIGHT", "Be.VBZ", E, X, Y) & GND("LEFT", X, V) & SUBJ(X, V) & RULE(R)) >> [show_line("\nupdating head: ", V), fillGndRule("RIGHT", R, X, Y)]
 
 finalize_rule() / (RULE(R) & WFR(R)) >> [show_line("\nfinalizing well formed rule..."), -RULE(R), declareRule(R)]
+finalize_rule() / RULE(R) >> [show_line("\nthe rule is not well formed!"), -RULE(R), declareRule(R)]
+
 
 
 
