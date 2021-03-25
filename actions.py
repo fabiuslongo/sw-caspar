@@ -867,16 +867,14 @@ class declareRule(Action):
         with my_onto:
            rule = Imp()
            rule.set_as_rule(rule_str)
-           sync_reasoner_pellet()
-           my_onto.save(file="world.owl", format="rdfxml")
 
 
 class fillActRule(Action):
     """fills a rule with a verbal action"""
     def execute(self, arg0, arg1, arg2, arg3, arg4, arg5):
 
-        rule = str(arg0).split("'")[3]
-        hand_side = str(arg1).split("'")[3]
+        hand_side = str(arg0).split("'")[1]
+        rule = str(arg1).split("'")[3]
         verb = str(arg2).split("'")[3].replace(":", ".")
         dav = str(arg3).split("'")[3]
         subj = str(arg4).split("'")[3]
@@ -905,7 +903,7 @@ class fillGndRule(Action):
     """fills a rule with a ground"""
     def execute(self, arg0, arg1, arg2, arg3):
 
-        hans_side = str(arg0).split("'")[3]
+        hand_side = str(arg0).split("'")[1]
         rule = str(arg1).split("'")[3]
         var = str(arg2).split("'")[3]
         value = str(arg3).split("'")[3].replace(":", ".")
@@ -915,7 +913,7 @@ class fillGndRule(Action):
         new_sub_entity = types.new_class(value, (Entity,))
         print(new_sub_entity)
 
-        if hans_side == "LEFT":
+        if hand_side == "LEFT":
             if rule[0] == "-":
                 rule = value+"(?"+var+") "+rule
             else:
@@ -934,7 +932,7 @@ class fillAdjRule(Action):
     """fills a rule with a ground"""
     def execute(self, arg0, arg1, arg2, arg3):
 
-        hand_side = str(arg0).split("'")[3]
+        hand_side = str(arg0).split("'")[1]
         rule = str(arg1).split("'")[3]
         var = str(arg2).split("'")[3]
         value = str(arg3).split("'")[3].replace(":", ".")
@@ -966,7 +964,7 @@ class fillPrepRule(Action):
     """fills a rule with a preposition"""
     def execute(self, arg0, arg1, arg2, arg3, arg4):
 
-        hand_side = str(arg0).split("'")[3]
+        hand_side = str(arg0).split("'")[1]
         rule = str(arg1).split("'")[3]
         var_master = str(arg2).split("'")[3]
         value = str(arg3).split("'")[3].replace(":", ".")
@@ -1152,7 +1150,9 @@ class createSubGndPrep(Action):
 class saveOnto(Action):
     """Creating a subclass of the class Verb"""
     def execute(self):
-        my_onto.save(file="world.owl", format="rdfxml")
+        with my_onto:
+            sync_reasoner_pellet()
+            my_onto.save(file="world.owl", format="rdfxml")
 
 
 class InitOnto(Action):

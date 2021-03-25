@@ -5,7 +5,7 @@ from actions import *
 
 # ONTOLOGY BUILDER
 
-process_onto() / ID(I) >> [aggr_ent(), create_adj(), create_gnd_prep(), create_prep(), create_verb(), create_body(), saveOnto(), finalize_rule(), -ID(I)]
+process_onto() / ID(I) >> [aggr_ent(), create_adj(), create_gnd_prep(), create_prep(), create_verb(), create_body(), create_head(), finalize_rule(), saveOnto(), -ID(I)]
 
 
 # flats
@@ -28,7 +28,7 @@ create_verb() >> [show_line("\nverb creation done.")]
 
 # implications
 
-create_body() / (ACTION("LEFT", V, E, X, Y) & RULE(R)) >> [show_line("\nupdating body with action: ", V), -ACTION("LEFT", V, E, X, Y), -RULE(R), +SUBJ(S), fillActRule(R, "LEFT", V, E, X, Y), create_body()]
+create_body() / (ACTION("LEFT", V, E, X, Y) & RULE(R)) >> [show_line("\nupdating body with action: ", V), -ACTION("LEFT", V, E, X, Y), -RULE(R), +SUBJ(X), fillActRule("LEFT", R, V, E, X, Y), create_body()]
 
 create_body() / (GND("LEFT", X, Y) & RULE(R) & SUBJ(X)) >> [show_line("\nupdating body with gnd: ", Y), -GND("LEFT", X, Y), -RULE(R), -SUBJ(X), +SUBJ(X, Y), fillGndRule("LEFT", R, X, Y), create_body()]
 create_body() / (GND("LEFT", X, Y) & RULE(R)) >> [show_line("\nupdating body with gnd: ", Y), -GND("LEFT", X, Y), -RULE(R), fillGndRule("LEFT", R, X, Y), create_body()]
@@ -36,7 +36,10 @@ create_body() / (GND("LEFT", X, Y) & RULE(R)) >> [show_line("\nupdating body wit
 create_body() / (ADJ("LEFT", X, Y) & RULE(R)) >> [show_line("\nupdating body with adj: ", Y), -ADJ("LEFT", X, Y), -RULE(R), fillAdjRule("LEFT", R, X, Y), create_body()]
 create_body() / (PREP("LEFT", E, X, Y) & RULE(R)) >> [show_line("\nupdating body with prep: ", X), -RULE(R), -PREP("LEFT", E, X, Y), fillPrepRule("LEFT", R, E, X, Y), create_body()]
 
-create_head() / (ACTION("RIGHT", "Be.VBZ", E, X, Y) & GND("LEFT", X, V) & SUBJ(X, V) & RULE(R)) >> [show_line("\nupdating head: ", V), fillGndRule("RIGHT", R, X, Y)]
+create_head() / (ACTION("RIGHT", "Be:VBZ", E, X, Y) & GND("RIGHT", X, K) & GND("RIGHT", Y, V) & SUBJ(S, K) & RULE(R)) >> [show_line("\nupdating implication head: ", V), -ACTION("RIGHT", "Be:VBZ", E, X, Y), -GND("RIGHT", X, K), -GND("RIGHT", Y, V), -SUBJ(S, K), -RULE(R), fillGndRule("RIGHT", R, S, V), create_head()]
+create_head() / (GND("RIGHT", X, K) & RULE(R)) >> [show_line("\nupdating isa head with gnd: ", K), -GND("RIGHT", X, K), -RULE(R), fillGndRule("RIGHT", R, X, K), create_head()]
+create_head() / (ADJ("RIGHT", X, K) & RULE(R)) >> [show_line("\nupdating isa head with adj: ", K), -ADJ("RIGHT", X, K), -RULE(R), fillAdjRule("RIGHT", R, X, K), create_head()]
+
 
 finalize_rule() / (RULE(R) & WFR(R)) >> [show_line("\nfinalizing well formed rule..."), -RULE(R), declareRule(R)]
 finalize_rule() / RULE(R) >> [show_line("\nthe rule is not well formed!"), -RULE(R), declareRule(R)]
