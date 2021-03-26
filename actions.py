@@ -270,6 +270,7 @@ class eval_cls(ActiveBelief):
         my_world = owlready2.World()
         my_world.get_ontology("world.owl").load()  # path to the owl file is given here
 
+        sync_reasoner(my_world)
         graph = my_world.as_rdflib_graph()
         result = list(graph.query("Select ?p WHERE {?p <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test.org/world.owl#"+obj+">.}"))
 
@@ -1162,7 +1163,7 @@ class saveOnto(Action):
     """Creating a subclass of the class Verb"""
     def execute(self):
         with my_onto:
-            sync_reasoner_pellet()
+            #sync_reasoner_pellet()
             my_onto.save(file="world.owl", format="rdfxml")
 
 
