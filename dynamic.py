@@ -134,12 +134,17 @@ my_world.get_ontology("west0.owl").load()  # path to the owl file is given here
 
 graph = my_world.as_rdflib_graph()
 
-result = list(graph.query("""Select ?p WHERE {<http://test/west0.owl#Colonel_West> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?p .}"""))
+result = list(graph.query("""Select ?p WHERE {?p <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test/west0.owl#Criminal.NN>.}"""))
+#result = list(graph.query("""SELECT ?o WHERE {?s ?p ?o .FILTER regex(str(?o), "Colonel_West") .}"""))
 
-for i in result:
-    print(i)
 
-result = list(graph.query("ASK WHERE {<http://test/west0.owl#Colonel_West> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test/west0.owl#Criminal.NN>.}"))
+for element in result:
+    print(element)
+    e = str(element).split("'")[1]
+    e_final = e.split("#")[1]
+    print(e_final)
+
+result = list(graph.query("ASK WHERE {?o <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test/west0.owl#Criminal.NN>.}"))
 
 print(result)
 

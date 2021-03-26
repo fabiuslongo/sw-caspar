@@ -262,21 +262,32 @@ class set_wait(Action):
 
 class eval_cls(ActiveBelief):
     """ActiveBelief for Beliefs KB and Clauses KB interaction"""
-    def evaluate(self, arg1, arg2, arg3):
+    def evaluate(self, arg1, arg2):
 
         subj = str(arg1).split("'")[1]
-        rel = str(arg2).split("'")[1]
-        obj = str(arg3).split("'")[1]
+        obj = str(arg2).split("'")[1]
 
         my_world = owlready2.World()
-        my_world.get_ontology("west.owl").load()  # path to the owl file is given here
+        my_world.get_ontology("world.owl").load()  # path to the owl file is given here
 
         graph = my_world.as_rdflib_graph()
+        result = list(graph.query("Select ?p WHERE {?p <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test.org/world.owl#"+obj+">.}"))
 
-        result = list(graph.query("ASK WHERE {<http://test/west.owl#"+subj+"> <http://www.w3.org/1999/02/22-rdf-syntax-ns#"+rel+"> <http://test/west.owl#"+obj+">.}"))
-        print(result)
+        res_def = []
 
-        return result[0]
+        for element in result:
+            e = str(element).split("'")[1]
+            e_final = e.split("#")[1].split(".")
+            final = ".".join(e_final[:-1])
+            res_def.append(final)
+
+        print("Meta-Reasoning: ", res_def)
+
+        if subj in res_def:
+            return True
+        else:
+            return False
+
 
 
 class lemma_in_syn(ActiveBelief):
@@ -614,7 +625,7 @@ class assert_command(Action):
 
     def process(self, vect_fol):
 
-        dateTimeObj = datetime.now()
+        dateTimeObj = datetime.datetime.now()
         id_ground = dateTimeObj.microsecond
 
         for g in vect_fol:
