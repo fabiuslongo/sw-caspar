@@ -1112,6 +1112,39 @@ class createPassSubVerb(Action):
         return cleaned
 
 
+
+class createIntrSubVerb(Action):
+    """Creating a subclass of the class Verb (Intransitive)"""
+    def execute(self, arg1, arg2, arg3):
+
+        id_str = str(arg1).split("'")[3]
+        print(id_str)
+        verb_str = str(arg2).split("'")[3].replace(":", ".")
+        print(verb_str)
+        subj_str = str(arg3).split("'")[3].replace(":", ".")
+        print(subj_str)
+
+        # subclasses
+        new_sub_verb = types.new_class(verb_str, (Verb,))
+        new_sub_subj = types.new_class(subj_str, (Entity,))
+
+        # entities individual
+        new_ind_verb = new_sub_verb(self.clean_from_POS(verb_str)+"."+id_str)
+        new_ind_subj = new_sub_subj(self.clean_from_POS(subj_str)+"."+id_str)
+
+        # individual entity - hasSubject - subject individual
+        new_ind_verb.hasSubject = [new_ind_subj]
+
+    def clean_from_POS(self, ent):
+        pre_clean = ent.split("_")
+        cleaned = []
+        for s in pre_clean:
+            cleaned.append(s.split("-")[0])
+
+        cleaned = "_".join(cleaned)
+        return cleaned
+
+
 class createSubPrep(Action):
     """Creating a subclass of depending action preposition"""
     def execute(self, arg0, arg1, arg2, arg3):
