@@ -29,6 +29,9 @@ with my_onto:
     class Adjective(Thing):
         pass
 
+    class Adverb(Thing):
+        pass
+
     class Entity(Thing):
         pass
 
@@ -36,6 +39,9 @@ with my_onto:
         pass
 
     class hasAdj(ObjectProperty):
+        pass
+
+    class hasAdv(ObjectProperty):
         pass
 
     class hasObject(ObjectProperty):
@@ -78,6 +84,7 @@ class create_onto(Procedure): pass
 class process_rule(Procedure): pass
 class process_onto(Procedure): pass
 class create_adj(Procedure): pass
+class create_adv(Procedure): pass
 class create_verb(Procedure): pass
 class create_gnd_prep(Procedure): pass
 class create_prep(Procedure): pass
@@ -1049,6 +1056,42 @@ class applyAdj(Action):
 
         cleaned = "_".join(cleaned)
         return cleaned
+
+
+class applyAdv(Action):
+    """create an entity and apply an adj to it"""
+    def execute(self, arg1, arg2, arg3):
+
+        id_str = str(arg1).split("'")[3]
+        print(id_str)
+
+        verb_str = str(arg2).split("'")[3].replace(":", ".")
+        print(verb_str)
+        adv_str = str(arg3).split("'")[3].replace(":", ".")
+        print(adv_str)
+
+        # creating subclass adjective
+        adv = types.new_class(adv_str, (Adverb,))
+        # adverb individual
+        new_adv_ind = adv(self.clean_from_POS(adv_str)+"."+id_str)
+
+        # creating subclass entity
+        new_sub = types.new_class(verb_str, (Verb,))
+        # creating entity individual
+        new_ind = new_sub(self.clean_from_POS(verb_str)+"."+id_str)
+
+        # individual entity - hasAdv - adverb individual
+        new_ind.hasAdv = [new_adv_ind]
+
+    def clean_from_POS(self, ent):
+        pre_clean = ent.split("_")
+        cleaned = []
+        for s in pre_clean:
+            cleaned.append(s.split("-")[0])
+
+        cleaned = "_".join(cleaned)
+        return cleaned
+
 
 
 class createSubVerb(Action):
