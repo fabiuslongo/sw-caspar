@@ -1081,6 +1081,27 @@ class createSubVerb(Action):
 
 
 
+class createPassSubVerb(Action):
+    """Creating a subclass of the class Verb (passive)"""
+    def execute(self, arg1, arg2, arg3):
+        id_str = str(arg1).split("'")[3]
+        print(id_str)
+        verb_str = str(arg2).split("'")[3].replace(":", ".")
+        print(verb_str)
+        obj_str = str(arg3).split("'")[3].replace(":", ".")
+        print(obj_str)
+
+        # subclasses
+        new_sub_verb = types.new_class(verb_str, (Verb,))
+        new_sub_obj = types.new_class(obj_str, (Entity,))
+
+        # entities individual
+        new_ind_verb = new_sub_verb(self.clean_from_POS(verb_str) + "." + id_str)
+        new_ind_obj = new_sub_obj(self.clean_from_POS(obj_str) + "." + id_str)
+
+        # individual entity - hasObject - Object individual
+        new_ind_verb.hasObject = [new_ind_obj]
+
     def clean_from_POS(self, ent):
         pre_clean = ent.split("_")
         cleaned = []
