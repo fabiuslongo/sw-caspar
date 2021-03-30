@@ -53,6 +53,9 @@ with my_onto:
     class hasPrep(ObjectProperty):
         pass
 
+    class hasDate(DataProperty):
+        pass
+
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -207,7 +210,7 @@ class MST_COND(Belief): pass
 class parse_deps(Procedure): pass
 class feed_mst(Procedure): pass
 class PROCESS_STORED_MST(Reactor): pass
-
+class NER(Belief): pass
 
 
 class log(Action):
@@ -326,6 +329,11 @@ class preprocess_onto(Action):
         self.MAIN_NEG_PRESENT = False
 
         deps = parser.get_last_deps()
+        ners = parser.get_last_ner()
+        print("NER: ", ners)
+        for ner in ners:
+            n = ner.split(", ")
+            self.assert_belief(NER(n[0][1:], n[1][:-1]))
 
         for i in range(len(deps)):
             governor = self.get_lemma(deps[i][1]).capitalize() + ":" + self.get_pos(deps[i][1])
@@ -890,9 +898,8 @@ class declareRule(Action):
 
 class fillActRule(Action):
     """fills a rule with a verbal action"""
-    def execute(self, arg0, arg1, arg2, arg3, arg4, arg5):
+    def execute(self, arg1, arg2, arg3, arg4, arg5):
 
-        hand_side = str(arg0).split("'")[1]
         rule = str(arg1).split("'")[3]
         verb = str(arg2).split("'")[3].replace(":", ".")
         dav = str(arg3).split("'")[3]
@@ -903,16 +910,54 @@ class fillActRule(Action):
         new_sub_verb = types.new_class(verb, (Verb,))
         print(new_sub_verb)
 
-        if hand_side == "LEFT":
-            if rule[0] == "-":
-                rule = "hasSubject(?"+dav+", ?"+subj+"), hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+") "+rule
-            else:
-                rule = "hasSubject(?"+dav+", ?"+subj+"), hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+"), "+rule
+        if rule[0] == "-":
+            rule = "hasSubject(?"+dav+", ?"+subj+"), hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+") "+rule
         else:
-            if rule[-1] == ">":
-                rule = rule + " hasSubject(?"+dav+", ?"+subj+"), hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+")"
-            else:
-                rule = rule + ", hasSubject(?"+dav+", ?"+subj+"), hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+")"
+            rule = "hasSubject(?"+dav+", ?"+subj+"), hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+"), "+rule
+
+        print("rule: ", rule)
+        self.assert_belief(RULE(rule))
+
+
+class fillPassActRule(Action):
+    """fills a rule with a passive verbal action"""
+    def execute(self, arg1, arg2, arg3, arg4):
+
+        rule = str(arg1).split("'")[3]
+        verb = str(arg2).split("'")[3].replace(":", ".")
+        dav = str(arg3).split("'")[3]
+        obj = str(arg4).split("'")[3]
+
+        # creating subclass of verb
+        new_sub_verb = types.new_class(verb, (Verb,))
+        print(new_sub_verb)
+
+        if rule[0] == "-":
+            rule = "hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+") "+rule
+        else:
+            rule = "hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+"), "+rule
+
+        print("rule: ", rule)
+        self.assert_belief(RULE(rule))
+
+
+class fillIntraActRule(Action):
+    """fills a rule with an intransitive verbal action"""
+    def execute(self, arg1, arg2, arg3, arg4):
+
+        rule = str(arg1).split("'")[3]
+        verb = str(arg2).split("'")[3].replace(":", ".")
+        dav = str(arg3).split("'")[3]
+        subj = str(arg4).split("'")[3]
+
+        # creating subclass of verb
+        new_sub_verb = types.new_class(verb, (Verb,))
+        print(new_sub_verb)
+
+        if rule[0] == "-":
+            rule = "hasSubject(?"+dav+", ?"+subj+"), "+verb+"(?"+dav+") "+rule
+        else:
+            rule = "hasSubject(?"+dav+", ?"+subj+"), "+verb+"(?"+dav+"), "+rule
 
         print("rule: ", rule)
         self.assert_belief(RULE(rule))
@@ -1122,6 +1167,14 @@ class createSubVerb(Action):
         # individual entity - hasObject - Object individual
         new_ind_verb.hasObject = [new_ind_obj]
 
+    def clean_from_POS(self, ent):
+        pre_clean = ent.split("_")
+        cleaned = []
+        for s in pre_clean:
+            cleaned.append(s.split("-")[0])
+
+        cleaned = "_".join(cleaned)
+        return cleaned
 
 
 class createPassSubVerb(Action):

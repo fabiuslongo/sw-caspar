@@ -407,28 +407,6 @@ class Parse(object):
         return deps
 
 
-    def morph(self, sent):
-        sent_changed = ""
-        for c in sent:
-            if c in [':', '$', '.']:
-                sent_changed = sent_changed + "_"
-            else:
-                sent_changed = sent_changed + c
-        final_sent_changed = ""
-        sent_changed_splitted = sent_changed.split(" ")
-        for i in range(len(sent_changed_splitted)):
-            if sent_changed_splitted[i][0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-                if i == 0:
-                    final_sent_changed = "N" + sent_changed_splitted[i]
-                else:
-                    final_sent_changed = final_sent_changed + " N" + sent_changed_splitted[i]
-            else:
-                if i == 0:
-                    final_sent_changed = sent_changed_splitted[i]
-                else:
-                    final_sent_changed = final_sent_changed + " " + sent_changed_splitted[i]
-
-        return final_sent_changed
 
 
     def shrink(self, word):
@@ -446,8 +424,10 @@ def main():
     parser = Parse(VERBOSE)
 
     LEMMMATIZED = True
-    sentence = "Dummy is a quality you think is important in a friend"
-    deps = parser.get_deps(sentence, LEMMMATIZED)
+    DISOK = True
+
+    sentence = "Patient visited the outpatient clinic in January 2020"
+    deps = parser.get_deps(sentence, LEMMMATIZED, DISOK)
     parser.set_last_deps(deps)
     ner = parser.get_last_ner()
     print("\nner: ", ner)

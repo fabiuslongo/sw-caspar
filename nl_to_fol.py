@@ -202,6 +202,89 @@ class ManageFols(object):
 
         RHS_temp = []
 
+        # building actions predicates
+
+        for act in ACTIONS:
+
+            first_arg = '__'
+            second_arg = '__'
+
+            #scanning var_list
+
+            for v in VARLIST:
+
+                if v[0] == act[1]:
+                    # adding adverb term to fol
+                    var =[]
+                    var.append(v[1])
+                    var.append(v[0])
+
+                    if var not in fol:
+                        fol.append(var)
+
+                if act[2][0] == dav:
+                    first_arg = act[2]
+
+                elif v[0] == act[2] and v[1] != '?':
+
+                    # adding grounded first argument to fol
+                    var = []
+                    var.append(v[1])
+                    var.append(v[0])
+
+                    if var not in fol:
+                        fol.append(var)
+
+                    first_arg = act[2]
+
+                if act[3][0] == dav:
+                    second_arg = act[3]
+
+                elif v[0] == act[3] and v[1] != '?':
+
+                    # adding grounded second argument to fol
+                    var = []
+                    var.append(v[1])
+                    var.append(v[0])
+
+                    if var not in fol:
+                        fol.append(var)
+                    second_arg = act[3]
+
+            action = []
+            action.append(act[0])
+            action.append(act[1])
+            action.append(first_arg)
+            action.append(second_arg)
+
+            fol.append(action)
+
+        # building prepositions
+
+        for p in PREPS:
+            for v in VARLIST:
+                if v[0] == p[2]:
+
+                    prep = []
+                    prep.append(p[0])
+                    prep.append(p[1])
+
+                    # check if reflective case
+                    if v[1] == '?':
+                        prep.append(' __')
+                    else:
+                        prep.append(p[2])
+
+                    fol.append(prep)
+
+                    if v[1] != '?':
+                        var = []
+                        var.append(v[1])
+                        var.append(v[0])
+
+                        if var not in fol:
+                            fol.append(var)
+
         # building compounds predicates
 
         for b in COMPOUNDS:
@@ -264,86 +347,6 @@ class ManageFols(object):
 
                         fol.append(new_act)
 
-        #building actions predicates
-
-        for act in ACTIONS:
-
-            first_arg = '__'
-            second_arg = '__'
-
-            #scanning var_list
-
-            for v in VARLIST:
-
-                if v[0] == act[1]:
-                    # adding adverb term to fol
-                    var =[]
-                    var.append(v[1])
-                    var.append(v[0])
-
-                    if var not in fol:
-                        fol.append(var)
-
-                if act[2][0] == dav:
-                    first_arg = act[2]
-
-                elif v[0] == act[2] and v[1] != '?':
-
-                    # adding grounded first argument to fol
-                    var = []
-                    var.append(v[1])
-                    var.append(v[0])
-
-                    if var not in fol:
-                        fol.append(var)
-
-                    first_arg = act[2]
-
-                if act[3][0] == dav:
-                    second_arg = act[3]
-
-                elif v[0] == act[3] and v[1] != '?':
-
-                    # adding grounded second argument to fol
-                    var = []
-                    var.append(v[1])
-                    var.append(v[0])
-
-                    if var not in fol:
-                        fol.append(var)
-                    second_arg = act[3]
-
-            action = []
-            action.append(act[0])
-            action.append(act[1])
-            action.append(first_arg)
-            action.append(second_arg)
-
-            fol.append(action)
-
-        for p in PREPS:
-            for v in VARLIST:
-                if v[0] == p[2]:
-
-                    prep = []
-                    prep.append(p[0])
-                    prep.append(p[1])
-
-                    # check if reflective case
-                    if v[1] == '?':
-                        prep.append(' __')
-                    else:
-                        prep.append(p[2])
-
-                    fol.append(prep)
-
-                    if v[1] != '?':
-                        var = []
-                        var.append(v[1])
-                        var.append(v[0])
-
-                        if var not in fol:
-                            fol.append(var)
 
         if len(CONDITIONALS) > 0:
 

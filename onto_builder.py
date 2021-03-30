@@ -34,7 +34,9 @@ create_verb() >> [show_line("\nverb creation done.")]
 
 # implications
 
-create_body() / (ACTION("LEFT", V, E, X, Y) & RULE(R)) >> [show_line("\nupdating body with action: ", V), -ACTION("LEFT", V, E, X, Y), -RULE(R), +SUBJ(X), fillActRule("LEFT", R, V, E, X, Y), create_body()]
+create_body() / (ACTION("LEFT", V, E, X, Y) & RULE(R)) >> [show_line("\nupdating body with normal verb: ", V), -ACTION("LEFT", V, E, X, Y), -RULE(R), +SUBJ(X), fillActRule("LEFT", R, V, E, X, Y), create_body()]
+create_body() / (ACTION("FLAT", V, D, "__", Y) & RULE(R)) >> [show_line("\nupdating body with passive verb: ", V), -ACTION("LEFT", V, D, "__", Y), -RULE(R), +SUBJ(X), fillPassActRule("LEFT", R, V, E, X, Y), create_body()]
+create_body() / (ACTION("FLAT", V, D, X, "__") & RULE(R)) >> [show_line("\nupdating body with intransitive verb: ", V), -ACTION("LEFT", V, D, X, "__"), -RULE(R), +SUBJ(X), fillIntraActRule("LEFT", R, V, E, X, Y), create_body()]
 
 create_body() / (GND("LEFT", X, Y) & RULE(R) & SUBJ(X)) >> [show_line("\nupdating body with gnd: ", Y), -GND("LEFT", X, Y), -RULE(R), -SUBJ(X), +SUBJ(X, Y), fillGndRule("LEFT", R, X, Y), create_body()]
 create_body() / (GND("LEFT", X, Y) & RULE(R)) >> [show_line("\nupdating body with gnd: ", Y), -GND("LEFT", X, Y), -RULE(R), fillGndRule("LEFT", R, X, Y), create_body()]
@@ -43,9 +45,10 @@ create_body() / (ADJ("LEFT", X, Y) & RULE(R)) >> [show_line("\nupdating body wit
 create_body() / (PREP("LEFT", E, X, Y) & RULE(R)) >> [show_line("\nupdating body with prep: ", X), -RULE(R), -PREP("LEFT", E, X, Y), fillPrepRule("LEFT", R, E, X, Y), create_body()]
 
 create_head() / (ACTION("RIGHT", "Be:VBZ", E, X, Y) & GND("RIGHT", X, K) & GND("RIGHT", Y, V) & SUBJ(S, K) & RULE(R)) >> [show_line("\nupdating implication head: ", V), -ACTION("RIGHT", "Be:VBZ", E, X, Y), -GND("RIGHT", X, K), -GND("RIGHT", Y, V), -SUBJ(S, K), -RULE(R), fillGndRule("RIGHT", R, S, V), create_head()]
+create_head() / (ACTION("RIGHT", D, E, X, Y) & GND("RIGHT", X, K) & GND("RIGHT", Y, V) & SUBJ(S, K) & RULE(R)) >> [show_line("\nnon-copular verbs admitted for head: ", V), -ACTION("RIGHT", D, E, X, Y), -GND("RIGHT", X, K), -GND("RIGHT", Y, V), -SUBJ(S, K), -RULE(R), create_head()]
+
 create_head() / (GND("RIGHT", X, K) & RULE(R)) >> [show_line("\nupdating isa head with gnd: ", K), -GND("RIGHT", X, K), -RULE(R), fillGndRule("RIGHT", R, X, K), create_head()]
 create_head() / (ADJ("RIGHT", X, K) & RULE(R)) >> [show_line("\nupdating isa head with adj: ", K), -ADJ("RIGHT", X, K), -RULE(R), fillAdjRule("RIGHT", R, X, K), create_head()]
-
 
 finalize_rule() / (RULE(R) & WFR(R)) >> [show_line("\nfinalizing well formed rule..."), -RULE(R), declareRule(R)]
 finalize_rule() / RULE(R) >> [show_line("\nthe rule is not well formed!"), -RULE(R), declareRule(R)]
