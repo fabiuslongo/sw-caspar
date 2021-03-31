@@ -5,7 +5,7 @@ from actions import *
 
 # ONTOLOGY BUILDER
 
-process_onto() / ID(I) >> [aggr_ent(), create_adj(), create_adv(), create_gnd_prep(), create_prep(), create_verb(), create_body(), create_head(), finalize_rule(), saveOnto(), -ID(I)]
+process_onto() / ID(I) >> [aggr_ent(), create_adj(), create_adv(), create_gnd_prep(), create_prep(), create_verb(), create_body(), create_head(), finalize_rule(), create_ner(), saveOnto(), -ID(I)]
 
 
 # flats
@@ -28,8 +28,11 @@ create_gnd_prep() >> [show_line("\nprep creation done.")]
 create_verb() / (ACTION("FLAT", V, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating normal verb: ", V), -ACTION("FLAT", V, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubVerb(I, V, K, J), create_verb()]
 create_verb() / (ACTION("FLAT", V, D, "__", Y) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating passive verb: ", V), -ACTION("FLAT", V, D, "__", Y), -GND("FLAT", Y, J), createPassSubVerb(I, V, J), create_verb()]
 create_verb() / (ACTION("FLAT", V, D, X, "__") & GND("FLAT", X, K) & ID(I)) >> [show_line("\ncreating intransitive verb: ", V), -ACTION("FLAT", V, D, X, "__"), -GND("FLAT", X, K), createIntrSubVerb(I, V, K), create_verb()]
-
 create_verb() >> [show_line("\nverb creation done.")]
+
+create_ner() / (NER("GPE", X) & ID(I)) >> [show_line("\nCreating GPE NER: ", X), -NER("GPE", X), createPlace(I, X), create_ner()]
+create_ner() / (NER("DATE", X) & ID(I)) >> [show_line("\nCreating DATE NER: ", X), -NER("DATE", X), createDate(I, X), create_ner()]
+create_ner() / ID(I) >> [show_line("\nNER creation done.")]
 
 
 # implications

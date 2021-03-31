@@ -408,13 +408,23 @@ class Parse(object):
 
 
 
-
     def shrink(self, word):
         chunk_list = word.split("_")
         sw = ""
         for chunk in chunk_list:
             sw = sw + chunk
         return sw
+
+
+    def clean_from_POS(self, ent):
+        pre_clean = ent.split("_")
+        cleaned = []
+        for s in pre_clean:
+            cleaned.append(s.split("-")[0])
+
+        cleaned = "_".join(cleaned)
+        return cleaned
+
 
 
 
