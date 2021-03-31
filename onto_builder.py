@@ -25,6 +25,8 @@ create_prep() >> [show_line("\nprep creation done.")]
 create_gnd_prep() / (GND("FLAT", X, K) & PREP("FLAT", X, Y, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating gnd prep: ", Y), -PREP("FLAT", X, Y, Z), -GND("FLAT", Z, S), createSubGndPrep(I, K, Y, S), create_prep()]
 create_gnd_prep() >> [show_line("\nprep creation done.")]
 
+create_verb() / (ACTION("FLAT", "Be:VBZ", D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating normal verb+Ass.Rule (VBZ)"), -ACTION("FLAT", "Be:VBZ", D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubVerbAssRule(I, "Be:VBZ", K, J), create_verb()]
+create_verb() / (ACTION("FLAT", "Be:VBP", D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating normal verb+Ass.Rule (VBP)"), -ACTION("FLAT", "Be:VBP", D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubVerbAssRule(I, "Be:VBP", K, J), create_verb()]
 create_verb() / (ACTION("FLAT", V, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating normal verb: ", V), -ACTION("FLAT", V, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubVerb(I, V, K, J), create_verb()]
 create_verb() / (ACTION("FLAT", V, D, "__", Y) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating passive verb: ", V), -ACTION("FLAT", V, D, "__", Y), -GND("FLAT", Y, J), createPassSubVerb(I, V, J), create_verb()]
 create_verb() / (ACTION("FLAT", V, D, X, "__") & GND("FLAT", X, K) & ID(I)) >> [show_line("\ncreating intransitive verb: ", V), -ACTION("FLAT", V, D, X, "__"), -GND("FLAT", X, K), createIntrSubVerb(I, V, K), create_verb()]
@@ -37,9 +39,9 @@ create_ner() / ID(I) >> [show_line("\nNER creation done.")]
 
 # implications
 
-create_body() / (ACTION("LEFT", V, E, X, Y) & RULE(R)) >> [show_line("\nupdating body with normal verb: ", V), -ACTION("LEFT", V, E, X, Y), -RULE(R), +SUBJ(X), fillActRule("LEFT", R, V, E, X, Y), create_body()]
-create_body() / (ACTION("FLAT", V, D, "__", Y) & RULE(R)) >> [show_line("\nupdating body with passive verb: ", V), -ACTION("LEFT", V, D, "__", Y), -RULE(R), +SUBJ(X), fillPassActRule("LEFT", R, V, E, X, Y), create_body()]
-create_body() / (ACTION("FLAT", V, D, X, "__") & RULE(R)) >> [show_line("\nupdating body with intransitive verb: ", V), -ACTION("LEFT", V, D, X, "__"), -RULE(R), +SUBJ(X), fillIntraActRule("LEFT", R, V, E, X, Y), create_body()]
+create_body() / (ACTION("LEFT", V, E, X, Y) & RULE(R)) >> [show_line("\nupdating body with normal verb: ", V), -ACTION("LEFT", V, E, X, Y), -RULE(R), +SUBJ(X), fillActRule(R, V, E, X, Y), create_body()]
+create_body() / (ACTION("LEFT", V, D, "__", Y) & RULE(R)) >> [show_line("\nupdating body with passive verb: ", V), -ACTION("LEFT", V, D, "__", Y), -RULE(R), +SUBJ(X), fillPassActRule("LEFT", R, V, E, X, Y), create_body()]
+create_body() / (ACTION("LEFT", V, D, X, "__") & RULE(R)) >> [show_line("\nupdating body with intransitive verb: ", V), -ACTION("LEFT", V, D, X, "__"), -RULE(R), +SUBJ(X), fillIntraActRule("LEFT", R, V, E, X, Y), create_body()]
 
 create_body() / (GND("LEFT", X, Y) & RULE(R) & SUBJ(X)) >> [show_line("\nupdating body with gnd: ", Y), -GND("LEFT", X, Y), -RULE(R), -SUBJ(X), +SUBJ(X, Y), fillGndRule("LEFT", R, X, Y), create_body()]
 create_body() / (GND("LEFT", X, Y) & RULE(R)) >> [show_line("\nupdating body with gnd: ", Y), -GND("LEFT", X, Y), -RULE(R), fillGndRule("LEFT", R, X, Y), create_body()]
