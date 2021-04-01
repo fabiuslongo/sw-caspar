@@ -208,6 +208,8 @@ class ID(Belief): pass
 class RULE(Belief): pass
 # subject accumulator
 class SUBJ(Belief): pass
+# subject accumulator
+class HEAD(Belief): pass
 
 
 # parse rule beliefs
@@ -1127,9 +1129,39 @@ class createSubVerb(Action):
         new_ind_verb.hasId = [new_ind_id]
 
 
+class updateHeadAssRule(Action):
+    """Creating a subclass of the class Verb"""
+    def execute(self, arg1, arg2, arg3):
+
+        var_str = str(arg1).split("'")[3]
+        print(var_str)
+        obj_str = str(arg2).split("'")[3]
+        print(obj_str)
+        head_str = str(arg3).split("'")[3]
+        print(head_str)
+
+        obj_str_clean = obj_str.replace(":", ".")
+
+        pos = parser.get_pos(obj_str)
+        print("pos: ", pos)
+
+        if pos in ['NN', 'NNP', 'NNS']:
+            new_sub_obj = types.new_class(obj_str_clean, (Entity,))
+        else:
+            new_sub_obj = types.new_class(obj_str_clean, (Adjective,))
+
+        if len(head_str) > 0:
+            head = head_str+", "+obj_str_clean+"(?"+var_str+")"
+        else:
+            head = obj_str_clean+"(?"+var_str+")"
+
+        print("New head assignment rule: ", head)
+        self.assert_belief(HEAD(head))
+
+
 class createSubVerbAssRule(Action):
     """Creating a subclass of the class Verb"""
-    def execute(self, arg1, arg2, arg3, arg4):
+    def execute(self, arg1, arg2, arg3, arg4, arg5):
 
         id_str = str(arg1).split("'")[3]
         print(id_str)
@@ -1139,6 +1171,9 @@ class createSubVerbAssRule(Action):
         print(subj_str)
         obj_str = str(arg4).split("'")[3]
         print(obj_str)
+        head_str = str(arg5).split("'")[3]
+        print(head_str)
+
 
         obj_str_clean = obj_str.replace(":", ".")
 
@@ -1167,7 +1202,7 @@ class createSubVerbAssRule(Action):
         # storing action's id
         new_ind_verb.hasId = [new_ind_id]
 
-        rule_str = "hasSubject(?x1, ?x2), hasObject(?x1, ?x3), "+verb_str+"(?x1), "+subj_str+"(?x2), "+obj_str_clean+"(?x3) -> "+obj_str_clean+"(?x2)"
+        rule_str = "hasSubject(?x1, ?x2), hasObject(?x1, ?x3), "+verb_str+"(?x1), "+subj_str+"(?x2) -> "+head_str
 
         print("New assignment rule: ", rule_str)
         with my_onto:
