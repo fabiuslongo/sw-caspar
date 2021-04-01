@@ -34,12 +34,6 @@ q() >> [+QUERY("The Colonel West is a criminal")]
 go() >> [show_line("Starting Caspar..."), set_wait(), HotwordDetect().start, say("system ready")]
 
 
-
-# Azure
-#l() >> [+STT("Listen.")]
-#r() >> [+STT("Reason.")]
-#d() >> [+STT("Done.")]
-
 # simulating sensors
 s1() >> [simulate_sensor("Be", "Time", "12")]
 s2() >> [simulate_sensor("Be", "Temperature", "25")]
@@ -59,10 +53,7 @@ s2() >> [simulate_sensor("Be", "Temperature", "25")]
 +STT("reason") / (WAKE("ON") & WAIT(W)) >> [-LISTEN("ON"), +REASON("ON"), show_line("\nWaiting for query...\n"), UtteranceDetect().stop, say("Waiting for query..."), UtteranceDetect().start, Timer(W).start]
 +STT("done") / (WAKE("ON") & WAIT(W)) >> [-LISTEN("ON"), -REASON("ON"), show_line("\nExiting from cognitive phase...\n"), UtteranceDetect().stop, say("Exiting from cognitive phase..."), HotwordDetect().start, Timer(W).start]
 
-# Azure STT
-#+STT("Listen.") / (WAKE("ON") & WAIT(W)) >> [-REASON("ON"), +LISTEN("ON"), show_line("\nWaiting for knowledge...\n"), UtteranceDetect().start, Timer(W).start]
-#+STT("Reason.") / (WAKE("ON") & WAIT(W)) >> [-LISTEN("ON"), +REASON("ON"), show_line("\nWaiting for query...\n"), UtteranceDetect().start, Timer(W).start]
-#+STT("Done.") / (WAKE("ON") & WAIT(W)) >> [-LISTEN("ON"), -REASON("ON"), show_line("\nExiting from cognitive phase...\n"), UtteranceDetect().stop, HotwordDetect().start, Timer(W).start]
+
 
 +STT(X) / (WAKE("ON") & LISTEN("ON")) >> [reset_ct(), parse_rules(X, "DISOK"), parse_deps(), feed_mst(), +PROCESS_STORED_MST("OK"), show_ct(), +ANSWER(X), Timer(W).start]
 +STT(X) / (WAKE("ON") & REASON("ON")) >> [reset_ct(), parse_rules(X, "DISOK"), parse_deps(), feed_mst(), +PROCESS_STORED_MST("OK"), show_ct(), Timer(W).start]
@@ -89,7 +80,6 @@ create_onto(T) >> [preprocess_onto(T), InitOnto(), process_onto(), show_line("\n
 +TIMEOUT("ON") / (WAKE("ON") & LISTEN("ON") & REASON("ON")) >> [show_line("\nReturning to idle state...\n"), -WAKE("ON"), -LISTEN("ON"), -REASON("ON"), UtteranceDetect().stop, HotwordDetect().start]
 +TIMEOUT("ON") / (WAKE("ON") & REASON("ON")) >> [show_line("\nReturning to idle state...\n"), -REASON("ON"), -WAKE("ON"), UtteranceDetect().stop, HotwordDetect().start]
 +TIMEOUT("ON") / (WAKE("ON") & LISTEN("ON")) >> [show_line("\nReturning to idle state...\n"), -LISTEN("ON"), -WAKE("ON"), UtteranceDetect().stop, HotwordDetect().start]
-
 +TIMEOUT("ON") / WAKE("ON") >> [show_line("\nReturning to idle state...\n"), -WAKE("ON"), UtteranceDetect().stop, HotwordDetect().start]
 
 

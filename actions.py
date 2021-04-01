@@ -1077,20 +1077,21 @@ class applyAdj(Action):
         id_str = str(arg1).split("'")[3]
         print(id_str)
 
+
         adj_str = str(arg2).split("'")[3].replace(":", ".")
         print(adj_str)
         # creating subclass adjective
         adj = types.new_class(adj_str, (Adjective,))
         # adjective individual
-        new_adj_ind = adj(parser.clean_from_POS(adj_str)+"."+id_str)
+        new_adj_ind = adj(parser.clean_from_POS(adj_str)+".ind")
 
         ent_str = str(arg3).split("'")[3].replace(":", ".")
         print(ent_str)
 
         # creating subclass entity
-        new_sub = types.new_class(ent_str, (Entity,))
+        new_sub = types.new_class(ent_str, (Adjective,))
         # creating entity individual
-        new_ind = new_sub(parser.clean_from_POS(ent_str)+"."+id_str)
+        new_ind = new_sub(parser.clean_from_POS(ent_str)+".ind")
 
         # individual entity - hasAdj - adjective individual
         new_ind.hasAdj = [new_adj_ind]
@@ -1111,7 +1112,7 @@ class applyAdv(Action):
         # creating subclass adjective
         adv = types.new_class(adv_str, (Adverb,))
         # adverb individual
-        new_adv_ind = adv(parser.clean_from_POS(adv_str)+"."+id_str)
+        new_adv_ind = adv(parser.clean_from_POS(adv_str)+".ind")
 
         # creating subclass entity
         new_sub = types.new_class(verb_str, (Verb,))
@@ -1143,8 +1144,8 @@ class createSubVerb(Action):
         # entities individual
         new_ind_id = Id(id_str)
         new_ind_verb = new_sub_verb(parser.clean_from_POS(verb_str)+"."+id_str)
-        new_ind_subj = new_sub_subj(parser.clean_from_POS(subj_str)+"."+id_str)
-        new_ind_obj = new_sub_obj(parser.clean_from_POS(obj_str)+"."+id_str)
+        new_ind_subj = new_sub_subj(parser.clean_from_POS(subj_str)+".ind")
+        new_ind_obj = new_sub_obj(parser.clean_from_POS(obj_str)+".ind")
 
         # individual entity - hasSubject - subject individual
         new_ind_verb.hasSubject = [new_ind_subj]
@@ -1175,8 +1176,8 @@ class createSubVerbAssRule(Action):
         # entities individual
         new_ind_id = Id(id_str)
         new_ind_verb = new_sub_verb(parser.clean_from_POS(verb_str)+"."+id_str)
-        new_ind_subj = new_sub_subj(parser.clean_from_POS(subj_str)+"."+id_str)
-        new_ind_obj = new_sub_obj(parser.clean_from_POS(obj_str)+"."+id_str)
+        new_ind_subj = new_sub_subj(parser.clean_from_POS(subj_str)+".ind")
+        new_ind_obj = new_sub_obj(parser.clean_from_POS(obj_str)+".ind")
 
         # individual entity - hasSubject - subject individual
         new_ind_verb.hasSubject = [new_ind_subj]
@@ -1213,8 +1214,8 @@ class createPassSubVerb(Action):
 
         # entities individual
         new_ind_id = Id(id_str)
-        new_ind_verb = new_sub_verb(parser.clean_from_POS(verb_str) + "." + id_str)
-        new_ind_obj = new_sub_obj(parser.clean_from_POS(obj_str) + "." + id_str)
+        new_ind_verb = new_sub_verb(parser.clean_from_POS(verb_str)+"."+id_str)
+        new_ind_obj = new_sub_obj(parser.clean_from_POS(obj_str) + ".ind")
 
         # individual entity - hasObject - Object individual
         new_ind_verb.hasObject = [new_ind_obj]
@@ -1243,7 +1244,7 @@ class createIntrSubVerb(Action):
         # entities individual
         new_ind_id = Id(id_str)
         new_ind_verb = new_sub_verb(parser.clean_from_POS(verb_str)+"."+id_str)
-        new_ind_subj = new_sub_subj(parser.clean_from_POS(subj_str)+"."+id_str)
+        new_ind_subj = new_sub_subj(parser.clean_from_POS(subj_str)+".ind")
 
         # individual entity - hasSubject - subject individual
         new_ind_verb.hasSubject = [new_ind_subj]
@@ -1272,7 +1273,7 @@ class createSubPrep(Action):
 
         # Creating subclass of Entity and individual
         new_sub_ent = types.new_class(ent, (Entity,))
-        new_ind_ent = new_sub_ent(parser.clean_from_POS(ent) + "." + id_str)
+        new_ind_ent = new_sub_ent(parser.clean_from_POS(ent) + ".ind")
 
         # Creating objects properties
         new_ind_verb.hasPrep = [new_ind_prep]
@@ -1291,26 +1292,19 @@ class createSubGndPrep(Action):
 
         # Creating subclasses of Entity and individuals
         new_sub_ent_master = types.new_class(ent_master, (Entity,))
-        new_ind_ent_master = new_sub_ent_master(self.clean_from_POS(ent_master) + "." + id_str)
+        new_ind_ent_master = new_sub_ent_master(parser.clean_from_POS(ent_master) + ".ind")
         new_sub_ent_slave = types.new_class(ent_slave, (Entity,))
-        new_ind_ent_slave = new_sub_ent_slave(self.clean_from_POS(ent_slave) + "." + id_str)
+        new_ind_ent_slave = new_sub_ent_slave(parser.clean_from_POS(ent_slave) + ".ind")
 
         # Creating subclass of Preposition and individual
         new_sub_prep = types.new_class(prep, (Preposition,))
-        new_ind_prep = new_sub_prep(self.clean_from_POS(prep) + "." + id_str)
+        new_ind_prep = new_sub_prep(parser.clean_from_POS(prep) + "." + id_str)
 
         # Creating objects properties
         new_ind_ent_master.hasPrep = [new_ind_prep]
         new_ind_prep.hasObject = [new_ind_ent_slave]
 
-    def clean_from_POS(self, ent):
-        pre_clean = ent.split("_")
-        cleaned = []
-        for s in pre_clean:
-            cleaned.append(s.split("-")[0])
 
-        cleaned = "_".join(cleaned)
-        return cleaned
 
 
 
@@ -1328,7 +1322,6 @@ class createPlace(Action):
 
         # storing id features
         new_ind_id.hasPlace = [place_str]
-        print(new_ind_id.hasPlace)
 
 
 class createDate(Action):
@@ -1345,7 +1338,6 @@ class createDate(Action):
 
         # storing id features
         new_ind_id.hasDate = [date_str]
-        print(new_ind_id.hasDate)
 
 
 class saveOnto(Action):

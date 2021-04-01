@@ -32,8 +32,9 @@ create_verb() / (ACTION("FLAT", V, D, "__", Y) & GND("FLAT", Y, J) & ID(I)) >> [
 create_verb() / (ACTION("FLAT", V, D, X, "__") & GND("FLAT", X, K) & ID(I)) >> [show_line("\ncreating intransitive verb: ", V), -ACTION("FLAT", V, D, X, "__"), -GND("FLAT", X, K), createIntrSubVerb(I, V, K), create_verb()]
 create_verb() >> [show_line("\nverb creation done.")]
 
-create_ner() / (NER("GPE", X) & ID(I)) >> [show_line("\nCreating GPE NER: ", X), -NER("GPE", X), createPlace(I, X), create_ner()]
-create_ner() / (NER("DATE", X) & ID(I)) >> [show_line("\nCreating DATE NER: ", X), -NER("DATE", X), createDate(I, X), create_ner()]
+create_ner() / (NER("GPE", Y) & ID(I)) >> [show_line("\nCreating GPE NER: ", Y), -NER("GPE", Y), createPlace(I, Y), create_ner()]
+create_ner() / (NER("DATE", Y) & ID(I)) >> [show_line("\nCreating DATE NER: ", Y), -NER("DATE", Y), createDate(I, Y), create_ner()]
+create_ner() / (NER(X, Y) & ID(I)) >> [-NER(X, Y), create_ner()]
 create_ner() / ID(I) >> [show_line("\nNER creation done.")]
 
 
