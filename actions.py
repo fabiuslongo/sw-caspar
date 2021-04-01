@@ -97,6 +97,7 @@ class process_onto(Procedure): pass
 class create_adj(Procedure): pass
 class create_adv(Procedure): pass
 class create_verb(Procedure): pass
+class create_assrule(Procedure): pass
 class create_gnd_prep(Procedure): pass
 class create_prep(Procedure): pass
 class aggr_ent(Procedure): pass
@@ -1010,17 +1011,14 @@ class fillAdjRule(Action):
         var = str(arg2).split("'")[3]
         value = str(arg3).split("'")[3].replace(":", ".")
 
-
         # creating subclass of verb
         new_sub_adjective = types.new_class(value, (Adjective,))
         print(new_sub_adjective)
 
-        new_index_var = str(next(cnt))
-
         if rule[0] == "-":
-            rule = value+"(?x"+new_index_var+"), hasAdj(?"+var+", ?x"+new_index_var+") "+rule
+            rule = value+"(?"+var+") "+rule
         else:
-            rule = value+"(?x"+new_index_var+"), hasAdj(?"+var+", ?x"+new_index_var+"), "+rule
+            rule = value+"(?"+var+"), "+rule
 
         print("rule: ", rule)
         self.assert_belief(RULE(rule))
@@ -1069,32 +1067,6 @@ class aggrEntity(Action):
         conc_label = label2 + "_" + label1
         self.assert_belief(GND(id, var, conc_label))
 
-
-class applyAdj(Action):
-    """create an entity and apply an adj to it"""
-    def execute(self, arg1, arg2, arg3):
-
-        id_str = str(arg1).split("'")[3]
-        print(id_str)
-
-
-        adj_str = str(arg2).split("'")[3].replace(":", ".")
-        print(adj_str)
-        # creating subclass adjective
-        adj = types.new_class(adj_str, (Adjective,))
-        # adjective individual
-        new_adj_ind = adj(parser.clean_from_POS(adj_str)+".ind")
-
-        ent_str = str(arg3).split("'")[3].replace(":", ".")
-        print(ent_str)
-
-        # creating subclass entity
-        new_sub = types.new_class(ent_str, (Adjective,))
-        # creating entity individual
-        new_ind = new_sub(parser.clean_from_POS(ent_str)+".ind")
-
-        # individual entity - hasAdj - adjective individual
-        new_ind.hasAdj = [new_adj_ind]
 
 
 class applyAdv(Action):
@@ -1165,19 +1137,28 @@ class createSubVerbAssRule(Action):
         print(verb_str)
         subj_str = str(arg3).split("'")[3].replace(":", ".")
         print(subj_str)
-        obj_str = str(arg4).split("'")[3].replace(":", ".")
+        obj_str = str(arg4).split("'")[3]
         print(obj_str)
+
+        obj_str_clean = obj_str.replace(":", ".")
 
         # subclasses
         new_sub_verb = types.new_class(verb_str, (Verb,))
         new_sub_subj = types.new_class(subj_str, (Entity,))
-        new_sub_obj = types.new_class(obj_str, (Entity,))
+
+        pos = parser.get_pos(obj_str)
+        print("pos: ", pos)
+
+        if pos in ['NN', 'NNP', 'NNS']:
+            new_sub_obj = types.new_class(obj_str_clean, (Entity,))
+        else:
+            new_sub_obj = types.new_class(obj_str_clean, (Adjective,))
 
         # entities individual
         new_ind_id = Id(id_str)
         new_ind_verb = new_sub_verb(parser.clean_from_POS(verb_str)+"."+id_str)
         new_ind_subj = new_sub_subj(parser.clean_from_POS(subj_str)+".ind")
-        new_ind_obj = new_sub_obj(parser.clean_from_POS(obj_str)+".ind")
+        new_ind_obj = new_sub_obj(parser.clean_from_POS(obj_str_clean)+".ind")
 
         # individual entity - hasSubject - subject individual
         new_ind_verb.hasSubject = [new_ind_subj]
@@ -1186,7 +1167,7 @@ class createSubVerbAssRule(Action):
         # storing action's id
         new_ind_verb.hasId = [new_ind_id]
 
-        rule_str = "hasSubject(?x1, ?x2), hasObject(?x1, ?x3), "+verb_str+"(?x1), "+subj_str+"(?x2), "+obj_str+"(?x3) -> "+obj_str+"(?x2)"
+        rule_str = "hasSubject(?x1, ?x2), hasObject(?x1, ?x3), "+verb_str+"(?x1), "+subj_str+"(?x2), "+obj_str_clean+"(?x3) -> "+obj_str_clean+"(?x2)"
 
         print("New assignment rule: ", rule_str)
         with my_onto:
