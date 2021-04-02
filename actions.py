@@ -1165,10 +1165,10 @@ class createSubVerbAssRule(Action):
         id_str = str(arg1).split("'")[3]
         print(id_str)
 
-        subj_var = str(arg2).split("'")[3].replace(":", ".")
+        subj_var = str(arg2).split("'")[3]
         print(subj_var)
 
-        subj_val = str(arg3).split("'")[3].replace(":", ".")
+        subj_val = str(arg3).split("'")[3]
         print(subj_val)
 
         head_str = str(arg4).split("'")[3]
@@ -1179,6 +1179,7 @@ class createSubVerbAssRule(Action):
 
         # subclasses
         pos = parser.get_pos(subj_val)
+        print("pos: ", pos)
 
         if pos in ['NN', 'NNP', 'NNS']:
             types.new_class(subj_val_clean, (Entity,))
