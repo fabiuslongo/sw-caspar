@@ -1135,25 +1135,24 @@ class updateHeadAssRule(Action):
 
         var_str = str(arg1).split("'")[3]
         print(var_str)
-        obj_str = str(arg2).split("'")[3]
-        print(obj_str)
+        label_str = str(arg2).split("'")[3]
+        print(label_str)
         head_str = str(arg3).split("'")[3]
         print(head_str)
 
-        obj_str_clean = obj_str.replace(":", ".")
+        label_str_clean = label_str.replace(":", ".")
 
-        pos = parser.get_pos(obj_str)
-        print("pos: ", pos)
+        pos = parser.get_pos(label_str)
 
         if pos in ['NN', 'NNP', 'NNS']:
-            new_sub_obj = types.new_class(obj_str_clean, (Entity,))
+            types.new_class(label_str_clean, (Entity,))
         else:
-            new_sub_obj = types.new_class(obj_str_clean, (Adjective,))
+            types.new_class(label_str_clean, (Adjective,))
 
         if len(head_str) > 0:
-            head = head_str+", "+obj_str_clean+"(?"+var_str+")"
+            head = head_str+", "+label_str_clean+"(?"+var_str+")"
         else:
-            head = obj_str_clean+"(?"+var_str+")"
+            head = label_str_clean+"(?"+var_str+")"
 
         print("New head assignment rule: ", head)
         self.assert_belief(HEAD(head))
@@ -1161,48 +1160,32 @@ class updateHeadAssRule(Action):
 
 class createSubVerbAssRule(Action):
     """Creating a subclass of the class Verb"""
-    def execute(self, arg1, arg2, arg3, arg4, arg5):
+    def execute(self, arg1, arg2, arg3, arg4):
 
         id_str = str(arg1).split("'")[3]
         print(id_str)
-        verb_str = str(arg2).split("'")[1].replace(":", ".")
-        print(verb_str)
-        subj_str = str(arg3).split("'")[3].replace(":", ".")
-        print(subj_str)
-        obj_str = str(arg4).split("'")[3]
-        print(obj_str)
-        head_str = str(arg5).split("'")[3]
+
+        subj_var = str(arg2).split("'")[3].replace(":", ".")
+        print(subj_var)
+
+        subj_val = str(arg3).split("'")[3].replace(":", ".")
+        print(subj_val)
+
+        head_str = str(arg4).split("'")[3]
         print(head_str)
 
 
-        obj_str_clean = obj_str.replace(":", ".")
+        subj_val_clean = subj_val.replace(":", ".")
 
         # subclasses
-        new_sub_verb = types.new_class(verb_str, (Verb,))
-        new_sub_subj = types.new_class(subj_str, (Entity,))
-
-        pos = parser.get_pos(obj_str)
-        print("pos: ", pos)
+        pos = parser.get_pos(subj_val)
 
         if pos in ['NN', 'NNP', 'NNS']:
-            new_sub_obj = types.new_class(obj_str_clean, (Entity,))
+            types.new_class(subj_val_clean, (Entity,))
         else:
-            new_sub_obj = types.new_class(obj_str_clean, (Adjective,))
+            types.new_class(subj_val_clean, (Adjective,))
 
-        # entities individual
-        new_ind_id = Id(id_str)
-        new_ind_verb = new_sub_verb(parser.clean_from_POS(verb_str)+"."+id_str)
-        new_ind_subj = new_sub_subj(parser.clean_from_POS(subj_str)+".ind")
-        new_ind_obj = new_sub_obj(parser.clean_from_POS(obj_str_clean)+".ind")
-
-        # individual entity - hasSubject - subject individual
-        new_ind_verb.hasSubject = [new_ind_subj]
-        # individual entity - hasObject - Object individual
-        new_ind_verb.hasObject = [new_ind_obj]
-        # storing action's id
-        new_ind_verb.hasId = [new_ind_id]
-
-        rule_str = "hasSubject(?x1, ?x2), hasObject(?x1, ?x3), "+verb_str+"(?x1), "+subj_str+"(?x2) -> "+head_str
+        rule_str = subj_val_clean+"(?"+subj_var+") -> "+head_str
 
         print("New assignment rule: ", rule_str)
         with my_onto:

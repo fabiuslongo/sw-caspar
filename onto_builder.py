@@ -24,15 +24,15 @@ create_gnd_prep() / (GND("FLAT", X, K) & PREP("FLAT", X, Y, Z) & GND("FLAT", Z, 
 create_gnd_prep() >> [show_line("\nprep creation done.")]
 
 # Assignment rules production
-create_assrule() / (ACTION("FLAT", "Be:VBZ", D, X, Y) & GND("FLAT", X, K) & ADJ("FLAT", Y, J) & ID(I) & HEAD(H)) >> [show_line("\ncreating verb+Ass.Rule ADJ (VBZ)"), -ADJ("FLAT", Y, J), -HEAD(H), updateHeadAssRule(Y, J, H), create_assrule()]
-create_assrule() / (ACTION("FLAT", "Be:VBZ", D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I) & HEAD(H)) >> [show_line("\ncreating verb+Ass.Rule (VBZ)"), -GND("FLAT", Y, J), -HEAD(H), updateHeadAssRule(Y, J, H), create_assrule()]
-create_assrule() / (ACTION("FLAT", "Be:VBZ", D, X, Y) & GND("FLAT", X, K) & ID(I) & HEAD(H)) >> [show_line("\nverb+Ass.Rule ADJ (VBZ) completed."), -ACTION("FLAT", "Be:VBZ", D, X, Y), -GND("FLAT", X, K), -HEAD(H), createSubVerbAssRule(I, "Be:VBZ", K, J, H), +HEAD(""), create_assrule()]
+create_assrule() / (ACTION("FLAT", "Be:VBZ", D, X, Y) & ADJ("FLAT", Y, J) & ID(I) & HEAD(H)) >> [show_line("\nupdating head for verb+Ass.Rule ADJ (VBZ): ", J), -ADJ("FLAT", Y, J), -HEAD(H), updateHeadAssRule(X, J, H), create_assrule()]
+create_assrule() / (ACTION("FLAT", "Be:VBZ", D, X, Y) & GND("FLAT", Y, K) & ID(I) & HEAD(H)) >> [show_line("\nupdating head for verb+Ass.Rule ADJ (VBZ): ", K), -GND("FLAT", Y, K), -HEAD(H), updateHeadAssRule(X, K, H), create_assrule()]
+create_assrule() / (ACTION("FLAT", "Be:VBZ", D, X, Y) & GND("FLAT", X, K) & ID(I) & HEAD(H)) >> [show_line("\nverb+Ass.Rule ADJ (VBZ) completed."), -ACTION("FLAT", "Be:VBZ", D, X, Y), -GND("FLAT", X, K), -HEAD(H), createSubVerbAssRule(I, X, K, H), create_assrule()]
 
-create_assrule() / (ACTION("FLAT", "Be:VBP", D, X, Y) & GND("FLAT", X, K) & ADJ("FLAT", Y, J) & ID(I) & HEAD(H)) >> [show_line("\ncreating verb+Ass.Rule ADJ (VBP)"),  -ADJ("FLAT", Y, J), -HEAD(H), updateHeadAssRule(Y, J, H), create_assrule()]
-create_assrule() / (ACTION("FLAT", "Be:VBP", D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I) & HEAD(H)) >> [show_line("\ncreating verb+Ass.Rule (VBP)"),  -GND("FLAT", Y, J), -HEAD(H), updateHeadAssRule(Y, J, H), create_assrule()]
-create_assrule() / (ACTION("FLAT", "Be:VBP", D, X, Y) & GND("FLAT", X, K) & ID(I) & HEAD(H)) >> [show_line("\nverb+Ass.Rule ADJ (VBP) completed."), -ACTION("FLAT", "Be:VBP", D, X, Y), -GND("FLAT", X, K), -HEAD(H), createSubVerbAssRule(I, "Be:VBP", K, J, H), +HEAD(""), create_assrule()]
+create_assrule() / (ACTION("FLAT", "Be:VBP", D, X, Y) & ADJ("FLAT", Y, J) & ID(I) & HEAD(H)) >> [show_line("\nupdating head for verb+Ass.Rule ADJ (VBP): ", J),  -ADJ("FLAT", Y, J), -HEAD(H), updateHeadAssRule(X, J, H), create_assrule()]
+create_assrule() / (ACTION("FLAT", "Be:VBP", D, X, Y) & GND("FLAT", Y, K) & ID(I) & HEAD(H)) >> [show_line("\nupdating head for verb+Ass.Rule ADJ (VBP): ", K),  -GND("FLAT", Y, K), -HEAD(H), updateHeadAssRule(X, K, H), create_assrule()]
+create_assrule() / (ACTION("FLAT", "Be:VBP", D, X, Y) & GND("FLAT", X, K) & ID(I) & HEAD(H)) >> [show_line("\nverb+Ass.Rule ADJ (VBP) completed."), -ACTION("FLAT", "Be:VBP", D, X, Y), -GND("FLAT", X, K), -HEAD(H), createSubVerbAssRule(I, X, K, H), create_assrule()]
 
-create_assrule() >> [show_line("\nassignment rules creation done.")]
+create_assrule() / HEAD(H) >> [show_line("\nassignment rules creation done."), -HEAD(H)]
 
 # Ordinary verbs prpoduction
 create_verb() / (ACTION("FLAT", V, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating normal verb: ", V), -ACTION("FLAT", V, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubVerb(I, V, K, J), create_verb()]
