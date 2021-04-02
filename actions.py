@@ -921,7 +921,6 @@ class fillActRule(Action):
 
         # creating subclass of verb
         new_sub_verb = types.new_class(verb, (Verb,))
-        print(new_sub_verb)
 
         if rule[0] == "-":
             rule = "hasSubject(?"+dav+", ?"+subj+"), hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+") "+rule
@@ -943,7 +942,6 @@ class fillPassActRule(Action):
 
         # creating subclass of verb
         new_sub_verb = types.new_class(verb, (Verb,))
-        print(new_sub_verb)
 
         if rule[0] == "-":
             rule = "hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+") "+rule
@@ -965,7 +963,6 @@ class fillIntraActRule(Action):
 
         # creating subclass of verb
         new_sub_verb = types.new_class(verb, (Verb,))
-        print(new_sub_verb)
 
         if rule[0] == "-":
             rule = "hasSubject(?"+dav+", ?"+subj+"), "+verb+"(?"+dav+") "+rule
@@ -988,7 +985,6 @@ class fillGndRule(Action):
 
         # creating subclass of entity
         new_sub_entity = types.new_class(value, (Entity,))
-        print(new_sub_entity)
 
         if hand_side == "LEFT":
             if rule[0] == "-":
@@ -1015,7 +1011,6 @@ class fillAdjRule(Action):
 
         # creating subclass of verb
         new_sub_adjective = types.new_class(value, (Adjective,))
-        print(new_sub_adjective)
 
         if rule[0] == "-":
             rule = value+"(?"+var+") "+rule
@@ -1038,8 +1033,6 @@ class fillPrepRule(Action):
 
         # creating subclass of preposition
         new_sub_prep = types.new_class(value, (Preposition,))
-        print(new_sub_prep)
-
         new_index_var = str(next(cnt))
 
         if hand_side == "LEFT":
@@ -1077,7 +1070,6 @@ class applyAdv(Action):
 
         id_str = str(arg1).split("'")[3]
         print(id_str)
-
         verb_str = str(arg2).split("'")[3].replace(":", ".")
         print(verb_str)
         adv_str = str(arg3).split("'")[3].replace(":", ".")
@@ -1164,16 +1156,12 @@ class createSubVerbAssRule(Action):
 
         id_str = str(arg1).split("'")[3]
         print(id_str)
-
         subj_var = str(arg2).split("'")[3]
         print(subj_var)
-
         subj_val = str(arg3).split("'")[3]
         print(subj_val)
-
         head_str = str(arg4).split("'")[3]
         print(head_str)
-
 
         subj_val_clean = subj_val.replace(":", ".")
 
@@ -1185,7 +1173,6 @@ class createSubVerbAssRule(Action):
             types.new_class(subj_val_clean, (Adjective,))
         else:
             types.new_class(subj_val_clean, (Entity,))
-
 
         rule_str = subj_val_clean+"(?"+subj_var+") -> "+head_str
 
@@ -1202,6 +1189,7 @@ class createSubVerbAssRule(Action):
 class createPassSubVerb(Action):
     """Creating a subclass of the class Verb (passive)"""
     def execute(self, arg1, arg2, arg3):
+
         id_str = str(arg1).split("'")[3]
         print(id_str)
         verb_str = str(arg2).split("'")[3].replace(":", ".")
@@ -1304,8 +1292,6 @@ class createSubGndPrep(Action):
         # Creating objects properties
         new_ind_ent_master.hasPrep = [new_ind_prep]
         new_ind_prep.hasObject = [new_ind_ent_slave]
-
-
 
 
 
