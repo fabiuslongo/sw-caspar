@@ -1144,10 +1144,10 @@ class updateHeadAssRule(Action):
 
         pos = parser.get_pos(label_str)
 
-        if pos in ['NN', 'NNP', 'NNS']:
-            types.new_class(label_str_clean, (Entity,))
-        else:
+        if pos in ['JJ', 'JJS', 'JJR']:
             types.new_class(label_str_clean, (Adjective,))
+        else:
+            types.new_class(label_str_clean, (Entity,))
 
         if len(head_str) > 0:
             head = head_str+", "+label_str_clean+"(?"+var_str+")"
@@ -1181,10 +1181,11 @@ class createSubVerbAssRule(Action):
         pos = parser.get_pos(subj_val)
         print("pos: ", pos)
 
-        if pos in ['NN', 'NNP', 'NNS']:
-            types.new_class(subj_val_clean, (Entity,))
-        else:
+        if pos in ['JJ', 'JJS', 'JJR']:
             types.new_class(subj_val_clean, (Adjective,))
+        else:
+            types.new_class(subj_val_clean, (Entity,))
+
 
         rule_str = subj_val_clean+"(?"+subj_var+") -> "+head_str
 

@@ -44,6 +44,15 @@ class ManageFols(object):
         BINDINGS = table[3]
         COMPOUNDS = table[4]
 
+        # commons direct var linked compounds
+        for b in COMPOUNDS:
+            for v in VARLIST:
+                if v[1] == b[0]:
+                    comp = []
+                    comp.append(b[1])
+                    comp.append(v[0])
+                    fol.append(comp)
+
         # building actions predicates
 
         for act in ACTIONS:
@@ -175,15 +184,6 @@ class ManageFols(object):
 
                         fol.append(new_act)
 
-        # commons direct var linked compounds
-        for b in COMPOUNDS:
-            for v in VARLIST:
-                if v[1] == b[0]:
-                    comp = []
-                    comp.append(b[1])
-                    comp.append(v[0])
-                    fol.append(comp)
-
         return fol
 
 
@@ -201,6 +201,16 @@ class ManageFols(object):
         LHS_temp = []
 
         RHS_temp = []
+
+        # building compounds predicates
+
+        for b in COMPOUNDS:
+            for v in VARLIST:
+                if v[1] == b[0]:
+                    comp = []
+                    comp.append(b[1])
+                    comp.append(v[0])
+                    fol.append(comp)
 
         # building actions predicates
 
@@ -284,16 +294,6 @@ class ManageFols(object):
 
                         if var not in fol:
                             fol.append(var)
-
-        # building compounds predicates
-
-        for b in COMPOUNDS:
-            for v in VARLIST:
-                if v[1] == b[0]:
-                    comp = []
-                    comp.append(b[1])
-                    comp.append(v[0])
-                    fol.append(comp)
 
         # building bindings predicates
 

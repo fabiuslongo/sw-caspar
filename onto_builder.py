@@ -32,7 +32,7 @@ create_assrule() / (ACTION("FLAT", "Be:VBP", D, X, Y) & ADJ("FLAT", Y, J) & ID(I
 create_assrule() / (ACTION("FLAT", "Be:VBP", D, X, Y) & GND("FLAT", Y, K) & ID(I) & HEAD(H)) >> [show_line("\nupdating head for verb+Ass.Rule GND (VBP): ", K),  -GND("FLAT", Y, K), -HEAD(H), updateHeadAssRule(X, K, H), create_assrule()]
 create_assrule() / (ACTION("FLAT", "Be:VBP", D, X, Y) & GND("FLAT", X, K) & ID(I) & HEAD(H)) >> [show_line("\nverb+Ass.Rule ADJ (VBP) completed."), -ACTION("FLAT", "Be:VBP", D, X, Y), -GND("FLAT", X, K), -HEAD(H), createSubVerbAssRule(I, X, K, H), create_assrule()]
 
-create_assrule() / HEAD(H) >> [show_line("\nassignment rules creation done."), -HEAD(H)]
+create_assrule() / (HEAD(H) & ID(I)) >> [show_line("\nassignment rules creation done."), -HEAD(H)]
 
 # Ordinary verbs prpoduction
 create_verb() / (ACTION("FLAT", V, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating normal verb: ", V), -ACTION("FLAT", V, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubVerb(I, V, K, J), create_verb()]
