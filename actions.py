@@ -1089,13 +1089,40 @@ class applyAdv(Action):
         new_ind.hasAdv = [new_adv_ind]
 
 
+
+class createAdj(Action):
+    """create an entity and apply an adj to it"""
+    def execute(self, arg1, arg2, arg3):
+
+        var_str = str(arg1).split("'")[3]
+        print(var_str)
+        ent_str = str(arg2).split("'")[3].replace(":", ".")
+        print(ent_str)
+        adj_str = str(arg3).split("'")[3].replace(":", ".")
+        print(adj_str)
+
+        # creating subclass adjective
+        adv = types.new_class(adj_str, (Adjective,))
+        # adverb individual
+        new_adj_ind = adv(parser.clean_from_POS(adj_str)+".ind")
+
+        # creating subclass entity
+        ent_sub = types.new_class(ent_str, (Entity,))
+        # creating entity individual
+        new_ind = ent_sub(parser.clean_from_POS(ent_str)+".ind")
+
+        # individual entity - hasAdv - adverb individual
+        new_ind.hasAdj = [new_adj_ind]
+
+
+
 class createSubVerb(Action):
     """Creating a subclass of the class Verb"""
     def execute(self, arg1, arg2, arg3, arg4):
 
         id_str = str(arg1).split("'")[3]
         print(id_str)
-        verb_str = str(arg2).split("'")[3].replace(":", ".")
+        verb_str = str(arg2).split("'")[1].replace(":", ".")
         print(verb_str)
         subj_str = str(arg3).split("'")[3].replace(":", ".")
         print(subj_str)
@@ -1181,6 +1208,28 @@ class createSubVerbAssRule(Action):
            rule = Imp()
            rule.set_as_rule(rule_str)
 
+
+
+
+
+class createAssRule(Action):
+    """Creating new assignment rule between entities"""
+    def execute(self, arg1, arg2):
+
+        ent1 = str(arg1).split("'")[3].replace(":", ".")
+        print(ent1)
+        ent2 = str(arg2).split("'")[3].replace(":", ".")
+        print(ent2)
+
+        types.new_class(ent1, (Entity,))
+        types.new_class(ent2, (Entity,))
+
+        rule_str = ent1+"(?x) -> "+ent2+"(?x)"
+
+        print("New assignment rule: ", rule_str)
+        with my_onto:
+           rule = Imp()
+           rule.set_as_rule(rule_str)
 
 
 
