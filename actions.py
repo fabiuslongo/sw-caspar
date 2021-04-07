@@ -1094,13 +1094,11 @@ class applyAdv(Action):
 
 class createAdj(Action):
     """create an entity and apply an adj to it"""
-    def execute(self, arg1, arg2, arg3):
+    def execute(self, arg1, arg2):
 
-        var_str = str(arg1).split("'")[3]
-        print(var_str)
-        ent_str = str(arg2).split("'")[3].replace(":", ".")
+        ent_str = str(arg1).split("'")[3].replace(":", ".")
         print(ent_str)
-        adj_str = str(arg3).split("'")[3].replace(":", ".")
+        adj_str = str(arg2).split("'")[3].replace(":", ".")
         print(adj_str)
 
         # creating subclass adjective
@@ -1258,7 +1256,7 @@ class createAssRule(Action):
 
         rule_str = ent1+"(?x) -> "+ent2+"(?x)"
 
-        rule_adj_legacy = ent1+"(?x1), "+ent2+"(?x2), hasAdj(?x1, ?x3), Adjective(?x3) -> hasAdj(?x2, ?x3)"
+        rule_adj_legacy = ent2+"(?x1), "+ent1+"(?x2), hasAdj(?x1, ?x3), Adjective(?x3) -> hasAdj(?x2, ?x3)"
 
         print("New assignment rule: ", rule_str)
         with my_onto:
@@ -1267,9 +1265,6 @@ class createAssRule(Action):
 
            rule2 = Imp()
            rule2.set_as_rule(rule_adj_legacy)
-
-
-
 
 
 

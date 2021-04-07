@@ -37,12 +37,15 @@ create_assrule() / (HEAD(H) & ID(I)) >> [show_line("\nassignment rules creation 
 
 
 # Ordinary verbs production
-create_verb() / (GND("FLAT", X, K) & ADJ("FLAT", X, J)) >> [show_line("\ncreating adjective: ", J), -ADJ("FLAT", X, J), createAdj(X, K, J), create_verb()]
+create_verb() / (GND("FLAT", X, K) & ADJ("FLAT", X, J)) >> [show_line("\ncreating adjective: ", J), -ADJ("FLAT", X, J), createAdj(K, J), create_verb()]
 
 create_verb() / (ACTION("FLAT", "Be:VBZ", D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\nVERB+Ass.Rule (VBZ)"), -ACTION("FLAT", "Be:VBZ", D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubCustVerb(I, "Be:VBZ", K, J), createAssRule(K, J), create_verb()]
 create_verb() / (ACTION("FLAT", "Be:VBP", D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\nVERB+Ass.Rule (VBP)"), -ACTION("FLAT", "Be:VBP", D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubCustVerb(I, "Be:VBP", K, J), createAssRule(K, J), create_verb()]
+create_verb() / (ACTION("FLAT", "Be:VBZ", D, X, Y) & GND("FLAT", X, K) & ADJ("FLAT", Y, J) & ID(I)) >> [show_line("\nVERB+Ass.Rule ADJ (VBZ)"), -ACTION("FLAT", "Be:VBZ", D, X, Y), -GND("FLAT", X, K), -ADJ("FLAT", Y, J), createSubCustVerb(I, "Be:VBZ", K, J), createAdj(K, J), create_verb()]
+create_verb() / (ACTION("FLAT", "Be:VBP", D, X, Y) & GND("FLAT", X, K) & ADJ("FLAT", Y, J) & ID(I)) >> [show_line("\nVERB+Ass.Rule ADJ (VBP)"), -ACTION("FLAT", "Be:VBP", D, X, Y), -GND("FLAT", X, K), -ADJ("FLAT", Y, J), createSubCustVerb(I, "Be:VBP", K, J), createAdj(K, J), create_verb()]
 
 create_verb() / (ACTION("FLAT", V, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating normal verb: ", V), -ACTION("FLAT", V, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubVerb(I, V, K, J), create_verb()]
+
 create_verb() / (ACTION("FLAT", V, D, "__", Y) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating passive verb: ", V), -ACTION("FLAT", V, D, "__", Y), -GND("FLAT", Y, J), createPassSubVerb(I, V, J), create_verb()]
 create_verb() / (ACTION("FLAT", V, D, X, "__") & GND("FLAT", X, K) & ID(I)) >> [show_line("\ncreating intransitive verb: ", V), -ACTION("FLAT", V, D, X, "__"), -GND("FLAT", X, K), createIntrSubVerb(I, V, K), create_verb()]
 create_verb() >> [show_line("\nverb creation done.")]
