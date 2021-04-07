@@ -16,7 +16,7 @@ check_conds() / SENSOR(V, X, Y) >> [show_line("\nbelief sensor not more needed..
 # turn off
 +INTENT(X, "Light", "Living Room", T) / lemma_in_syn(X, "change_state.v.01") >> [exec_cmd("change_state.v.01", "Light", "Living Room", T), show_ct(), say("execution successful")]
 
-# after +FEED("When an inhabitant is at home, the house is safe"), +FEED("Robert is an inhabitant"),  +FEED("Robert is at home"), d2()
+# after +FEED("When a resident is at home, the home is safe"), +FEED("Robert is a resident"),  +FEED("Robert is at home"), d2()
 +INTENT(X, "Alarm", "Garage", T) / (lemma_in_syn(X, "change_state.v.01") & eval_cls("Colonel.NNP_West.NNP", "Criminal.NN")) >> [exec_cmd("change_state.v.01", "Alarm", "Garage", T), show_ct(), say("execution successful")]
 #+INTENT(X, "Alarm", "Garage", T) / (lemma_in_syn(X, "change_state.v.01") & eval_cls("Be_VBZ(Colonel_NNP_West_NNP(x1), Criminal_NN(x2))")) >> [exec_cmd("change_state.v.01", "Alarm", "Garage", T), show_ct(), say("execution successful")]
 

@@ -21,7 +21,7 @@ d2() >> [+WAKE("TEST"), +STT("turn off the alarm in the garage")]
 
 # sentences for reasoning purposes
 c1() >> [+FEED("Cuba is a hostile nation")]
-c2() >> [+FEED("The Colonel West is American")]
+c2() >> [+FEED("The Colonel West is an American")]
 c3() >> [+FEED("missiles are weapons")]
 c4() >> [+FEED("the Colonel West sells missiles to Cuba")]
 c5() >> [+FEED("When an American sells weapons to a hostile nation, that American is a criminal")]

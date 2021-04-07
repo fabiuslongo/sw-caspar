@@ -208,8 +208,6 @@ class ID(Belief): pass
 class RULE(Belief): pass
 # subject accumulator
 class SUBJ(Belief): pass
-# subject accumulator
-class HEAD(Belief): pass
 
 
 # parse rule beliefs
@@ -358,9 +356,8 @@ class preprocess_onto(Action):
         MST = parser.get_last_MST()
         print("\nMST: \n" + str(MST))
         print("\nGMC_SUPP: \n" + str(parser.GMC_SUPP))
-        print("\nSUPP_SUPP_REV: \n" + str(parser.GMC_SUPP_REV))
+        print("\nGMC_SUPP_REV: \n" + str(parser.GMC_SUPP_REV))
         print("\nLCD: \n" + str(parser.LCD))
-
 
         # MST varlist correction on cases of adj-obj
         if OBJ_JJ_TO_NOUN is True:
@@ -1034,7 +1031,7 @@ class fillPrepRule(Action):
         var_slave = str(arg4).split("'")[3]
 
         # creating subclass of preposition
-        new_sub_prep = types.new_class(value, (Preposition,))
+        types.new_class(value, (Preposition,))
         new_index_var = str(next(cnt))
 
         if hand_side == "LEFT":
@@ -1071,11 +1068,8 @@ class applyAdv(Action):
     def execute(self, arg1, arg2, arg3):
 
         id_str = str(arg1).split("'")[3]
-        print(id_str)
         verb_str = str(arg2).split("'")[3].replace(":", ".")
-        print(verb_str)
         adv_str = str(arg3).split("'")[3].replace(":", ".")
-        print(adv_str)
 
         # creating subclass adjective
         adv = types.new_class(adv_str, (Adverb,))
@@ -1097,9 +1091,7 @@ class createAdj(Action):
     def execute(self, arg1, arg2):
 
         ent_str = str(arg1).split("'")[3].replace(":", ".")
-        print(ent_str)
         adj_str = str(arg2).split("'")[3].replace(":", ".")
-        print(adj_str)
 
         # creating subclass adjective
         adv = types.new_class(adj_str, (Adjective,))
@@ -1119,13 +1111,9 @@ class createSubCustVerb(Action):
     def execute(self, arg1, arg2, arg3, arg4):
 
         id_str = str(arg1).split("'")[3]
-        print(id_str)
         verb_str = str(arg2).split("'")[1].replace(":", ".")
-        print(verb_str)
         subj_str = str(arg3).split("'")[3].replace(":", ".")
-        print(subj_str)
         obj_str = str(arg4).split("'")[3].replace(":", ".")
-        print(obj_str)
 
         # subclasses
         new_sub_verb = types.new_class(verb_str, (Verb,))
@@ -1151,13 +1139,9 @@ class createSubVerb(Action):
     def execute(self, arg1, arg2, arg3, arg4):
 
         id_str = str(arg1).split("'")[3]
-        print(id_str)
         verb_str = str(arg2).split("'")[3].replace(":", ".")
-        print(verb_str)
         subj_str = str(arg3).split("'")[3].replace(":", ".")
-        print(subj_str)
         obj_str = str(arg4).split("'")[3].replace(":", ".")
-        print(obj_str)
 
         # subclasses
         new_sub_verb = types.new_class(verb_str, (Verb,))
@@ -1178,68 +1162,6 @@ class createSubVerb(Action):
         new_ind_verb.hasId = [new_ind_id]
 
 
-class updateHeadAssRule(Action):
-    """Creating a subclass of the class Verb"""
-    def execute(self, arg1, arg2, arg3):
-
-        var_str = str(arg1).split("'")[3]
-        print(var_str)
-        label_str = str(arg2).split("'")[3]
-        print(label_str)
-        head_str = str(arg3).split("'")[3]
-        print(head_str)
-
-        label_str_clean = label_str.replace(":", ".")
-
-        pos = parser.get_pos(label_str)
-
-        if pos in ['JJ', 'JJS', 'JJR']:
-            types.new_class(label_str_clean, (Adjective,))
-        else:
-            types.new_class(label_str_clean, (Entity,))
-
-        if len(head_str) > 0:
-            head = head_str+", "+label_str_clean+"(?"+var_str+")"
-        else:
-            head = label_str_clean+"(?"+var_str+")"
-
-        print("New head assignment rule: ", head)
-        self.assert_belief(HEAD(head))
-
-
-class createSubVerbAssRule(Action):
-    """Creating a subclass of the class Verb"""
-    def execute(self, arg1, arg2, arg3, arg4):
-
-        id_str = str(arg1).split("'")[3]
-        print(id_str)
-        subj_var = str(arg2).split("'")[3]
-        print(subj_var)
-        subj_val = str(arg3).split("'")[3]
-        print(subj_val)
-        head_str = str(arg4).split("'")[3]
-        print(head_str)
-
-        subj_val_clean = subj_val.replace(":", ".")
-
-        # subclasses
-        pos = parser.get_pos(subj_val)
-        print("pos: ", pos)
-
-        if pos in ['JJ', 'JJS', 'JJR']:
-            types.new_class(subj_val_clean, (Adjective,))
-        else:
-            types.new_class(subj_val_clean, (Entity,))
-
-        rule_str = subj_val_clean+"(?"+subj_var+") -> "+head_str
-
-        print("New assignment rule: ", rule_str)
-        with my_onto:
-           rule = Imp()
-           rule.set_as_rule(rule_str)
-
-
-
 
 
 class createAssRule(Action):
@@ -1247,18 +1169,18 @@ class createAssRule(Action):
     def execute(self, arg1, arg2):
 
         ent1 = str(arg1).split("'")[3].replace(":", ".")
-        print(ent1)
         ent2 = str(arg2).split("'")[3].replace(":", ".")
-        print(ent2)
 
         types.new_class(ent1, (Entity,))
         types.new_class(ent2, (Entity,))
 
         rule_str = ent1+"(?x) -> "+ent2+"(?x)"
 
-        rule_adj_legacy = ent2+"(?x1), "+ent1+"(?x2), hasAdj(?x1, ?x3), Adjective(?x3) -> hasAdj(?x2, ?x3)"
+        rule_adj_legacy = ent1+"(?x2), "+ent2+"(?x1), hasAdj(?x1, ?x3), Adjective(?x3) -> hasAdj(?x2, ?x3)"
 
         print("New assignment rule: ", rule_str)
+        print("New legacy rule: ", rule_adj_legacy)
+
         with my_onto:
            rule1 = Imp()
            rule1.set_as_rule(rule_str)
@@ -1273,11 +1195,8 @@ class createPassSubVerb(Action):
     def execute(self, arg1, arg2, arg3):
 
         id_str = str(arg1).split("'")[3]
-        print(id_str)
         verb_str = str(arg2).split("'")[3].replace(":", ".")
-        print(verb_str)
         obj_str = str(arg3).split("'")[3].replace(":", ".")
-        print(obj_str)
 
         # subclasses
         new_sub_verb = types.new_class(verb_str, (Verb,))
@@ -1302,11 +1221,8 @@ class createIntrSubVerb(Action):
     def execute(self, arg1, arg2, arg3):
 
         id_str = str(arg1).split("'")[3]
-        print(id_str)
         verb_str = str(arg2).split("'")[3].replace(":", ".")
-        print(verb_str)
         subj_str = str(arg3).split("'")[3].replace(":", ".")
-        print(subj_str)
 
         # subclasses
         new_sub_verb = types.new_class(verb_str, (Verb,))
@@ -1382,9 +1298,7 @@ class createPlace(Action):
     def execute(self, arg1, arg2):
 
         id_str = str(arg1).split("'")[3]
-        print(id_str)
         place_str = str(arg2).split("'")[3]
-        print(place_str)
 
         # entities individual
         new_ind_id = Id(id_str)
@@ -1398,9 +1312,7 @@ class createDate(Action):
     def execute(self, arg1, arg2):
 
         id_str = str(arg1).split("'")[3]
-        print(id_str)
         date_str = str(arg2).split("'")[3]
-        print(date_str)
 
         # entities individual
         new_ind_id = Id(id_str)
@@ -1420,10 +1332,8 @@ class saveOnto(Action):
 class InitOnto(Action):
     """Generating sentence id individual"""
     def execute(self):
-
         dateTimeObj = datetime.datetime.now()
         id_ind = str(dateTimeObj.microsecond)
-
         self.assert_belief(ID(id_ind))
 
 

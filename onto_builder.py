@@ -5,7 +5,7 @@ from actions import *
 
 # ONTOLOGY BUILDER
 
-process_onto() / ID(I) >> [aggr_ent(), create_adv(), create_gnd_prep(), create_prep(), +HEAD(""), create_assrule(), create_verb(), create_body(), create_head(), finalize_rule(), create_ner(), saveOnto(), -ID(I)]
+process_onto() / ID(I) >> [aggr_ent(), create_adv(), create_gnd_prep(), create_prep(), create_verb(), create_body(), create_head(), finalize_rule(), create_ner(), saveOnto(), -ID(I)]
 
 # Grounds aggregation
 aggr_ent() / (GND(X, Y, Z) & GND(X, Y, K) & neq(Z, K)) >> [show_line("\naggregating entity: ", Y), -GND(X, Y, Z), -GND(X, Y, K), aggrEntity(X, Y, Z, K), aggr_ent()]
@@ -22,19 +22,6 @@ create_prep() >> [show_line("\nprep creation done.")]
 # Ground-related Prepositions
 create_gnd_prep() / (GND("FLAT", X, K) & PREP("FLAT", X, Y, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating gnd prep: ", Y), -PREP("FLAT", X, Y, Z), -GND("FLAT", Z, S), createSubGndPrep(I, K, Y, S), create_prep()]
 create_gnd_prep() >> [show_line("\nprep creation done.")]
-
-"""
-# Assignment rules production
-create_assrule() / (ACTION("FLAT", "Be:VBZ", D, X, Y) & ADJ("FLAT", Y, J) & ID(I) & HEAD(H)) >> [show_line("\nupdating head for verb+Ass.Rule ADJ (VBZ): ", J), -ADJ("FLAT", Y, J), -HEAD(H), updateHeadAssRule(X, J, H), create_assrule()]
-create_assrule() / (ACTION("FLAT", "Be:VBZ", D, X, Y) & GND("FLAT", Y, K) & ID(I) & HEAD(H)) >> [show_line("\nupdating head for verb+Ass.Rule GND (VBZ): ", K), -GND("FLAT", Y, K), -HEAD(H), updateHeadAssRule(X, K, H), create_assrule()]
-create_assrule() / (ACTION("FLAT", "Be:VBZ", D, X, Y) & GND("FLAT", X, K) & ID(I) & HEAD(H)) >> [show_line("\nverb+Ass.Rule ADJ (VBZ) completed."), -ACTION("FLAT", "Be:VBZ", D, X, Y), -GND("FLAT", X, K), -HEAD(H), createSubVerbAssRule(I, X, K, H), create_assrule()]
-
-create_assrule() / (ACTION("FLAT", "Be:VBP", D, X, Y) & ADJ("FLAT", Y, J) & ID(I) & HEAD(H)) >> [show_line("\nupdating head for verb+Ass.Rule ADJ (VBP): ", J),  -ADJ("FLAT", Y, J), -HEAD(H), updateHeadAssRule(X, J, H), create_assrule()]
-create_assrule() / (ACTION("FLAT", "Be:VBP", D, X, Y) & GND("FLAT", Y, K) & ID(I) & HEAD(H)) >> [show_line("\nupdating head for verb+Ass.Rule GND (VBP): ", K),  -GND("FLAT", Y, K), -HEAD(H), updateHeadAssRule(X, K, H), create_assrule()]
-create_assrule() / (ACTION("FLAT", "Be:VBP", D, X, Y) & GND("FLAT", X, K) & ID(I) & HEAD(H)) >> [show_line("\nverb+Ass.Rule ADJ (VBP) completed."), -ACTION("FLAT", "Be:VBP", D, X, Y), -GND("FLAT", X, K), -HEAD(H), createSubVerbAssRule(I, X, K, H), create_assrule()]
-"""
-create_assrule() / (HEAD(H) & ID(I)) >> [show_line("\nassignment rules creation done."), -HEAD(H)]
-
 
 # Ordinary verbs production
 create_verb() / (GND("FLAT", X, K) & ADJ("FLAT", X, J)) >> [show_line("\ncreating adjective: ", J), -ADJ("FLAT", X, J), createAdj(K, J), create_verb()]
