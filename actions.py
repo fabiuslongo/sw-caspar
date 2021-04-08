@@ -916,7 +916,7 @@ class fillActRule(Action):
         subj = str(arg4).split("'")[3]
         obj = str(arg5).split("'")[3]
 
-        # creating subclass of verb
+        # creating subclass of Verb
         types.new_class(verb, (Verb,))
 
         if rule[0] == "-":
@@ -937,7 +937,7 @@ class fillPassActRule(Action):
         dav = str(arg3).split("'")[3]
         obj = str(arg4).split("'")[3].replace(":", ".")
 
-        # creating subclass of verb
+        # creating subclass of Verb
         types.new_class(verb, (Verb,))
 
         if rule[0] == "-":
@@ -958,7 +958,7 @@ class fillIntraActRule(Action):
         dav = str(arg3).split("'")[3]
         subj = str(arg4).split("'")[3].replace(":", ".")
 
-        # creating subclass of verb
+        # creating subclass of Verb
         types.new_class(verb, (Verb,))
 
         if rule[0] == "-":
@@ -979,7 +979,7 @@ class fillGndRule(Action):
         var = str(arg2).split("'")[3]
         value = str(arg3).split("'")[3].replace(":", ".")
 
-        # creating subclass of entity
+        # creating subclass of Entity
         types.new_class(value, (Entity,))
 
         if hand_side == "LEFT":
@@ -1005,7 +1005,7 @@ class fillAdjRule(Action):
         var = str(arg2).split("'")[3]
         adj_str = str(arg3).split("'")[3].replace(":", ".")
 
-        # creating subclass of adjective
+        # creating subclass of Adjective
         types.new_class(adj_str, (Adjective,))
 
         new_var = "x" + str(next(cnt))
@@ -1017,6 +1017,30 @@ class fillAdjRule(Action):
 
         print("rule: ", rule)
         self.assert_belief(RULE(rule))
+
+
+
+class fillAdvRule(Action):
+    """fills a rule with an adverb"""
+    def execute(self, arg1, arg2, arg3):
+
+        rule = str(arg1).split("'")[3]
+        var = str(arg2).split("'")[3]
+        adv_str = str(arg3).split("'")[3].replace(":", ".")
+
+        # creating subclass of Adverb
+        types.new_class(adv_str, (Adverb,))
+
+        new_var = "x" + str(next(cnt))
+
+        if rule[0] == "-":
+            rule = "hasAdv(?"+var+", ?"+new_var+"), "+adv_str+"(?"+new_var+") "+rule
+        else:
+            rule = "hasAdv(?"+var+", ?"+new_var+"), "+adv_str+"(?"+new_var+"), "+rule
+
+        print("rule: ", rule)
+        self.assert_belief(RULE(rule))
+
 
 
 class fillPrepRule(Action):

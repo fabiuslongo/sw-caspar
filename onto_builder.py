@@ -48,6 +48,11 @@ create_ner() / ID(I) >> [show_line("\nNER creation done.")]
 
 # updating head/absorbing copular verb
 create_head() / (ACTION("RIGHT", "Be:VBZ", E, X, Y) & GND("RIGHT", X, K) & GND("RIGHT", Y, V) & RULE(R)) >> [show_line("\nupdating implication head: ", V), -ACTION("RIGHT", "Be:VBZ", E, X, Y), -GND("RIGHT", X, K), -GND("RIGHT", Y, V), +SUBJ(Y, K), -RULE(R), fillGndRule("RIGHT", R, Y, V), create_head()]
+create_head() / ACTION("RIGHT", V, E, X, Y) >> [show_line("\nnon-copular verb not admitted for head: ", V), -ACTION("RIGHT", V, E, X, Y), create_head()]
+create_head() / GND("RIGHT", X, K) >> [show_line("\ngnd linked to non-copular verbs not admitted for head: ", K), -GND("RIGHT", X, K), create_head()]
+create_head() / PREP("RIGHT", E, X, Y) >> [show_line("\npreps not admitted for head: ", X), -PREP("RIGHT", E, X, Y), create_head()]
+create_head() / ADJ("RIGHT", X, K) >> [show_line("\nadjectives not admitted for head: ", K), -ADJ("RIGHT", X, K), create_head()]
+create_head() / ADV("RIGHT", D, K) >> [show_line("\nadverbs not admitted for head: ", K), -ADV("RIGHT", D, K), create_head()]
 create_head() / RULE(R) >> [show_line("\nhead creation completed")]
 
 create_body() / (ACTION("LEFT", V, D, "__", Y) & RULE(R)) >> [show_line("\nupdating body with passive verb: ", V), -ACTION("LEFT", V, D, "__", Y), -RULE(R), fillPassActRule(R, V, D, Y), create_body()]
@@ -56,6 +61,9 @@ create_body() / (ACTION("LEFT", V, E, X, Y) & RULE(R)) >> [show_line("\nupdating
 
 # updating body with adjectives
 create_body() / (ADJ("LEFT", X, K) & RULE(R)) >> [show_line("\nupdating body with adj: ", K), -ADJ("LEFT", X, K), -RULE(R), fillAdjRule(R, X, K), create_body()]
+
+# updating body with adverbs
+create_body() / (ADV("LEFT", D, K) & RULE(R)) >> [show_line("\nupdating body with adj: ", K), -ADV("LEFT", D, K), -RULE(R), fillAdjRule(R, D, K), create_body()]
 
 #updating body with prepositions
 create_body() / (PREP("LEFT", E, X, Y) & RULE(R)) >> [show_line("\nupdating body with prep: ", X), -RULE(R), -PREP("LEFT", E, X, Y), fillPrepRule("LEFT", R, E, X, Y), create_body()]
@@ -66,7 +74,7 @@ create_body() / (GND("LEFT", X, Y) & RULE(R)) >> [show_line("\nupdating body wit
 create_body() / (RULE(R) & SUBJ(X, Y)) >> [show_line("\nupdating body with gnd completed."),  -SUBJ(X, Y)]
 
 finalize_rule() / (RULE(R) & WFR(R)) >> [show_line("\nfinalizing well formed rule..."), -RULE(R), declareRule(R)]
-finalize_rule() / RULE(R) >> [show_line("\nthe rule is not well formed!"), -RULE(R), declareRule(R)]
+finalize_rule() / RULE(R) >> [show_line("\nthe rule is not well formed!"), -RULE(R)]
 
 
 
