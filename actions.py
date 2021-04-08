@@ -917,7 +917,7 @@ class fillActRule(Action):
         obj = str(arg5).split("'")[3]
 
         # creating subclass of verb
-        new_sub_verb = types.new_class(verb, (Verb,))
+        types.new_class(verb, (Verb,))
 
         if rule[0] == "-":
             rule = "hasSubject(?"+dav+", ?"+subj+"), hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+") "+rule
@@ -935,10 +935,10 @@ class fillPassActRule(Action):
         rule = str(arg1).split("'")[3]
         verb = str(arg2).split("'")[3].replace(":", ".")
         dav = str(arg3).split("'")[3]
-        obj = str(arg4).split("'")[3]
+        obj = str(arg4).split("'")[3].replace(":", ".")
 
         # creating subclass of verb
-        new_sub_verb = types.new_class(verb, (Verb,))
+        types.new_class(verb, (Verb,))
 
         if rule[0] == "-":
             rule = "hasObject(?"+dav+", ?"+obj+"), "+verb+"(?"+dav+") "+rule
@@ -956,10 +956,10 @@ class fillIntraActRule(Action):
         rule = str(arg1).split("'")[3]
         verb = str(arg2).split("'")[3].replace(":", ".")
         dav = str(arg3).split("'")[3]
-        subj = str(arg4).split("'")[3]
+        subj = str(arg4).split("'")[3].replace(":", ".")
 
         # creating subclass of verb
-        new_sub_verb = types.new_class(verb, (Verb,))
+        types.new_class(verb, (Verb,))
 
         if rule[0] == "-":
             rule = "hasSubject(?"+dav+", ?"+subj+"), "+verb+"(?"+dav+") "+rule
@@ -979,9 +979,8 @@ class fillGndRule(Action):
         var = str(arg2).split("'")[3]
         value = str(arg3).split("'")[3].replace(":", ".")
 
-
         # creating subclass of entity
-        new_sub_entity = types.new_class(value, (Entity,))
+        types.new_class(value, (Entity,))
 
         if hand_side == "LEFT":
             if rule[0] == "-":

@@ -216,7 +216,7 @@ class Parse(object):
         for token in reversed(doc):
             index = counter[token.text]
 
-            print("\nlemma in exam:",token.lemma_,"--- pos:",token.tag_)
+            print("\nlemma in exam:",token.lemma_)
 
             # check for presence in Grounded Meaning Context (GMC). In this case the choosen synset must be that in GMC, already found
             if GMC_ACTIVE is True and token.tag_ in GMC_POS and token.lemma_ in self.GMC_SUPP:
