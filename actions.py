@@ -15,12 +15,12 @@ FILE_NAME = config.get('AGENT', 'FILE_NAME')
 
 try:
     my_onto = get_ontology(FILE_NAME).load()
-    print("\nLoading existing owl...")
+    print("\nLoading existing "+FILE_NAME+" file...")
 except IOError:
     my_onto = get_ontology("http://test.org/"+FILE_NAME)
-    print("\nCreating new owl file...")
+    print("\nCreating new "+FILE_NAME+" file...")
     print("\nPlease Re-Run SW-Caspar.")
-    my_onto.save(file="world.owl", format="rdfxml")
+    my_onto.save(file=FILE_NAME, format="rdfxml")
     exit()
 
 
@@ -311,7 +311,6 @@ class eval_cls(ActiveBelief):
             return True
         else:
             return False
-
 
 
 class lemma_in_syn(ActiveBelief):
@@ -1021,7 +1020,6 @@ class fillAdjRule(Action):
         self.assert_belief(RULE(rule))
 
 
-
 class fillAdvRule(Action):
     """fills a rule with an adverb"""
     def execute(self, arg1, arg2, arg3):
@@ -1042,7 +1040,6 @@ class fillAdvRule(Action):
 
         print("rule: ", rule)
         self.assert_belief(RULE(rule))
-
 
 
 class fillPrepRule(Action):
@@ -1087,7 +1084,6 @@ class aggrEntity(Action):
         self.assert_belief(GND(id, var, conc_label))
 
 
-
 class applyAdv(Action):
     """create an entity and apply an adj to it"""
     def execute(self, arg1, arg2, arg3):
@@ -1110,7 +1106,6 @@ class applyAdv(Action):
         new_ind.hasAdv = [new_adv_ind]
 
 
-
 class createAdj(Action):
     """create an entity and apply an adj to it"""
     def execute(self, arg1, arg2):
@@ -1130,6 +1125,7 @@ class createAdj(Action):
 
         # individual entity - hasAdv - adverb individual
         new_ind.hasAdj = [new_adj_ind]
+
 
 class createSubCustVerb(Action):
     """Creating a subclass of the class Verb"""
@@ -1187,8 +1183,6 @@ class createSubVerb(Action):
         new_ind_verb.hasId = [new_ind_id]
 
 
-
-
 class createAssRule(Action):
     """Creating new assignment rule between entities"""
     def execute(self, arg1, arg2):
@@ -1214,7 +1208,6 @@ class createAssRule(Action):
            rule2.set_as_rule(rule_adj_legacy)
 
 
-
 class createPassSubVerb(Action):
     """Creating a subclass of the class Verb (passive)"""
     def execute(self, arg1, arg2, arg3):
@@ -1238,9 +1231,6 @@ class createPassSubVerb(Action):
         new_ind_verb.hasId = [new_ind_id]
 
 
-
-
-
 class createIntrSubVerb(Action):
     """Creating a subclass of the class Verb (Intransitive)"""
     def execute(self, arg1, arg2, arg3):
@@ -1262,8 +1252,6 @@ class createIntrSubVerb(Action):
         new_ind_verb.hasSubject = [new_ind_subj]
         # storing action's id
         new_ind_verb.hasId = [new_ind_id]
-
-
 
 
 class createSubPrep(Action):
@@ -1292,7 +1280,6 @@ class createSubPrep(Action):
         new_ind_prep.hasObject = [new_ind_ent]
 
 
-
 class createSubGndPrep(Action):
     """Creating a subclass of depending gnd preposition"""
     def execute(self, arg0, arg1, arg2, arg3):
@@ -1315,7 +1302,6 @@ class createSubGndPrep(Action):
         # Creating objects properties
         new_ind_ent_master.hasPrep = [new_ind_prep]
         new_ind_prep.hasObject = [new_ind_ent_slave]
-
 
 
 class createPlace(Action):
@@ -1351,7 +1337,7 @@ class saveOnto(Action):
     def execute(self):
         with my_onto:
             #sync_reasoner_pellet()
-            my_onto.save(file="world.owl", format="rdfxml")
+            my_onto.save(file=FILE_NAME, format="rdfxml")
 
 
 class InitOnto(Action):
@@ -1364,10 +1350,8 @@ class InitOnto(Action):
 
 
 
-
-
-
 # ---------------------- MST Builder Section
+
 
 class parse_rules(Action):
     """Asserting dependencies related beliefs."""
