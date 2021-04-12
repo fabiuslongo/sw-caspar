@@ -11,11 +11,13 @@ from datetime import datetime
 from owlready2 import *
 
 
+FILE_NAME = config.get('AGENT', 'FILE_NAME')
+
 try:
-    my_onto = get_ontology("world.owl").load()
+    my_onto = get_ontology(FILE_NAME).load()
     print("\nLoading existing owl...")
 except IOError:
-    my_onto = get_ontology("http://test.org/world.owl")
+    my_onto = get_ontology("http://test.org/"+FILE_NAME)
     print("\nCreating new owl file...")
     print("\nPlease Re-Run SW-Caspar.")
     my_onto.save(file="world.owl", format="rdfxml")

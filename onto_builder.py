@@ -16,12 +16,12 @@ create_adv() / (ACTION("FLAT", V, D, X, Y) & ADV("FLAT", D, K) & ID(I)) >> [show
 create_adv() >> [show_line("\nadverb creation done.")]
 
 # Verb-related prepositions
-create_prep() / (ACTION("FLAT", V, D, X, Y) & PREP("FLAT", D, K, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating verb prep: ", K), -PREP("FLAT", D, K, Z), -GND("FLAT", Z, S), createSubPrep(I, V, K, S), create_prep()]
-create_prep() >> [show_line("\nprep creation done.")]
+create_prep() / (ACTION("FLAT", V, D, X, Y) & PREP("FLAT", D, K, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating verb related prep: ", K), -PREP("FLAT", D, K, Z), -GND("FLAT", Z, S), createSubPrep(I, V, K, S), create_prep()]
+create_prep() >> [show_line("\nverv related prep creation done.")]
 
 # Ground-related Prepositions
-create_gnd_prep() / (GND("FLAT", X, K) & PREP("FLAT", X, Y, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating gnd prep: ", Y), -PREP("FLAT", X, Y, Z), -GND("FLAT", Z, S), createSubGndPrep(I, K, Y, S), create_prep()]
-create_gnd_prep() >> [show_line("\nprep creation done.")]
+create_gnd_prep() / (GND("FLAT", X, K) & PREP("FLAT", X, Y, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating gnd related prep: ", Y), -PREP("FLAT", X, Y, Z), -GND("FLAT", Z, S), createSubGndPrep(I, K, Y, S), create_prep()]
+create_gnd_prep() >> [show_line("\ngnd related prep creation done.")]
 
 # Ordinary verbs production
 create_verb() / (GND("FLAT", X, K) & ADJ("FLAT", X, J)) >> [show_line("\ncreating adjective: ", J), -ADJ("FLAT", X, J), createAdj(K, J), create_verb()]
