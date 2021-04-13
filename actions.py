@@ -75,6 +75,8 @@ dav = itertools.count(1)
 
 VERBOSE = config.getboolean('PARSING', 'VERBOSE')
 LANGUAGE = config.get('PARSING', 'LANGUAGE')
+ASSIGN_RULES_LEMMAS = config.get('PARSING', 'ASSIGN_RULES_LEMMAS').split(", ")
+ASSIGN_RULES_POS = config.get('PARSING', 'ASSIGN_RULES_POS').split(", ")
 
 WAIT_TIME = config.getint('AGENT', 'WAIT_TIME')
 LOG_ACTIVE = config.getboolean('AGENT', 'LOG_ACTIVE')
@@ -1332,6 +1334,28 @@ class InitOnto(Action):
         dateTimeObj = datetime.datetime.now()
         id_ind = str(dateTimeObj.microsecond)
         self.assert_belief(ID(id_ind))
+
+
+class COP(ActiveBelief):
+    """ActiveBelief for checking wether a lemma can generate an assignment rule"""
+    def evaluate(self, arg1):
+
+        lemma = str(arg1).split("'")[3]
+        lemma_decomposed = lemma.split(":")
+
+        # Checking for proper lemma
+        if lemma_decomposed[0] in ASSIGN_RULES_LEMMAS:
+            # Checking for proper Part-of-Speech
+            if len(lemma_decomposed) > 1:
+                if lemma_decomposed[1] in ASSIGN_RULES_POS:
+                    return True
+                else:
+                    return False
+            else:
+                return True
+        else:
+            return False
+
 
 
 
