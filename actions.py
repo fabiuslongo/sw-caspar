@@ -75,7 +75,6 @@ dav = itertools.count(1)
 
 VERBOSE = config.getboolean('PARSING', 'VERBOSE')
 LANGUAGE = config.get('PARSING', 'LANGUAGE')
-ASSIGN_RULES_ADMITTED = config.getboolean('PARSING', 'ASSIGN_RULES_ADMITTED')
 
 WAIT_TIME = config.getint('AGENT', 'WAIT_TIME')
 LOG_ACTIVE = config.getboolean('AGENT', 'LOG_ACTIVE')
@@ -338,8 +337,6 @@ class preprocess_onto(Action):
         print("\n--------- NEW ONTOLOGY ---------\n ")
         print("type: " + type + "\n")
 
-        self.MAIN_NEG_PRESENT = False
-
         deps = parser.get_last_deps()
         ners = parser.get_last_ner()
         print("NER: ", ners)
@@ -380,7 +377,6 @@ class preprocess_onto(Action):
                         if b[0] == old_value:
                             b[0] = new_value
 
-
         vect_LR_fol = m.build_LR_fol(MST, 'e')
 
         print("\nBefore dealing case:\n" + str(vect_LR_fol))
@@ -389,49 +385,30 @@ class preprocess_onto(Action):
             self.assert_belief(ANSWER("Improper verbal phrase"))
             return
 
-        if type == "NOMINAL":
-            # NOMINAL CASE
-            CHECK_IMPLICATION = m.check_implication(vect_LR_fol)
-            if not CHECK_IMPLICATION:
-                if ASSIGN_RULES_ADMITTED:
-                    check_isa = m.check_for_rule(deps, vect_LR_fol)
-                    if check_isa:
-                        self.assert_belief(IS_RULE("TRUE"))
-                dclause = vect_LR_fol[:]
-            else:
-                dclause = vect_LR_fol[:]
-                dclause[1] = ["==>"]
-                self.assert_belief(RULE("->"))
-        else:
-            # RULE CASE
-            ent_root = self.get_ent_ROOT(deps)
-            dav_rule = self.get_dav_rule(vect_LR_fol, ent_root)
-            positive_vect_LR_fol = []
-            for v in vect_LR_fol:
-                lemma = self.get_lemma(v[0])[:-2]
-                if self.check_neg(lemma, LANGUAGE) and v[1] == dav_rule:
-                    self.assert_belief(RETRACT("ON"))
-                else:
-                    positive_vect_LR_fol.append(v)
+        CHECK_IMPLICATION = m.check_implication(vect_LR_fol)
+        dclause = vect_LR_fol[:]
 
-            vect_LR_fol_plus_isa = m.build_isa_fol(positive_vect_LR_fol, deps)
-            dclause = m.isa_fol_to_clause(vect_LR_fol_plus_isa)
+        if CHECK_IMPLICATION:
+            dclause[1] = ["==>"]
             self.assert_belief(RULE("->"))
 
         print("\nAfter dealing case:\n" + str(dclause))
+
+        ent_root = self.get_ent_ROOT(deps)
+        print("\nent_root: ", ent_root)
 
         # IMPLICATION CASES
         if dclause[1][0] == "==>":
 
             print("\nPROCESSING LEFT HAND-SIDE...")
-            self.process_fol(dclause[0], "LEFT")
+            self.process_fol(dclause[0], "LEFT", ent_root)
 
             print("\nPROCESSING RIGHT HAND-SIDE...")
-            self.process_fol(dclause[2], "RIGHT")
+            self.process_fol(dclause[2], "RIGHT", ent_root)
 
         # FLAT CASES
         else:
-            self.process_fol(dclause, "FLAT")
+            self.process_fol(dclause, "FLAT", ent_root)
 
     def get_ent_ROOT(self, deps):
         for d in deps:
@@ -463,7 +440,8 @@ class preprocess_onto(Action):
                 lemma_nocount = total_lemma[i].split(':')[0][:-2] + ":" + total_lemma[i].split(':')[1] + "_" + lemma_nocount
         return lemma_nocount
 
-    def process_fol(self, vect_fol, id):
+
+    def process_fol(self, vect_fol, id, ent_root):
 
         # prepositions
         for v in vect_fol:
@@ -491,14 +469,22 @@ class preprocess_onto(Action):
         # actions
         for v in vect_fol:
             if len(v) == 4:
+
+                print("\naction label: ", v[0])
+
                 label = self.get_nocount_lemma(v[0])
                 if INCLUDE_ACT_POS:
                     lemma = label
                 else:
                     lemma = parser.get_lemma(label)
 
-                self.assert_belief(ACTION(str(id), lemma, v[1], v[2], v[3]))
-                print("ACTION(" + str(id) + ", " + lemma + ", " + v[1] + ", " + v[2] + ", " + v[3] + ")")
+                if id == "FLAT" and ent_root == v[0]:
+                    self.assert_belief(ACTION("ROOT", str(id), lemma, v[1], v[2], v[3]))
+                    print("ACTION(ROOT, " + str(id) + ", " + lemma + ", " + v[1] + ", " + v[2] + ", " + v[3] + ")")
+                else:
+                    self.assert_belief(ACTION(str(id), lemma, v[1], v[2], v[3]))
+                    print("ACTION(" + str(id) + ", " + lemma + ", " + v[1] + ", " + v[2] + ", " + v[3] + ")")
+
 
 
         # nouns
