@@ -1120,7 +1120,7 @@ class createSubCustVerb(Action):
     def execute(self, arg1, arg2, arg3, arg4):
 
         id_str = str(arg1).split("'")[3]
-        verb_str = str(arg2).split("'")[1].replace(":", ".")
+        verb_str = str(arg2).split("'")[3].replace(":", ".")
         subj_str = str(arg3).split("'")[3].replace(":", ".")
         obj_str = str(arg4).split("'")[3].replace(":", ".")
 

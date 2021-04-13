@@ -28,8 +28,8 @@ create_gnd_prep() >> [show_line("\ngnd related prep creation done.")]
 # Ordinary verbs production
 create_verb() / (GND("FLAT", X, K) & ADJ("FLAT", X, J)) >> [show_line("\ncreating adjective: ", J), -ADJ("FLAT", X, J), createAdj(K, J), create_verb()]
 
-create_verb() / (ACTION("ROOT", "FLAT", Z, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I) & COP(Z)) >> [show_line("\nVERB+Ass.Rule (VBZ)"), -ACTION("ROOT", "FLAT", "Be:VBZ", D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubCustVerb(I, "Be:VBZ", K, J), createAssRule(K, J), create_verb()]
-create_verb() / (ACTION("ROOT", "FLAT", Z, D, X, Y) & GND("FLAT", X, K) & ADJ("FLAT", Y, J) & ID(I) & COP(Z)) >> [show_line("\nVERB+Ass.Rule ADJ (VBP)"), -ACTION("ROOT", "FLAT", "Be:VBP", D, X, Y), -GND("FLAT", X, K), -ADJ("FLAT", Y, J), createSubCustVerb(I, "Be:VBP", K, J), createAdj(K, J), create_verb()]
+create_verb() / (ACTION("ROOT", "FLAT", Z, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I) & COP(Z)) >> [show_line("\nVERB+Ass.Rule (VBZ)"), -ACTION("ROOT", "FLAT", Z, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubCustVerb(I, Z, K, J), createAssRule(K, J), create_verb()]
+create_verb() / (ACTION("ROOT", "FLAT", Z, D, X, Y) & GND("FLAT", X, K) & ADJ("FLAT", Y, J) & ID(I) & COP(Z)) >> [show_line("\nVERB+Ass.Rule ADJ (VBP)"), -ACTION("ROOT", "FLAT", Z, D, X, Y), -GND("FLAT", X, K), -ADJ("FLAT", Y, J), createSubCustVerb(I, Z, K, J), createAdj(K, J), create_verb()]
 
 create_verb() / (ACTION("FLAT", V, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating normal verb: ", V), -ACTION("FLAT", V, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubVerb(I, V, K, J), create_verb()]
 create_verb() / (ACTION("ROOT", "FLAT", V, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating normal verb (ROOT): ", V), -ACTION("ROOT", "FLAT", V, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubVerb(I, V, K, J), create_verb()]
@@ -51,9 +51,9 @@ create_ner() / ID(I) >> [show_line("\nNER creation done.")]
 #  COPULAR VERBS IMPLICATIONS
 
 # updating head/absorbing copular verb
-create_head() / (ACTION("RIGHT", Z, E, X, Y) & GND("RIGHT", X, K) & GND("RIGHT", Y, V) & RULE(R) & COP(Z)) >> [show_line("\nupdating implication head: ", V), -ACTION("RIGHT", "Be:VBZ", E, X, Y), -GND("RIGHT", X, K), -GND("RIGHT", Y, V), +SUBJ(Y, K), -RULE(R), fillGndRule("RIGHT", R, Y, V), create_head()]
+create_head() / (ACTION("RIGHT", Z, E, X, Y) & GND("RIGHT", X, K) & GND("RIGHT", Y, V) & RULE(R) & COP(Z)) >> [show_line("\nupdating implication head: ", V), -ACTION("RIGHT", Z, E, X, Y), -GND("RIGHT", X, K), -GND("RIGHT", Y, V), +SUBJ(Y, K), -RULE(R), fillGndRule("RIGHT", R, Y, V), create_head()]
 create_head() / ACTION("RIGHT", V, E, X, Y) >> [show_line("\nnon-copular verb not admitted for head: ", V), -ACTION("RIGHT", V, E, X, Y), create_head()]
-create_head() / (ACTION("ROOT", "RIGHT", Z, E, X, Y) & GND("RIGHT", X, K) & GND("RIGHT", Y, V) & RULE(R) & COP(Z)) >> [show_line("\nupdating implication head (ROOT): ", V), -ACTION("ROOT", "RIGHT", "Be:VBZ", E, X, Y), -GND("RIGHT", X, K), -GND("RIGHT", Y, V), +SUBJ(Y, K), -RULE(R), fillGndRule("RIGHT", R, Y, V), create_head()]
+create_head() / (ACTION("ROOT", "RIGHT", Z, E, X, Y) & GND("RIGHT", X, K) & GND("RIGHT", Y, V) & RULE(R) & COP(Z)) >> [show_line("\nupdating implication head (ROOT): ", V), -ACTION("ROOT", "RIGHT", Z, E, X, Y), -GND("RIGHT", X, K), -GND("RIGHT", Y, V), +SUBJ(Y, K), -RULE(R), fillGndRule("RIGHT", R, Y, V), create_head()]
 create_head() / ACTION("ROOT", "RIGHT", V, E, X, Y) >> [show_line("\nnon-copular verb not admitted for head (ROOT): ", V), -ACTION("ROOT", "RIGHT", V, E, X, Y), create_head()]
 
 create_head() / GND("RIGHT", X, K) >> [show_line("\ngnd linked to non-copular verbs not admitted for head: ", K), -GND("RIGHT", X, K), create_head()]
