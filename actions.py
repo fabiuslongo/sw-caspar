@@ -381,7 +381,6 @@ class preprocess_onto(Action):
 
         vect_LR_fol = m.build_LR_fol(MST, 'e')
 
-        print("\nBefore dealing case:\n" + str(vect_LR_fol))
         if len(vect_LR_fol) == 0:
             print("\n --- IMPROPER VERBAL PHRASE COSTITUTION ---")
             self.assert_belief(ANSWER("Improper verbal phrase"))
@@ -394,10 +393,9 @@ class preprocess_onto(Action):
             dclause[1] = ["==>"]
             self.assert_belief(RULE("->"))
 
-        print("\nAfter dealing case:\n" + str(dclause))
+        print("\nvect_LR_fol:\n" + str(dclause))
 
         ent_root = self.get_ent_ROOT(deps)
-        print("\nent_root: ", ent_root)
 
         # IMPLICATION CASES
         if dclause[1][0] == "==>":
@@ -471,8 +469,6 @@ class preprocess_onto(Action):
         # actions
         for v in vect_fol:
             if len(v) == 4:
-
-                print("\naction label: ", v[0])
 
                 label = self.get_nocount_lemma(v[0])
                 if INCLUDE_ACT_POS:
@@ -986,6 +982,23 @@ class fillGndRule(Action):
         self.assert_belief(RULE(rule))
 
 
+class fillHeadAdjRule(Action):
+    """fills a rule with an adjective"""
+    def execute(self, arg1, arg2, arg3):
+
+        rule = str(arg1).split("'")[3]
+        var = str(arg2).split("'")[3]
+        adj_str = str(arg3).split("'")[3].replace(":", ".")
+
+        # creating subclass of Adjective
+        types.new_class(adj_str, (Adjective,))
+
+        rule = rule+" "+adj_str+"(?"+var+")"
+
+        print("rule: ", rule)
+        self.assert_belief(RULE(rule))
+
+
 class fillAdjRule(Action):
     """fills a rule with an adjective"""
     def execute(self, arg1, arg2, arg3):
@@ -1343,18 +1356,19 @@ class COP(ActiveBelief):
         lemma = str(arg1).split("'")[3]
         lemma_decomposed = lemma.split(":")
 
-        # Checking for proper lemma
-        if lemma_decomposed[0] in ASSIGN_RULES_LEMMAS:
-            # Checking for proper Part-of-Speech
-            if len(lemma_decomposed) > 1:
-                if lemma_decomposed[1] in ASSIGN_RULES_POS:
-                    return True
-                else:
-                    return False
-            else:
-                return True
+        POS_ADMITTED = False
+
+        if len(lemma_decomposed) > 1:
+            if lemma_decomposed[1] in ASSIGN_RULES_POS:
+                POS_ADMITTED = True
         else:
-            return False
+            POS_ADMITTED = True
+
+        # Checking for proper lemma
+        if lemma_decomposed[0] in ASSIGN_RULES_LEMMAS and POS_ADMITTED is True:
+           return True
+        else:
+           return False
 
 
 

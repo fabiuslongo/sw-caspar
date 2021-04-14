@@ -19,7 +19,7 @@ create_adv() >> [show_line("\nadverb creation done.")]
 # Verb-related prepositions
 create_prep() / (ACTION("FLAT", V, D, X, Y) & PREP("FLAT", D, K, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating verb related prep: ", K), -PREP("FLAT", D, K, Z), -GND("FLAT", Z, S), createSubPrep(I, V, K, S), create_prep()]
 create_prep() / (ACTION("ROOT", "FLAT", V, D, X, Y) & PREP("FLAT", D, K, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating verb related prep: ", K), -PREP("FLAT", D, K, Z), -GND("FLAT", Z, S), createSubPrep(I, V, K, S), create_prep()]
-create_prep() >> [show_line("\nverv related prep creation done.")]
+create_prep() >> [show_line("\nverb related prep creation done.")]
 
 # Ground-related Prepositions
 create_gnd_prep() / (GND("FLAT", X, K) & PREP("FLAT", X, Y, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating gnd related prep: ", Y), -PREP("FLAT", X, Y, Z), -GND("FLAT", Z, S), createSubGndPrep(I, K, Y, S), create_prep()]
@@ -52,6 +52,8 @@ create_ner() / ID(I) >> [show_line("\nNER creation done.")]
 
 # updating head/absorbing copular verb
 create_head() / (ACTION("RIGHT", Z, E, X, Y) & GND("RIGHT", X, K) & GND("RIGHT", Y, V) & RULE(R) & COP(Z)) >> [show_line("\nupdating implication head: ", V), -ACTION("RIGHT", Z, E, X, Y), -GND("RIGHT", X, K), -GND("RIGHT", Y, V), +SUBJ(Y, K), -RULE(R), fillGndRule("RIGHT", R, Y, V), create_head()]
+create_head() / (ACTION("RIGHT", Z, E, X, Y) & GND("RIGHT", X, K) & ADJ("RIGHT", Y, V) & RULE(R) & COP(Z)) >> [show_line("\nupdating implication head (ADJ-obj): ", V), -ACTION("RIGHT", Z, E, X, Y), -GND("RIGHT", X, K), -ADJ("RIGHT", Y, V), +SUBJ(Y, K), -RULE(R), fillHeadAdjRule(R, Y, V), create_head()]
+
 create_head() / ACTION("RIGHT", V, E, X, Y) >> [show_line("\nnon-copular verb not admitted for head: ", V), -ACTION("RIGHT", V, E, X, Y), create_head()]
 create_head() / (ACTION("ROOT", "RIGHT", Z, E, X, Y) & GND("RIGHT", X, K) & GND("RIGHT", Y, V) & RULE(R) & COP(Z)) >> [show_line("\nupdating implication head (ROOT): ", V), -ACTION("ROOT", "RIGHT", Z, E, X, Y), -GND("RIGHT", X, K), -GND("RIGHT", Y, V), +SUBJ(Y, K), -RULE(R), fillGndRule("RIGHT", R, Y, V), create_head()]
 create_head() / ACTION("ROOT", "RIGHT", V, E, X, Y) >> [show_line("\nnon-copular verb not admitted for head (ROOT): ", V), -ACTION("ROOT", "RIGHT", V, E, X, Y), create_head()]

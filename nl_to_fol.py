@@ -183,8 +183,8 @@ class ManageFols(object):
                             new_act[3] = '__'
 
                         fol.append(new_act)
-
         return fol
+
 
 
     def build_LR_fol(self, table, dav):
@@ -360,7 +360,7 @@ class ManageFols(object):
                         else:
                             LHS_temp.append(term)
 
-            #print("\nLHS_temp: "+str(LHS_temp))
+            print("\nLHS_temp: "+str(LHS_temp))
 
             left_RHS_inserted = []
 
@@ -370,7 +370,7 @@ class ManageFols(object):
                     RHS_temp.append(term)
                     left_RHS_inserted.append(False)
 
-            #print("RHS_temp: " + str(RHS_temp))
+            print("RHS_temp: " + str(RHS_temp))
 
             new_LHS1_temp = LHS_temp[:]
 
@@ -390,7 +390,7 @@ class ManageFols(object):
                             new_LHS1_temp.append(RHS_temp[i])
                             left_RHS_inserted[i] = True
 
-            #print("\nnew_LHS1_temp: " + str(new_LHS1_temp))
+            print("\nnew_LHS1_temp: " + str(new_LHS1_temp))
 
             new_LHS2_temp = new_LHS1_temp[:]
 
@@ -410,7 +410,7 @@ class ManageFols(object):
                             if left_RHS_inserted[i] is False:
                                 new_LHS2_temp.append(RHS_temp[i])
 
-            #print("\nnew_LHS2_temp: " + str(new_LHS2_temp))
+            print("\nnew_LHS2_temp: " + str(new_LHS2_temp))
 
             new_RHS1_temp = RHS_temp[:]
 
@@ -422,17 +422,11 @@ class ManageFols(object):
                         if len(term_int) == 4:
                             if term_est[1] in term_int:
                                 PREP_OK = True
-                            elif term_est[2] in term_int:
-                                PREP_OK = True
-                        if len(term_int) == 3:
-                            if term_est[1] in term_int:
-                                PREP_OK = True
-                            elif term_est[2] in term_int:
-                                PREP_OK = True
+
                     if PREP_OK == False:
                         new_RHS1_temp.remove(term_est)
 
-            #print("\nnew_RHS1_temp: " + str(new_RHS1_temp))
+            print("\nnew_RHS1_temp: " + str(new_RHS1_temp))
 
             new_RHS2_temp = new_RHS1_temp[:]
 
@@ -441,17 +435,20 @@ class ManageFols(object):
                 if len(term_est) == 2:
                     TERM_OK = False
                     for term_int in new_RHS1_temp:
-                        if len(term_int) == 4:
-                            if term_est[1] in term_int:
-                                TERM_OK = True
+
                         if len(term_int) == 3:
                             if term_est[1] in term_int:
                                 TERM_OK = True
+
+                        elif len(term_int) == 4:
+                            if term_est[1] in term_int:
+                                TERM_OK = True
+
                     if TERM_OK == False:
                         new_RHS2_temp.remove(term_est)
 
-            #print("\nnew_RHS2_temp: " + str(new_RHS2_temp))
-            #print("\n----------------------------------")
+            print("\nnew_RHS2_temp: " + str(new_RHS2_temp))
+            print("\n----------------------------------")
 
             fol = []
             implication = ['==>']
