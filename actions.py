@@ -67,6 +67,9 @@ with my_onto:
     class hasPlace(DataProperty):
         pass
 
+    class hasValue(DataProperty):
+        pass
+
 config = configparser.ConfigParser()
 config.read('config.ini')
 
@@ -109,6 +112,7 @@ class create_body(Procedure): pass
 class create_head(Procedure): pass
 class finalize_rule(Procedure): pass
 class create_ner(Procedure): pass
+class valorize(Procedure): pass
 
 
 # Reactive procedures - direct commands
@@ -211,6 +215,9 @@ class ID(Belief): pass
 class RULE(Belief): pass
 # subject accumulator
 class SUBJ(Belief): pass
+# subject accumulator
+class VALUE(Belief): pass
+
 
 
 # parse rule beliefs
@@ -484,7 +491,6 @@ class preprocess_onto(Action):
                     print("ACTION(" + str(id) + ", " + lemma + ", " + v[1] + ", " + v[2] + ", " + v[3] + ")")
 
 
-
         # nouns
         for v in vect_fol:
             if len(v) == 2:
@@ -542,7 +548,18 @@ class preprocess_onto(Action):
                     self.assert_belief(ADV(str(id), v[1], lemma))
                     print("ADV(" + str(id) + ", " + v[1] + ", " + lemma + ")")
 
+        # cardinal numbers
+        for v in vect_fol:
+            if len(v) == 2:
+                if self.get_pos(v[0]) == "CD":
+                    label = self.get_nocount_lemma(v[0])
+                    if INCLUDE_NOUNS_POS:
+                        lemma = label
+                    else:
+                        lemma = parser.get_lemma(label)
 
+                    self.assert_belief(VALUE(str(id), v[1], lemma))
+                    print("VALUE(" + str(id) + ", " + v[1] + ", " + lemma + ")")
 
     def get_pos(self, s):
         first = s.split('_')[0]
@@ -1331,6 +1348,23 @@ class createDate(Action):
 
         # storing id features
         new_ind_id.hasDate = [date_str]
+
+
+class createValue(Action):
+    """Creating DataProperty fro a given value to entity"""
+    def execute(self, arg1, arg2):
+
+        ent_str = str(arg1).split("'")[3]
+        value_str = str(arg2).split("'")[3]
+
+        # creating subclass of entity
+        new_sub_obj = types.new_class(ent_str, (Entity,))
+
+        # entities individual
+        new_ind_ent = new_sub_obj(parser.clean_from_POS(ent_str) + ".ind")
+
+        # storing value
+        new_ind_ent.hasValue = [value_str]
 
 
 class saveOnto(Action):

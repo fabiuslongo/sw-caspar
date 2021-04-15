@@ -5,11 +5,14 @@ from actions import *
 
 # ONTOLOGY BUILDER
 
-process_onto() / ID(I) >> [aggr_ent(), create_adv(), create_gnd_prep(), create_prep(), create_verb(), create_head(), create_body(), finalize_rule(), create_ner(), saveOnto(), -ID(I)]
+process_onto() / ID(I) >> [aggr_ent(), valorize(), create_adv(), create_gnd_prep(), create_prep(), create_verb(), create_head(), create_body(), finalize_rule(), create_ner(), saveOnto(), -ID(I)]
 
 # Grounds aggregation
 aggr_ent() / (GND(X, Y, Z) & GND(X, Y, K) & neq(Z, K)) >> [show_line("\naggregating entity: ", Y), -GND(X, Y, Z), -GND(X, Y, K), aggrEntity(X, Y, Z, K), aggr_ent()]
 aggr_ent() >> [show_line("\nentities aggregation done.")]
+
+valorize() / (GND("FLAT", X, Y) & ADJ("FLAT", X, "Equal") & PREP("FLAT", X, "To", S) & VALUE("FLAT", S, V)) >> [show_line("\ngiving value: ", V), -ADJ("FLAT", X, "Equal"), -PREP("FLAT", X, "To", S), -VALUE("FLAT", S, V), createValue(Y, V)]
+valorize() >> [show_line("\nvalues attribution completed.")]
 
 # Adverb productions
 create_adv() / (ACTION("FLAT", V, D, X, Y) & ADV("FLAT", D, K) & ID(I)) >> [show_line("\ncreating adverbs: ", Y), -ADV("FLAT", D, K), applyAdv(I, V, K), create_adv()]

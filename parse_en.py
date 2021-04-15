@@ -217,7 +217,7 @@ class Parse(object):
         for token in reversed(doc):
             index = counter[token.text]
 
-            print("\nlemma in exam:",token.lemma_)
+            print("\nlemma in exam:", token.lemma_)
 
             # check for presence in Grounded Meaning Context (GMC). In this case the choosen synset must be that in GMC, already found
             if GMC_ACTIVE is True and token.tag_ in GMC_POS and token.lemma_ in self.GMC_SUPP:
@@ -404,13 +404,16 @@ class Parse(object):
             governor = self.get_lemma(deps[i][1]).capitalize() + ":" + self.get_pos(deps[i][1])
             dependent = self.get_lemma(deps[i][2]).capitalize() + ":" + self.get_pos(deps[i][2])
 
+            """
             # Numbers labelling correction
             if dependent[0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
                 dependent = "N"+dependent
             if governor[0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
                 governor = "N"+governor
+            """
 
             deps[i] = [deps[i][0], governor, dependent]
+
 
         return deps
 
