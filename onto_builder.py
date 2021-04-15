@@ -67,28 +67,32 @@ create_head() / ADJ("RIGHT", X, K) >> [show_line("\nadjectives not admitted for 
 create_head() / ADV("RIGHT", D, K) >> [show_line("\nadverbs not admitted for head: ", K), -ADV("RIGHT", D, K), create_head()]
 create_head() / RULE(R) >> [show_line("\nhead creation completed")]
 
-create_body() / (ACTION("LEFT", V, D, "__", Y) & RULE(R)) >> [show_line("\nupdating body with passive verb: ", V), -ACTION("LEFT", V, D, "__", Y), -RULE(R), fillPassActRule(R, V, D, Y), create_body()]
-create_body() / (ACTION("LEFT", V, D, X, "__") & RULE(R)) >> [show_line("\nupdating body with intransitive verb: ", V), -ACTION("LEFT", V, D, X, "__"), -RULE(R), fillIntraActRule(R, V, D, X), create_body()]
-create_body() / (ACTION("LEFT", V, E, X, Y) & RULE(R)) >> [show_line("\nupdating body with normal verb: ", V), -ACTION("LEFT", V, E, X, Y), -RULE(R), fillActRule(R, V, E, X, Y), create_body()]
-create_body() / (ACTION("ROOT", "LEFT", V, D, "__", Y) & RULE(R)) >> [show_line("\nupdating body with passive verb (ROOT): ", V), -ACTION("ROOT","LEFT", V, D, "__", Y), -RULE(R), fillPassActRule(R, V, D, Y), create_body()]
-create_body() / (ACTION("ROOT", "LEFT", V, D, X, "__") & RULE(R)) >> [show_line("\nupdating body with intransitive verb (ROOT): ", V), -ACTION("ROOT", "LEFT", V, D, X, "__"), -RULE(R), fillIntraActRule(R, V, D, X), create_body()]
-create_body() / (ACTION("ROOT", "LEFT", V, E, X, Y) & RULE(R)) >> [show_line("\nupdating body with normal verb (ROOT): ", V), -ACTION("ROOT","LEFT", V, E, X, Y), -RULE(R), fillActRule(R, V, E, X, Y), create_body()]
+# updating body with grounds
+create_body() / (GND("LEFT", X, Y) & RULE(R) & SUBJ(Z, Y)) >> [show_line("\nupdating body with gnd: ", Y), -SUBJ(Z, Y), +SUBJ(X, Z), -GND("LEFT", X, Y), -RULE(R), fillGndRule("LEFT", R, Z, Y), create_body()]
+create_body() / (GND("LEFT", X, Y) & RULE(R)) >> [show_line("\nupdating body with gnd: ", Y), -GND("LEFT", X, Y), -RULE(R), fillGndRule("LEFT", R, X, Y), create_body()]
+
+create_body() / (ACTION("LEFT", V, D, "__", Y) & RULE(R) & SUBJ(Y, Z)) >> [show_line("\nupdating body with passive verb: ", V), -ACTION("LEFT", V, D, "__", Y), -RULE(R), fillPassActRule(R, V, D, Z), create_body()]
+create_body() / (ACTION("LEFT", V, D, X, "__") & RULE(R) & SUBJ(X, Z)) >> [show_line("\nupdating body with intransitive verb: ", V), -ACTION("LEFT", V, D, X, "__"), -RULE(R), fillIntraActRule(R, V, D, Z), create_body()]
+create_body() / (ACTION("LEFT", V, E, X, Y) & RULE(R) & SUBJ(X, Z)) >> [show_line("\nupdating body with normal verb: ", V), -ACTION("LEFT", V, E, X, Y), -RULE(R), fillActRule(R, V, E, Z, Y), create_body()]
+create_body() / (ACTION("ROOT", "LEFT", V, D, "__", Y) & RULE(R) & SUBJ(Y, Z)) >> [show_line("\nupdating body with passive verb (ROOT): ", V), -ACTION("ROOT","LEFT", V, D, "__", Y), -RULE(R), fillPassActRule(R, V, D, Z), create_body()]
+create_body() / (ACTION("ROOT", "LEFT", V, D, X, "__") & RULE(R) & SUBJ(X, Z)) >> [show_line("\nupdating body with intransitive verb (ROOT): ", V), -ACTION("ROOT", "LEFT", V, D, X, "__"), -RULE(R), fillIntraActRule(R, V, D, Z), create_body()]
+create_body() / (ACTION("ROOT", "LEFT", V, E, X, Y) & RULE(R) & SUBJ(X, Z)) >> [show_line("\nupdating body with normal verb (ROOT): ", V), -ACTION("ROOT","LEFT", V, E, X, Y), -RULE(R), fillActRule(R, V, E, Z, Y), create_body()]
 
 # updating body with comparison operators
+create_body() / (ADJ("LEFT", X, "Great") & PREP("LEFT", X, "Than", S) & VALUE("LEFT", S, V) & RULE(R) & SUBJ(X, Z)) >> [show_line("\nupdating body (SUBJ) with greater than ", V), -ADJ("LEFT", X, "Great"), -PREP("LEFT", X, "Than", S), -VALUE("LEFT", S, V), -RULE(R), fillOpRule(R, Z, V)]
 create_body() / (ADJ("LEFT", X, "Great") & PREP("LEFT", X, "Than", S) & VALUE("LEFT", S, V) & RULE(R)) >> [show_line("\nupdating body with greater than ", V), -ADJ("LEFT", X, "Great"), -PREP("LEFT", X, "Than", S), -VALUE("LEFT", S, V), -RULE(R), fillOpRule(R, X, V)]
 
 # updating body with adjectives
+create_body() / (ADJ("LEFT", X, K) & RULE(R) & SUBJ(X, Z)) >> [show_line("\nupdating body (SUBJ) with adj: ", K), -ADJ("LEFT", X, K), -RULE(R), fillAdjRule(R, Z, K), create_body()]
 create_body() / (ADJ("LEFT", X, K) & RULE(R)) >> [show_line("\nupdating body with adj: ", K), -ADJ("LEFT", X, K), -RULE(R), fillAdjRule(R, X, K), create_body()]
 
 # updating body with adverbs
 create_body() / (ADV("LEFT", D, K) & RULE(R)) >> [show_line("\nupdating body with adv: ", K), -ADV("LEFT", D, K), -RULE(R), fillAdjRule(R, D, K), create_body()]
 
 #updating body with prepositions
+create_body() / (PREP("LEFT", E, X, Y) & RULE(R) & SUBJ(X, Z)) >> [show_line("\nupdating body (SUBJ) with prep: ", X), -RULE(R), -PREP("LEFT", E, X, Y), fillPrepRule("LEFT", R, E, Z, Y), create_body()]
 create_body() / (PREP("LEFT", E, X, Y) & RULE(R)) >> [show_line("\nupdating body with prep: ", X), -RULE(R), -PREP("LEFT", E, X, Y), fillPrepRule("LEFT", R, E, X, Y), create_body()]
 
-# updating body with grounds
-create_body() / (GND("LEFT", X, Y) & RULE(R) & SUBJ(Z, Y)) >> [show_line("\nupdating body with gnd: ", Y), -GND("LEFT", X, Y), -RULE(R), fillGndRule("LEFT", R, Z, Y), create_body()]
-create_body() / (GND("LEFT", X, Y) & RULE(R)) >> [show_line("\nupdating body with gnd: ", Y), -GND("LEFT", X, Y), -RULE(R), fillGndRule("LEFT", R, X, Y), create_body()]
 create_body() / (RULE(R) & SUBJ(X, Y)) >> [show_line("\nupdating body with gnd completed."),  -SUBJ(X, Y)]
 
 finalize_rule() / (RULE(R) & WFR(R)) >> [show_line("\nfinalizing well formed rule..."), -RULE(R), declareRule(R)]
