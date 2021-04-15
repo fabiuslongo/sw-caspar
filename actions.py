@@ -68,7 +68,8 @@ with my_onto:
         pass
 
     class hasValue(DataProperty):
-        pass
+        range = [int]
+
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -494,7 +495,7 @@ class preprocess_onto(Action):
         # nouns
         for v in vect_fol:
             if len(v) == 2:
-                if self.get_pos(v[0]) in ['NNP', 'NNPS', 'PRP', 'CD', 'NN', 'NNS', 'PRP', 'PRP$']:
+                if self.get_pos(v[0]) in ['NNP', 'NNPS', 'PRP', 'NN', 'NNS', 'PRP', 'PRP$']:
                     label = self.get_nocount_lemma(v[0])
                     if INCLUDE_NOUNS_POS:
                         lemma = label
@@ -1089,6 +1090,23 @@ class fillPrepRule(Action):
         self.assert_belief(RULE(rule))
 
 
+class fillOpRule(Action):
+    """fills with comparison operators"""
+    def execute(self, arg1, arg2, arg3):
+
+        rule = str(arg1).split("'")[3]
+        var = str(arg2).split("'")[3]
+        val_str = str(arg3).split("'")[3]
+
+        if rule[0] == "-":
+            rule = "greaterThan(?"+var+", "+val_str+") "+rule
+        else:
+            rule = "greaterThan(?"+var+", "+val_str+"), "+rule
+
+        print("rule: ", rule)
+        self.assert_belief(RULE(rule))
+
+
 class aggrEntity(Action):
     """aggregate two entity beliefs in one"""
     def execute(self, arg1, arg2, arg3, arg4):
@@ -1364,7 +1382,7 @@ class createValue(Action):
         new_ind_ent = new_sub_obj(parser.clean_from_POS(ent_str) + ".ind")
 
         # storing value
-        new_ind_ent.hasValue = [value_str]
+        new_ind_ent.hasValue = [int(value_str)]
 
 
 class saveOnto(Action):

@@ -45,8 +45,8 @@ create_verb() / (ACTION("ROOT", "FLAT", V, D, X, "__") & GND("FLAT", X, K) & ID(
 create_verb() >> [show_line("\nverb creation done.")]
 
 # Named Entity Recognition production
-create_ner() / (NER("GPE", Y) & ID(I)) >> [show_line("\nCreating GPE NER: ", Y), -NER("GPE", Y), createPlace(I, Y), create_ner()]
-create_ner() / (NER("DATE", Y) & ID(I)) >> [show_line("\nCreating DATE NER: ", Y), -NER("DATE", Y), createDate(I, Y), create_ner()]
+#create_ner() / (NER("GPE", Y) & ID(I)) >> [show_line("\nCreating GPE NER: ", Y), -NER("GPE", Y), createPlace(I, Y), create_ner()]
+#create_ner() / (NER("DATE", Y) & ID(I)) >> [show_line("\nCreating DATE NER: ", Y), -NER("DATE", Y), createDate(I, Y), create_ner()]
 create_ner() / (NER(X, Y) & ID(I)) >> [-NER(X, Y), create_ner()]
 create_ner() / ID(I) >> [show_line("\nNER creation done.")]
 
@@ -74,11 +74,14 @@ create_body() / (ACTION("ROOT", "LEFT", V, D, "__", Y) & RULE(R)) >> [show_line(
 create_body() / (ACTION("ROOT", "LEFT", V, D, X, "__") & RULE(R)) >> [show_line("\nupdating body with intransitive verb (ROOT): ", V), -ACTION("ROOT", "LEFT", V, D, X, "__"), -RULE(R), fillIntraActRule(R, V, D, X), create_body()]
 create_body() / (ACTION("ROOT", "LEFT", V, E, X, Y) & RULE(R)) >> [show_line("\nupdating body with normal verb (ROOT): ", V), -ACTION("ROOT","LEFT", V, E, X, Y), -RULE(R), fillActRule(R, V, E, X, Y), create_body()]
 
+# updating body with comparison operators
+create_body() / (ADJ("LEFT", X, "Great") & PREP("LEFT", X, "Than", S) & VALUE("LEFT", S, V) & RULE(R)) >> [show_line("\nupdating body with greater than ", V), -ADJ("LEFT", X, "Great"), -PREP("LEFT", X, "Than", S), -VALUE("LEFT", S, V), -RULE(R), fillOpRule(R, X, V)]
+
 # updating body with adjectives
 create_body() / (ADJ("LEFT", X, K) & RULE(R)) >> [show_line("\nupdating body with adj: ", K), -ADJ("LEFT", X, K), -RULE(R), fillAdjRule(R, X, K), create_body()]
 
 # updating body with adverbs
-create_body() / (ADV("LEFT", D, K) & RULE(R)) >> [show_line("\nupdating body with adj: ", K), -ADV("LEFT", D, K), -RULE(R), fillAdjRule(R, D, K), create_body()]
+create_body() / (ADV("LEFT", D, K) & RULE(R)) >> [show_line("\nupdating body with adv: ", K), -ADV("LEFT", D, K), -RULE(R), fillAdjRule(R, D, K), create_body()]
 
 #updating body with prepositions
 create_body() / (PREP("LEFT", E, X, Y) & RULE(R)) >> [show_line("\nupdating body with prep: ", X), -RULE(R), -PREP("LEFT", E, X, Y), fillPrepRule("LEFT", R, E, X, Y), create_body()]
