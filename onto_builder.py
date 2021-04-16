@@ -11,7 +11,7 @@ process_onto() / ID(I) >> [aggr_ent(), valorize(), create_adv(), create_gnd_prep
 aggr_ent() / (GND(X, Y, Z) & GND(X, Y, K) & neq(Z, K)) >> [show_line("\naggregating entity: ", Y), -GND(X, Y, Z), -GND(X, Y, K), aggrEntity(X, Y, Z, K), aggr_ent()]
 aggr_ent() >> [show_line("\nentities aggregation done.")]
 
-valorize() / (GND("FLAT", X, Y) & ADJ("FLAT", X, "Equal") & PREP("FLAT", X, "To", S) & VALUE("FLAT", S, V)) >> [show_line("\ngiving value: ", V), -ADJ("FLAT", X, "Equal"), -PREP("FLAT", X, "To", S), -VALUE("FLAT", S, V), createValue(Y, V)]
+valorize() / (GND("FLAT", X, Y) & ADJ("FLAT", X, "Equal") & PREP("FLAT", X, "To", S) & VALUE("FLAT", S, V) & ID(I)) >> [show_line("\ngiving value: ", V), -ADJ("FLAT", X, "Equal"), -PREP("FLAT", X, "To", S), -VALUE("FLAT", S, V), createValue(I, Y, V)]
 valorize() >> [show_line("\nvalues attribution completed.")]
 
 # Adverb productions
@@ -29,7 +29,7 @@ create_gnd_prep() / (GND("FLAT", X, K) & PREP("FLAT", X, Y, Z) & GND("FLAT", Z, 
 create_gnd_prep() >> [show_line("\ngnd related prep creation done.")]
 
 # Adjective production
-create_adj() / (GND("FLAT", X, K) & ADJ("FLAT", X, J)) >> [show_line("\ncreating adjective: ", J), -ADJ("FLAT", X, J), createAdj(K, J), create_adj()]
+create_adj() / (GND("FLAT", X, K) & ADJ("FLAT", X, J) & ID(I)) >> [show_line("\ncreating adjective: ", J), -ADJ("FLAT", X, J), createAdj(I, K, J), create_adj()]
 create_adj() >> [show_line("\nadjective creation done.")]
 
 # Adjective production

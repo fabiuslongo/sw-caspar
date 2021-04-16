@@ -314,7 +314,7 @@ class eval_sem(ActiveBelief):
             final = ".".join(e_final[:-1])
             res_def.append(final)
 
-        print("Meta-Reasoning: ", res_def)
+        print("\nMeta-Reasoning: ", res_def)
 
         if subj in res_def:
             return True
@@ -1146,8 +1146,9 @@ class applyAdv(Action):
 
 class createAdj(Action):
     """create an entity and apply an adj to it"""
-    def execute(self, arg1, arg2):
+    def execute(self, arg0, arg1, arg2):
 
+        id_str = str(arg0).split("'")[3]
         ent_str = str(arg1).split("'")[3].replace(":", ".")
         adj_str = str(arg2).split("'")[3].replace(":", ".")
 
@@ -1159,7 +1160,7 @@ class createAdj(Action):
         # creating subclass entity
         ent_sub = types.new_class(ent_str, (Entity,))
         # creating entity individual
-        new_ind = ent_sub(parser.clean_from_POS(ent_str)+".ind")
+        new_ind = ent_sub(parser.clean_from_POS(ent_str)+"."+id_str)
 
         # individual entity - hasAdv - adverb individual
         new_ind.hasAdj = [new_adj_ind]
@@ -1211,7 +1212,7 @@ class createSubVerb(Action):
         new_ind_id = Id(id_str)
         new_ind_verb = new_sub_verb(parser.clean_from_POS(verb_str)+"."+id_str)
         new_ind_subj = new_sub_subj(parser.clean_from_POS(subj_str)+".ind")
-        new_ind_obj = new_sub_obj(parser.clean_from_POS(obj_str)+".ind")
+        new_ind_obj = new_sub_obj(parser.clean_from_POS(obj_str)+"."+id_str)
 
         # individual entity - hasSubject - subject individual
         new_ind_verb.hasSubject = [new_ind_subj]
@@ -1372,8 +1373,9 @@ class createDate(Action):
 
 class createValue(Action):
     """Creating DataProperty fro a given value to entity"""
-    def execute(self, arg1, arg2):
+    def execute(self, arg0, arg1, arg2):
 
+        id_str = str(arg0).split("'")[3]
         ent_str = str(arg1).split("'")[3]
         value_str = str(arg2).split("'")[3]
 
@@ -1381,7 +1383,7 @@ class createValue(Action):
         new_sub_obj = types.new_class(ent_str, (Entity,))
 
         # entities individual
-        new_ind_ent = new_sub_obj(parser.clean_from_POS(ent_str) + ".ind")
+        new_ind_ent = new_sub_obj(parser.clean_from_POS(ent_str)+"."+id_str)
 
         # storing value
         new_ind_ent.hasValue = [int(value_str)]
