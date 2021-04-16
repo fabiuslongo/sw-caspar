@@ -1098,10 +1098,12 @@ class fillOpRule(Action):
         var = str(arg2).split("'")[3]
         val_str = str(arg3).split("'")[3]
 
+        new_index_var = str(next(cnt))
+
         if rule[0] == "-":
-            rule = "greaterThan(?"+var+", "+val_str+") "+rule
+            rule = "hasValue(?"+var+", ?x"+new_index_var+"), greaterThan(?x"+new_index_var+", "+val_str+") "+rule
         else:
-            rule = "greaterThan(?"+var+", "+val_str+"), "+rule
+            rule = "hasValue(?"+var+", ?x"+new_index_var+"), greaterThan(?x"+new_index_var+", "+val_str+"), "+rule
 
         print("rule: ", rule)
         self.assert_belief(RULE(rule))

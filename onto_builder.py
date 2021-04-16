@@ -5,7 +5,7 @@ from actions import *
 
 # ONTOLOGY BUILDER
 
-process_onto() / ID(I) >> [aggr_ent(), valorize(), create_adv(), create_gnd_prep(), create_prep(), create_verb(), create_head(), create_body(), finalize_rule(), create_ner(), saveOnto(), -ID(I)]
+process_onto() / ID(I) >> [aggr_ent(), valorize(), create_adv(), create_gnd_prep(), create_prep(), create_adj(), create_verb(), create_head(), create_body(), finalize_rule(), create_ner(), saveOnto(), -ID(I)]
 
 # Grounds aggregation
 aggr_ent() / (GND(X, Y, Z) & GND(X, Y, K) & neq(Z, K)) >> [show_line("\naggregating entity: ", Y), -GND(X, Y, Z), -GND(X, Y, K), aggrEntity(X, Y, Z, K), aggr_ent()]
@@ -28,9 +28,11 @@ create_prep() >> [show_line("\nverb related prep creation done.")]
 create_gnd_prep() / (GND("FLAT", X, K) & PREP("FLAT", X, Y, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating gnd related prep: ", Y), -PREP("FLAT", X, Y, Z), -GND("FLAT", Z, S), createSubGndPrep(I, K, Y, S), create_prep()]
 create_gnd_prep() >> [show_line("\ngnd related prep creation done.")]
 
-# Ordinary verbs production
-create_verb() / (GND("FLAT", X, K) & ADJ("FLAT", X, J)) >> [show_line("\ncreating adjective: ", J), -ADJ("FLAT", X, J), createAdj(K, J), create_verb()]
+# Adjective production
+create_adj() / (GND("FLAT", X, K) & ADJ("FLAT", X, J)) >> [show_line("\ncreating adjective: ", J), -ADJ("FLAT", X, J), createAdj(K, J), create_adj()]
+create_adj() >> [show_line("\nadjective creation done.")]
 
+# Adjective production
 create_verb() / (ACTION("ROOT", "FLAT", Z, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I) & COP(Z)) >> [show_line("\nVERB+Ass.Rule (VBZ)"), -ACTION("ROOT", "FLAT", Z, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubCustVerb(I, Z, K, J), createAssRule(K, J), create_verb()]
 create_verb() / (ACTION("ROOT", "FLAT", Z, D, X, Y) & GND("FLAT", X, K) & ADJ("FLAT", Y, J) & ID(I) & COP(Z)) >> [show_line("\nVERB+Ass.Rule ADJ (VBP)"), -ACTION("ROOT", "FLAT", Z, D, X, Y), -GND("FLAT", X, K), -ADJ("FLAT", Y, J), createSubCustVerb(I, Z, K, J), createAdj(K, J), create_verb()]
 
@@ -79,8 +81,8 @@ create_body() / (ACTION("ROOT", "LEFT", V, D, X, "__") & RULE(R) & SUBJ(X, Z)) >
 create_body() / (ACTION("ROOT", "LEFT", V, E, X, Y) & RULE(R) & SUBJ(X, Z)) >> [show_line("\nupdating body with normal verb (ROOT): ", V), -ACTION("ROOT","LEFT", V, E, X, Y), -RULE(R), fillActRule(R, V, E, Z, Y), create_body()]
 
 # updating body with comparison operators
-create_body() / (ADJ("LEFT", X, "Great") & PREP("LEFT", X, "Than", S) & VALUE("LEFT", S, V) & RULE(R) & SUBJ(X, Z)) >> [show_line("\nupdating body (SUBJ) with greater than ", V), -ADJ("LEFT", X, "Great"), -PREP("LEFT", X, "Than", S), -VALUE("LEFT", S, V), -RULE(R), fillOpRule(R, Z, V)]
-create_body() / (ADJ("LEFT", X, "Great") & PREP("LEFT", X, "Than", S) & VALUE("LEFT", S, V) & RULE(R)) >> [show_line("\nupdating body with greater than ", V), -ADJ("LEFT", X, "Great"), -PREP("LEFT", X, "Than", S), -VALUE("LEFT", S, V), -RULE(R), fillOpRule(R, X, V)]
+create_body() / (ADJ("LEFT", X, "Great") & PREP("LEFT", X, "Than", S) & VALUE("LEFT", S, V) & RULE(R) & SUBJ(X, Z)) >> [show_line("\nupdating body (SUBJ) with greater than ", V), -ADJ("LEFT", X, "Great"), -PREP("LEFT", X, "Than", S), -VALUE("LEFT", S, V), -RULE(R), fillOpRule(R, Z, V), create_body()]
+create_body() / (ADJ("LEFT", X, "Great") & PREP("LEFT", X, "Than", S) & VALUE("LEFT", S, V) & RULE(R)) >> [show_line("\nupdating body with greater than ", V), -ADJ("LEFT", X, "Great"), -PREP("LEFT", X, "Than", S), -VALUE("LEFT", S, V), -RULE(R), fillOpRule(R, X, V), create_body()]
 
 # updating body with adjectives
 create_body() / (ADJ("LEFT", X, K) & RULE(R) & SUBJ(X, Z)) >> [show_line("\nupdating body (SUBJ) with adj: ", K), -ADJ("LEFT", X, K), -RULE(R), fillAdjRule(R, Z, K), create_body()]
