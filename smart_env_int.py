@@ -13,30 +13,13 @@ check_conds() / SENSOR(V, X, Y) >> [show_line("\nbelief sensor not more needed..
 +START_ROUTINE(I) / ROUTINE(I, K, J, L, T) >> [show_line("\nexecuting routine..."), -ROUTINE(I, K, J, L, T), +INTENT(K, J, L, T), +START_ROUTINE(I), say("executing routine")]
 
 
-# turn off
-+INTENT(X, "Light", "Living Room", T) / lemma_in_syn(X, "change_state.v.01") >> [exec_cmd("change_state.v.01", "Light", "Living Room", T), show_ct(), say("execution successful")]
-
-# after +FEED("When a resident is at home, the home is safe"), +FEED("Robert is a resident"),  +FEED("Robert is at home"), d2()
-+INTENT(X, "Alarm", "Garage", T) / (lemma_in_syn(X, "change_state.v.01") & eval_cls("Colonel.NNP_West.NNP", "Criminal.NN")) >> [exec_cmd("change_state.v.01", "Alarm", "Garage", T), show_ct(), say("execution successful")]
-#+INTENT(X, "Alarm", "Garage", T) / (lemma_in_syn(X, "change_state.v.01") & eval_cls("Be_VBZ(Colonel_NNP_West_NNP(x1), Criminal_NN(x2))")) >> [exec_cmd("change_state.v.01", "Alarm", "Garage", T), show_ct(), say("execution successful")]
-
-
-# turn on
-+INTENT(X, "Light", "Living Room", T) / lemma_in_syn(X, "switch.v.03") >> [exec_cmd("switch.v.03", "Light", "Living Room", T), show_ct(), say("execution successful")]
-+INTENT(X, "Light", Y, T) / lemma_in_syn(X, "switch.v.03") >> [show_line("\n---- Result: failed to execute the command in the specified location"), show_ct(), say("wrong location")]
-
-# open
-+INTENT(X, "Door", "Living Room", T) / lemma_in_syn(X, "open.v.01") >> [exec_cmd("open.v.01", "Door", "Living Room", T), show_ct(), say("execution successful")]
-+INTENT(X, "Door", "Kitchen", T) / lemma_in_syn(X, "open.v.01") >> [exec_cmd("open.v.01", "Door", "Kitchen", T), show_ct(), say("execution successful")]
-+INTENT(X, "Door", Y, T) / lemma_in_syn(X, "open.v.01") >> [show_line("\n---- Result: failed to execute the command in the specified location"), show_ct(), say("wrong location")]
-
-# specify, set, determine, define, fix, limit
-+INTENT(X, "Cooler", "Bedroom", T) / lemma_in_syn(X, "specify.v.02") >> [exec_cmd("specify.v.02", "Cooler", "Bedroom", T), show_ct(), say("execution successful")]
-+INTENT(X, "Cooler", Y, T) / lemma_in_syn(X, "specify.v.02") >> [show_line("\n---- Result: failed to execute the command in the specified location"), show_ct(), say("wrong location")]
-
-# cut
-+INTENT(X, "Grass", "Garden", T) / lemma_in_syn(X, "cut.v.01") >> [exec_cmd("cut.v.01", "Grass", "Garden", T), show_ct(), say("execution successful")]
-+INTENT(X, "cut.v.01", "grass", Y, T) / lemma_in_syn(X, "cut.v.01") >> [show_line("\n---- Result: failed to execute the command in the specified location"), show_ct(), say("wrong location")]
+# after:
+# +FEED("Woody Allen is a patient")
+# +FEED("Woody Allen has diastolic blood pressure equal to 150")
+# +FEED("When a patient has diastolic blood pressure greater than 140, the patient is hypertensive")
+# d2()
++INTENT(X, "Rinazina", Z, T) / (lemma_in_syn(X, "give.v.19") & eval_sem(T, "Hypertensive")) >> [show_ct(), say("I cannot execute the task. The patient is hypertensive")]
++INTENT(X, "Rinazina", Z, T) / lemma_in_syn(X, "give.v.19") >> [exec_cmd(X, "Rinazina", Z, T), show_ct(), say("execution successful")]
 
 # any other commands
 +INTENT(V, X, L, T) >> [show_line("\n---- Result: failed to execute the command: ", V), show_ct(), say("execution failed")]

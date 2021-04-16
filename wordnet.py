@@ -1,7 +1,7 @@
 from nltk.corpus import wordnet
 
-word = "equal"
-pos = wordnet.ADJ
+word = "give"
+pos = wordnet.VERB
 language = "eng"
 
 syns = wordnet.synsets(word, pos=pos, lang=language)

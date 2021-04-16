@@ -292,19 +292,19 @@ class set_wait(Action):
                 myfile.write("\n\n------ NEW SESSION ------ "+str(datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")))
 
 
-class eval_cls(ActiveBelief):
+class eval_sem(ActiveBelief):
     """ActiveBelief for Beliefs KB and Clauses KB interaction"""
     def evaluate(self, arg1, arg2):
 
-        subj = str(arg1).split("'")[1]
+        subj = str(arg1).split("'")[3].split(" ")[-1]
         obj = str(arg2).split("'")[1]
 
         my_world = owlready2.World()
-        my_world.get_ontology("world.owl").load()  # path to the owl file is given here
+        my_world.get_ontology(FILE_NAME).load()  # path to the owl file is given here
 
-        sync_reasoner(my_world)
+        sync_reasoner_pellet(my_world)
         graph = my_world.as_rdflib_graph()
-        result = list(graph.query("Select ?p WHERE {?p <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test.org/world.owl#"+obj+">.}"))
+        result = list(graph.query("Select ?p WHERE {?p <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://test.org/"+FILE_NAME+"#"+obj+">.}"))
 
         res_def = []
 
@@ -688,10 +688,10 @@ class assert_command(Action):
 class join_grounds(Action):
     """join two GROUNDS Beliefs in one, with concatenated variables"""
     def execute(self, *args):
-        dateTimeObj = datetime.now()
+        dateTimeObj = datetime.datetime.now()
         id_ground = dateTimeObj.microsecond
 
-        union = self.get_arg(str(args[1])) + " " + self.get_arg(str(args[2]))
+        union = self.get_arg(str(args[1])) + "_" + self.get_arg(str(args[2]))
         self.assert_belief(GROUND(str(id_ground), self.get_arg(str(args[0])), union))
 
     def get_arg(self, arg):

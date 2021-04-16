@@ -17,7 +17,7 @@ r2() >> [+WAKE("TEST"), +STT("set the cooler in the bedroom to 25 degrees and cu
 
 # simulating direct commands
 d1() >> [+WAKE("TEST"), +STT("set the cooler at 27 degrees in the bedroom")]
-d2() >> [+WAKE("TEST"), +STT("turn off the alarm in the garage")]
+d2() >> [+WAKE("TEST"), +STT("Give Rinazina to Woody Allen")]
 
 # sentences for reasoning purposes
 c1() >> [+FEED("The Colonel West is an American")]
