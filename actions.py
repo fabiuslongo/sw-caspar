@@ -81,6 +81,7 @@ VERBOSE = config.getboolean('PARSING', 'VERBOSE')
 LANGUAGE = config.get('PARSING', 'LANGUAGE')
 ASSIGN_RULES_LEMMAS = config.get('PARSING', 'ASSIGN_RULES_LEMMAS').split(", ")
 ASSIGN_RULES_POS = config.get('PARSING', 'ASSIGN_RULES_POS').split(", ")
+AXIOMS_WORDS = config.get('PARSING', 'AXIOMS_WORDS').split(", ")
 
 WAIT_TIME = config.getint('AGENT', 'WAIT_TIME')
 LOG_ACTIVE = config.getboolean('AGENT', 'LOG_ACTIVE')
@@ -1503,7 +1504,7 @@ class COND_WORD(ActiveBelief):
 
         word = str(x).split("'")[3]
         # Check for conditional word
-        if word.upper()[0:4] == "WHEN":
+        if word.upper()[0:4] in AXIOMS_WORDS:
             return True
         else:
             return False

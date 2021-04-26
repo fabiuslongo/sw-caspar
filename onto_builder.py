@@ -32,7 +32,7 @@ create_gnd_prep() >> [show_line("\ngnd related prep creation done.")]
 create_adj() / (GND("FLAT", X, K) & ADJ("FLAT", X, J) & ID(I)) >> [show_line("\ncreating adjective: ", J), -ADJ("FLAT", X, J), createAdj(I, K, J), create_adj()]
 create_adj() >> [show_line("\nadjective creation done.")]
 
-# Adjective production
+# Verbs production
 create_verb() / (ACTION("ROOT", "FLAT", Z, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I) & COP(Z)) >> [show_line("\nVERB+Ass.Rule (VBZ)"), -ACTION("ROOT", "FLAT", Z, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubCustVerb(I, Z, K, J), createAssRule(K, J), create_verb()]
 create_verb() / (ACTION("ROOT", "FLAT", Z, D, X, Y) & GND("FLAT", X, K) & ADJ("FLAT", Y, J) & ID(I) & COP(Z)) >> [show_line("\nVERB+Ass.Rule ADJ (VBP)"), -ACTION("ROOT", "FLAT", Z, D, X, Y), -GND("FLAT", X, K), -ADJ("FLAT", Y, J), createSubCustVerb(I, Z, K, J), createAdj(K, J), create_verb()]
 
