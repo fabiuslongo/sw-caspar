@@ -1,7 +1,9 @@
 from nltk.corpus import wordnet
 
-word = "give"
-pos = wordnet.VERB
+# http://www.w3.org/2006/03/wn/wn20/instances/wordsense-bank-noun-1
+
+word = "bank"
+pos = wordnet.NOUN
 language = "eng"
 
 syns = wordnet.synsets(word, pos=pos, lang=language)

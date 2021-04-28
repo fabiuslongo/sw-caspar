@@ -71,6 +71,9 @@ with my_onto:
         range = [int]
 
 
+owl_obj_dict = {}
+
+
 config = configparser.ConfigParser()
 config.read('config.ini')
 
@@ -1134,7 +1137,7 @@ class applyAdv(Action):
         # creating subclass adjective
         adv = types.new_class(adv_str, (Adverb,))
         # adverb individual
-        new_adv_ind = adv(parser.clean_from_POS(adv_str)+".ind")
+        new_adv_ind = adv(parser.clean_from_POS(adv_str)+"."+id_str)
 
         # creating subclass entity
         new_sub = types.new_class(verb_str, (Verb,))
@@ -1142,7 +1145,7 @@ class applyAdv(Action):
         new_ind = new_sub(parser.clean_from_POS(verb_str)+"."+id_str)
 
         # individual entity - hasAdv - adverb individual
-        new_ind.hasAdv = [new_adv_ind]
+        new_ind.hasAdv.append(new_adv_ind)
 
 
 class createAdj(Action):
@@ -1156,7 +1159,7 @@ class createAdj(Action):
         # creating subclass adjective
         adv = types.new_class(adj_str, (Adjective,))
         # adverb individual
-        new_adj_ind = adv(parser.clean_from_POS(adj_str)+".ind")
+        new_adj_ind = adv(parser.clean_from_POS(adj_str)+"."+id_str)
 
         # creating subclass entity
         ent_sub = types.new_class(ent_str, (Entity,))
@@ -1164,7 +1167,7 @@ class createAdj(Action):
         new_ind = ent_sub(parser.clean_from_POS(ent_str)+"."+id_str)
 
         # individual entity - hasAdv - adverb individual
-        new_ind.hasAdj = [new_adj_ind]
+        new_ind.hasAdj.append(new_adj_ind)
 
 
 class createSubCustVerb(Action):
@@ -1184,8 +1187,8 @@ class createSubCustVerb(Action):
         # entities individual
         new_ind_id = Id(id_str)
         new_ind_verb = new_sub_verb(parser.clean_from_POS(verb_str)+"."+id_str)
-        new_ind_subj = new_sub_subj(parser.clean_from_POS(subj_str)+".ind")
-        new_ind_obj = new_sub_obj(parser.clean_from_POS(obj_str)+".ind")
+        new_ind_subj = new_sub_subj(parser.clean_from_POS(subj_str)+"."+id_str)
+        new_ind_obj = new_sub_obj(parser.clean_from_POS(obj_str)+"."+id_str)
 
         # individual entity - hasSubject - subject individual
         new_ind_verb.hasSubject = [new_ind_subj]
@@ -1212,7 +1215,7 @@ class createSubVerb(Action):
         # entities individual
         new_ind_id = Id(id_str)
         new_ind_verb = new_sub_verb(parser.clean_from_POS(verb_str)+"."+id_str)
-        new_ind_subj = new_sub_subj(parser.clean_from_POS(subj_str)+".ind")
+        new_ind_subj = new_sub_subj(parser.clean_from_POS(subj_str)+"."+id_str)
         new_ind_obj = new_sub_obj(parser.clean_from_POS(obj_str)+"."+id_str)
 
         # individual entity - hasSubject - subject individual
@@ -1263,7 +1266,7 @@ class createPassSubVerb(Action):
         # entities individual
         new_ind_id = Id(id_str)
         new_ind_verb = new_sub_verb(parser.clean_from_POS(verb_str)+"."+id_str)
-        new_ind_obj = new_sub_obj(parser.clean_from_POS(obj_str) + ".ind")
+        new_ind_obj = new_sub_obj(parser.clean_from_POS(obj_str)+"."+id_str)
 
         # individual entity - hasObject - Object individual
         new_ind_verb.hasObject = [new_ind_obj]
@@ -1286,7 +1289,7 @@ class createIntrSubVerb(Action):
         # entities individual
         new_ind_id = Id(id_str)
         new_ind_verb = new_sub_verb(parser.clean_from_POS(verb_str)+"."+id_str)
-        new_ind_subj = new_sub_subj(parser.clean_from_POS(subj_str)+".ind")
+        new_ind_subj = new_sub_subj(parser.clean_from_POS(subj_str)+"."+id_str)
 
         # individual entity - hasSubject - subject individual
         new_ind_verb.hasSubject = [new_ind_subj]
@@ -1303,9 +1306,20 @@ class createSubPrep(Action):
         prep = str(arg2).split("'")[3].replace(":", ".")
         ent = str(arg3).split("'")[3].replace(":", ".")
 
-        # Creating subclass of Verb and individual
-        new_sub_verb = types.new_class(verb, (Verb,))
-        new_ind_verb = new_sub_verb(parser.clean_from_POS(verb)+"."+id_str)
+        v = parser.clean_from_POS(verb) + "." + id_str
+
+        if v in owl_obj_dict:
+            print("Getting objects from dict....", owl_obj_dict[v])
+            # Getting object from dict
+            new_ind_verb = owl_obj_dict[v]
+        else:
+            print("Creating objects....")
+            # Creating subclass of Verb and individual
+            new_sub_verb = types.new_class(verb, (Verb,))
+            new_ind_verb = new_sub_verb(v)
+            # Updating owl object dict
+            owl_obj_dict[verb] = new_sub_verb
+            owl_obj_dict[v] = new_ind_verb
 
         # Creating subclass of Preposition and individual
         new_sub_prep = types.new_class(prep, (Preposition,))
@@ -1313,11 +1327,13 @@ class createSubPrep(Action):
 
         # Creating subclass of Entity and individual
         new_sub_ent = types.new_class(ent, (Entity,))
-        new_ind_ent = new_sub_ent(parser.clean_from_POS(ent) + ".ind")
+        new_ind_ent = new_sub_ent(parser.clean_from_POS(ent) + "." + id_str)
 
         # Creating objects properties
-        new_ind_verb.hasPrep = [new_ind_prep]
-        new_ind_prep.hasObject = [new_ind_ent]
+        new_ind_verb.hasPrep.append(new_ind_prep)
+        new_ind_prep.hasObject.append(new_ind_ent)
+
+
 
 
 class createSubGndPrep(Action):
@@ -1331,17 +1347,17 @@ class createSubGndPrep(Action):
 
         # Creating subclasses of Entity and individuals
         new_sub_ent_master = types.new_class(ent_master, (Entity,))
-        new_ind_ent_master = new_sub_ent_master(parser.clean_from_POS(ent_master) + ".ind")
+        new_ind_ent_master = new_sub_ent_master(parser.clean_from_POS(ent_master)+"."+id_str)
         new_sub_ent_slave = types.new_class(ent_slave, (Entity,))
-        new_ind_ent_slave = new_sub_ent_slave(parser.clean_from_POS(ent_slave) + ".ind")
+        new_ind_ent_slave = new_sub_ent_slave(parser.clean_from_POS(ent_slave)+"."+id_str)
 
         # Creating subclass of Preposition and individual
         new_sub_prep = types.new_class(prep, (Preposition,))
         new_ind_prep = new_sub_prep(parser.clean_from_POS(prep) + "." + id_str)
 
         # Creating objects properties
-        new_ind_ent_master.hasPrep = [new_ind_prep]
-        new_ind_prep.hasObject = [new_ind_ent_slave]
+        new_ind_ent_master.hasPrep.append(new_ind_prep)
+        new_ind_prep.hasObject.append(new_ind_ent_slave)
 
 
 class createPlace(Action):

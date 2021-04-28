@@ -27,7 +27,9 @@ c4() >> [+FEED("the Colonel West sells missiles to Cuba")]
 c5() >> [+FEED("When an American sells weapons to a hostile nation, that American is a criminal")]
 
 # Query
-q() >> [+QUERY("The Colonel West is a criminal")]
+#q() >> [+QUERY("The Colonel West is a criminal")]
+q() >> [+FEED("They had to journey from Heathrow to Endinburgh by overnight coach")]
+
 
 
 # Start agent command

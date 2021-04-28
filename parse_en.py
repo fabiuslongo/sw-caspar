@@ -448,7 +448,7 @@ def main():
     LEMMMATIZED = True
     DISOK = True
 
-    sentence = "Patient visited the outpatient clinic in January 2020"
+    sentence = "They had to journey from Heathrow to Edinburgh by overnight coach"
     deps = parser.get_deps(sentence, LEMMMATIZED, DISOK)
     parser.set_last_deps(deps)
     ner = parser.get_last_ner()

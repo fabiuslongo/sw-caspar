@@ -5,7 +5,7 @@ from actions import *
 
 # ONTOLOGY BUILDER
 
-process_onto() / ID(I) >> [aggr_ent(), valorize(), create_adv(), create_gnd_prep(), create_prep(), create_adj(), create_verb(), create_head(), create_body(), finalize_rule(), create_ner(), saveOnto(), -ID(I)]
+process_onto() / ID(I) >> [aggr_ent(), valorize(), create_adj(), create_adv(), create_gnd_prep(), create_prep(), create_verb(), create_head(), create_body(), finalize_rule(), create_ner(), saveOnto(), -ID(I)]
 
 # Grounds aggregation
 aggr_ent() / (GND(X, Y, Z) & GND(X, Y, K) & neq(Z, K)) >> [show_line("\naggregating entity: ", Y), -GND(X, Y, Z), -GND(X, Y, K), aggrEntity(X, Y, Z, K), aggr_ent()]
@@ -14,27 +14,27 @@ aggr_ent() >> [show_line("\nentities aggregation done.")]
 valorize() / (GND("FLAT", X, Y) & ADJ("FLAT", X, "Equal") & PREP("FLAT", X, "To", S) & VALUE("FLAT", S, V) & ID(I)) >> [show_line("\ngiving value: ", V), -ADJ("FLAT", X, "Equal"), -PREP("FLAT", X, "To", S), -VALUE("FLAT", S, V), createValue(I, Y, V)]
 valorize() >> [show_line("\nvalues attribution completed.")]
 
+# Adjective production
+create_adj() / (GND("FLAT", X, K) & ADJ("FLAT", X, J) & ID(I)) >> [show_line("\ncreating adjective: ", J), -ADJ("FLAT", X, J), createAdj(I, K, J), create_adj()]
+create_adj() >> [show_line("\nadjective creation done.")]
+
 # Adverb productions
 create_adv() / (ACTION("FLAT", V, D, X, Y) & ADV("FLAT", D, K) & ID(I)) >> [show_line("\ncreating adverbs: ", Y), -ADV("FLAT", D, K), applyAdv(I, V, K), create_adv()]
 create_adv() / (ACTION("ROOT", "FLAT", V, D, X, Y) & ADV("FLAT", D, K) & ID(I)) >> [show_line("\ncreating adverbs (ROOT): ", Y), -ADV("FLAT", D, K), applyAdv(I, V, K), create_adv()]
-create_adv() >> [show_line("\nadverb creation done.")]
+create_adv() >> [show_line("\nadverbs creation done.")]
 
 # Verb-related prepositions
 create_prep() / (ACTION("FLAT", V, D, X, Y) & PREP("FLAT", D, K, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating verb related prep: ", K), -PREP("FLAT", D, K, Z), -GND("FLAT", Z, S), createSubPrep(I, V, K, S), create_prep()]
-create_prep() / (ACTION("ROOT", "FLAT", V, D, X, Y) & PREP("FLAT", D, K, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating verb related prep: ", K), -PREP("FLAT", D, K, Z), -GND("FLAT", Z, S), createSubPrep(I, V, K, S), create_prep()]
-create_prep() >> [show_line("\nverb related prep creation done.")]
+create_prep() / (ACTION("ROOT", "FLAT", V, D, X, Y) & PREP("FLAT", D, K, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating verb related  (ROOT): ", K), -PREP("FLAT", D, K, Z), -GND("FLAT", Z, S), createSubPrep(I, V, K, S), create_prep()]
+create_prep() >> [show_line("\nverb related preps creation done.")]
 
 # Ground-related Prepositions
 create_gnd_prep() / (GND("FLAT", X, K) & PREP("FLAT", X, Y, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating gnd related prep: ", Y), -PREP("FLAT", X, Y, Z), -GND("FLAT", Z, S), createSubGndPrep(I, K, Y, S), create_prep()]
 create_gnd_prep() >> [show_line("\ngnd related prep creation done.")]
 
-# Adjective production
-create_adj() / (GND("FLAT", X, K) & ADJ("FLAT", X, J) & ID(I)) >> [show_line("\ncreating adjective: ", J), -ADJ("FLAT", X, J), createAdj(I, K, J), create_adj()]
-create_adj() >> [show_line("\nadjective creation done.")]
-
 # Verbs production
-create_verb() / (ACTION("ROOT", "FLAT", Z, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I) & COP(Z)) >> [show_line("\nVERB+Ass.Rule (VBZ)"), -ACTION("ROOT", "FLAT", Z, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubCustVerb(I, Z, K, J), createAssRule(K, J), create_verb()]
-create_verb() / (ACTION("ROOT", "FLAT", Z, D, X, Y) & GND("FLAT", X, K) & ADJ("FLAT", Y, J) & ID(I) & COP(Z)) >> [show_line("\nVERB+Ass.Rule ADJ (VBP)"), -ACTION("ROOT", "FLAT", Z, D, X, Y), -GND("FLAT", X, K), -ADJ("FLAT", Y, J), createSubCustVerb(I, Z, K, J), createAdj(K, J), create_verb()]
+create_verb() / (ACTION("ROOT", "FLAT", Z, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I) & COP(Z)) >> [show_line("\nVERB+Ass.Rule (ROOT-VBZ)"), -ACTION("ROOT", "FLAT", Z, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubCustVerb(I, Z, K, J), createAssRule(K, J), create_verb()]
+create_verb() / (ACTION("ROOT", "FLAT", Z, D, X, Y) & GND("FLAT", X, K) & ADJ("FLAT", Y, J) & ID(I) & COP(Z)) >> [show_line("\nVERB+Ass.Rule ADJ (ROOT-VBP)"), -ACTION("ROOT", "FLAT", Z, D, X, Y), -GND("FLAT", X, K), -ADJ("FLAT", Y, J), createSubCustVerb(I, Z, K, J), createAdj(K, J), create_verb()]
 
 create_verb() / (ACTION("FLAT", V, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating normal verb: ", V), -ACTION("FLAT", V, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubVerb(I, V, K, J), create_verb()]
 create_verb() / (ACTION("ROOT", "FLAT", V, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating normal verb (ROOT): ", V), -ACTION("ROOT", "FLAT", V, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubVerb(I, V, K, J), create_verb()]
