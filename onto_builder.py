@@ -32,13 +32,18 @@ create_prep() >> [show_line("\nverb related preps creation done.")]
 create_gnd_prep() / (GND("FLAT", X, K) & PREP("FLAT", X, Y, Z) & GND("FLAT", Z, S) & ID(I)) >> [show_line("\ncreating gnd related prep: ", Y), -PREP("FLAT", X, Y, Z), -GND("FLAT", Z, S), createSubGndPrep(I, K, Y, S), create_prep()]
 create_gnd_prep() >> [show_line("\ngnd related prep creation done.")]
 
-# Verbs production
+# Verbs production - copula
 create_verb() / (ACTION("ROOT", "FLAT", Z, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I) & COP(Z)) >> [show_line("\nVERB+Ass.Rule (ROOT-VBZ)"), -ACTION("ROOT", "FLAT", Z, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubCustVerb(I, Z, K, J), createAssRule(K, J), create_verb()]
 create_verb() / (ACTION("ROOT", "FLAT", Z, D, X, Y) & GND("FLAT", X, K) & ADJ("FLAT", Y, J) & ID(I) & COP(Z)) >> [show_line("\nVERB+Ass.Rule ADJ (ROOT-VBP)"), -ACTION("ROOT", "FLAT", Z, D, X, Y), -GND("FLAT", X, K), -ADJ("FLAT", Y, J), createSubCustVerb(I, Z, K, J), createAdj(K, J), create_verb()]
 
+# Verbs production - embedded
+create_verb() / (ACTION("ROOT", "FLAT", V, D, X, E) & GND("FLAT", X, H) & ACTION("FLAT", L, E, S, Y) & GND("FLAT", S, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating embedded verbs (ROOT): ", V), -ACTION("ROOT", "FLAT", V, D, X, E), -GND("FLAT", X, H), -ACTION("FLAT", L, E, S, Y), -GND("FLAT", S, K), -GND("FLAT", Y, J), createEmbVerbs(I, V, H, L, K, J), create_verb()]
+
+# Verbs production - ordinary
 create_verb() / (ACTION("FLAT", V, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating normal verb: ", V), -ACTION("FLAT", V, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubVerb(I, V, K, J), create_verb()]
 create_verb() / (ACTION("ROOT", "FLAT", V, D, X, Y) & GND("FLAT", X, K) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating normal verb (ROOT): ", V), -ACTION("ROOT", "FLAT", V, D, X, Y), -GND("FLAT", X, K), -GND("FLAT", Y, J), createSubVerb(I, V, K, J), create_verb()]
 
+# Verbs production - passive/intransitive
 create_verb() / (ACTION("FLAT", V, D, "__", Y) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating passive verb: ", V), -ACTION("FLAT", V, D, "__", Y), -GND("FLAT", Y, J), createPassSubVerb(I, V, J), create_verb()]
 create_verb() / (ACTION("FLAT", V, D, X, "__") & GND("FLAT", X, K) & ID(I)) >> [show_line("\ncreating intransitive verb: ", V), -ACTION("FLAT", V, D, X, "__"), -GND("FLAT", X, K), createIntrSubVerb(I, V, K), create_verb()]
 create_verb() / (ACTION("ROOT", "FLAT", V, D, "__", Y) & GND("FLAT", Y, J) & ID(I)) >> [show_line("\ncreating passive verb (ROOT): ", V), -ACTION("ROOT", "FLAT", V, D, "__", Y), -GND("FLAT", Y, J), createPassSubVerb(I, V, J), create_verb()]

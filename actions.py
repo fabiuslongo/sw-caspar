@@ -1226,6 +1226,49 @@ class createSubVerb(Action):
         new_ind_verb.hasId = [new_ind_id]
 
 
+class createEmbVerbs(Action):
+    """Creating subclasses of the class Verb/Entity + embedded individuals"""
+    def execute(self, arg1, arg2, arg3, arg4, arg5, arg6):
+
+        id_str = str(arg1).split("'")[3]
+        main_verb_str = str(arg2).split("'")[3].replace(":", ".")
+        main_subj_str = str(arg3).split("'")[3].replace(":", ".")
+        emb_verb_str = str(arg4).split("'")[3].replace(":", ".")
+        emb_subj_str = str(arg5).split("'")[3].replace(":", ".")
+        emb_obj_str = str(arg6).split("'")[3].replace(":", ".")
+
+        # subclasses
+        main_sub_verb = types.new_class(main_verb_str, (Verb,))
+        main_sub_subj = types.new_class(main_subj_str, (Entity,))
+        emb_sub_verb = types.new_class(emb_verb_str, (Verb,))
+        emb_sub_subj = types.new_class(emb_subj_str, (Entity,))
+        emb_sub_obj = types.new_class(emb_obj_str, (Entity,))
+
+        # individuals
+        new_ind_id = Id(id_str)
+        new_ind_main_verb = main_sub_verb(parser.clean_from_POS(main_verb_str)+"."+id_str)
+        new_ind_main_subj = main_sub_subj(parser.clean_from_POS(main_subj_str)+"."+id_str)
+
+        new_ind_emb_verb = emb_sub_verb(parser.clean_from_POS(emb_verb_str)+"."+id_str)
+        new_ind_emb_subj = emb_sub_subj(parser.clean_from_POS(emb_subj_str)+"."+id_str)
+        new_ind_emb_obj = emb_sub_obj(parser.clean_from_POS(emb_obj_str)+"."+id_str)
+
+        # main
+        new_ind_main_verb.hasSubject = [new_ind_main_subj]
+        new_ind_main_verb.hasObject = [new_ind_emb_verb]
+
+        # embedded
+        new_ind_emb_verb.hasSubject = [new_ind_emb_subj]
+        new_ind_emb_verb.hasObject = [new_ind_emb_obj]
+
+        # storing action's id
+        new_ind_main_verb.hasId = [new_ind_id]
+        new_ind_emb_verb.hasId = [new_ind_id]
+
+
+
+
+
 class createAssRule(Action):
     """Creating new assignment rule between entities"""
     def execute(self, arg1, arg2):
