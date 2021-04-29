@@ -5,7 +5,7 @@ from actions import *
 
 # ONTOLOGY BUILDER
 
-process_onto() / ID(I) >> [aggr_ent(), valorize(), create_adj(), create_adv(), create_gnd_prep(), create_prep(), create_verb(), create_head(), create_body(), finalize_rule(), create_ner(), saveOnto(), -ID(I)]
+process_onto() / ID(I) >> [aggr_ent(), valorize(), create_adj(), create_adv(), create_gnd_prep(), create_prep(), create_verb(), create_head(), create_body(), finalize_onto(), create_ner(), saveOnto(), -ID(I)]
 
 # Grounds aggregation
 aggr_ent() / (GND(X, Y, Z) & GND(X, Y, K) & neq(Z, K)) >> [show_line("\naggregating entity: ", Y), -GND(X, Y, Z), -GND(X, Y, K), aggrEntity(X, Y, Z, K), aggr_ent()]
@@ -97,15 +97,17 @@ create_body() / (PREP("LEFT", E, X, Y) & RULE(R)) >> [show_line("\nupdating body
 
 create_body() / (RULE(R) & SUBJ(X, Y)) >> [show_line("\nupdating body with gnd completed."),  -SUBJ(X, Y)]
 
-finalize_rule() / (RULE(R) & WFR(R)) >> [show_line("\nfinalizing well formed rule..."), -RULE(R), declareRule(R), finalize_rule()]
-finalize_rule() / RULE(R) >> [show_line("\nthe rule is not well formed!"), -RULE(R), finalize_rule()]
-finalize_rule() / ACTION(S, V, D, X, Y) >> [show_line("\nremoving unuseful action: ", V), -ACTION(S, V, D, X, Y), finalize_rule()]
-finalize_rule() / GND(S, X, Y) >> [show_line("\nremoving unuseful gnd: ", Y), -GND(S, X, Y), finalize_rule()]
-finalize_rule() / ADJ(S, X, Y) >> [show_line("\nremoving unuseful adj: ", Y), -ADJ(S, X, Y), finalize_rule()]
-finalize_rule() / ADV(S, X, Y) >> [show_line("\nremoving unuseful adv: ", Y), -ADV(S, X, Y), finalize_rule()]
-finalize_rule() / PREP(S, D, X, Y) >> [show_line("\nremoving unuseful prep: ", Y), -PREP(S, D, X, Y), finalize_rule()]
+finalize_onto() / (RULE(R) & WFR(R)) >> [show_line("\nfinalizing well formed rule..."), -RULE(R), declareRule(R), finalize_onto()]
 
-finalize_rule() >> [show_line("\nrule finalization done.")]
+finalize_onto() / RULE(R) >> [show_line("\nthe rule is not well formed!"), -RULE(R), finalize_onto()]
+finalize_onto() / ACTION(S, V, D, X, Y) >> [show_line("\nremoving unuseful action: ", V), -ACTION(S, V, D, X, Y), finalize_onto()]
+finalize_onto() / ACTION("ROOT", S, V, D, X, Y) >> [show_line("\nremoving unuseful action (ROOT): ", V), -ACTION("ROOT", S, V, D, X, Y), finalize_onto()]
+finalize_onto() / GND(S, X, Y) >> [show_line("\nremoving unuseful gnd: ", Y), -GND(S, X, Y), finalize_onto()]
+finalize_onto() / ADJ(S, X, Y) >> [show_line("\nremoving unuseful adj: ", Y), -ADJ(S, X, Y), finalize_onto()]
+finalize_onto() / ADV(S, X, Y) >> [show_line("\nremoving unuseful adv: ", Y), -ADV(S, X, Y), finalize_onto()]
+finalize_onto() / PREP(S, D, X, Y) >> [show_line("\nremoving unuseful prep: ", Y), -PREP(S, D, X, Y), finalize_onto()]
+
+finalize_onto() >> [show_line("\nontology finalization done.")]
 
 
 

@@ -115,7 +115,7 @@ class aggr_ent(Procedure): pass
 class create_rule(Procedure): pass
 class create_body(Procedure): pass
 class create_head(Procedure): pass
-class finalize_rule(Procedure): pass
+class finalize_onto(Procedure): pass
 class create_ner(Procedure): pass
 class valorize(Procedure): pass
 
