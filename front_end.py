@@ -28,7 +28,7 @@ c5() >> [+FEED("When an American sells weapons to a hostile nation, that America
 
 # Query
 #q() >> [+QUERY("The Colonel West is a criminal")]
-q() >> [+FEED("They had to journey from Heathrow to Endinburgh by overnight coach")]
+q() >> [+FEED("Most of these therapeutic agents require intracellular uptake for their therapeutic effect because their site of action is within the cell")]
 
 
 

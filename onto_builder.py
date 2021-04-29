@@ -97,8 +97,17 @@ create_body() / (PREP("LEFT", E, X, Y) & RULE(R)) >> [show_line("\nupdating body
 
 create_body() / (RULE(R) & SUBJ(X, Y)) >> [show_line("\nupdating body with gnd completed."),  -SUBJ(X, Y)]
 
-finalize_rule() / (RULE(R) & WFR(R)) >> [show_line("\nfinalizing well formed rule..."), -RULE(R), declareRule(R)]
-finalize_rule() / RULE(R) >> [show_line("\nthe rule is not well formed!"), -RULE(R)]
+finalize_rule() / (RULE(R) & WFR(R)) >> [show_line("\nfinalizing well formed rule..."), -RULE(R), declareRule(R), finalize_rule()]
+finalize_rule() / RULE(R) >> [show_line("\nthe rule is not well formed!"), -RULE(R), finalize_rule()]
+finalize_rule() / ACTION(S, V, D, X, Y) >> [show_line("\nremoving unuseful action: ", V), -ACTION(S, V, D, X, Y), finalize_rule()]
+finalize_rule() / GND(S, X, Y) >> [show_line("\nremoving unuseful gnd: ", Y), -GND(S, X, Y), finalize_rule()]
+finalize_rule() / ADJ(S, X, Y) >> [show_line("\nremoving unuseful adj: ", Y), -ADJ(S, X, Y), finalize_rule()]
+finalize_rule() / ADV(S, X, Y) >> [show_line("\nremoving unuseful adv: ", Y), -ADV(S, X, Y), finalize_rule()]
+finalize_rule() / PREP(S, D, X, Y) >> [show_line("\nremoving unuseful prep: ", Y), -PREP(S, D, X, Y), finalize_rule()]
+
+finalize_rule() >> [show_line("\nrule finalization done.")]
+
+
 
 
 
