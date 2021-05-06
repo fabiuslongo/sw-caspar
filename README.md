@@ -183,3 +183,7 @@ Non-taxonomic relations related to the individual "Be.426837":
 Rules:
  
 ![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-rules.JPG)
+
+Thanks of all relations, we can make reasoning (with Hermit/Pellet) and infer the following further relations:
+
+![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-criminal.JPG)
