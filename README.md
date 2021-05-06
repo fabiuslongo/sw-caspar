@@ -171,4 +171,6 @@ Here is all taxonomic relations (by opening the ontology file with Protege) afte
  
 ![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-taxo.JPG)
 
-
+Here is all individuals:
+ 
+![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-ind.JPG)
