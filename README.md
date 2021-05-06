@@ -215,9 +215,29 @@ Here's ontology details like seen previously:
 ![Image 10](https://github.com/fabiuslongo/sw-caspar/blob/master/images/health-nontaxo2.JPG)
 ![Image 11](https://github.com/fabiuslongo/sw-caspar/blob/master/images/health-rules.JPG)
 
-The triggering conditions of the rule in line 21-22 of smart_env_int.py:
+Considering the triggering conditions of the rule in line 21-22 of smart_env_int.py:
 
 ```sh
 +INTENT(X, "Rinazina", Z, T) / (lemma_in_syn(X, "give.v.19") & eval_sem(T, "Hypertensive")) >> [show_ct(), say("I cannot execute the task. The patient is hypertensive")]
 +INTENT(X, "Rinazina", Z, T) / lemma_in_syn(X, "give.v.19") >> [exec_cmd(X, "Rinazina", Z, T), show_ct(), say("execution successful")]
 ```
+
+Let's suppose to simulate the agent awakening from its idle state with the following command:
+
+```sh
+eShell: main > +WAKE("TEST")
+```
+
+Then, give te agent the following vocal command:
+
+```sh
+eShell: main > +STT("Give Rinazina to Robinson Crusoe")]
+```
+
+In such case, due to the evaluation of the ActiveBelief *eval_sem(T, "Hypertensive")*, which will invoke pellet and check for membership
+of *Robinson Crusoe* to the class *Hypertensive*.
+
+![Image 12](https://github.com/fabiuslongo/sw-caspar/blob/master/images/health-hypertensive.JPG)
+
+In this case, the first production rule will be triggered and the agent will not provide the drug to the patient.
+Otherwise, the second production rule will be triggered and the agent won't have obection to provide the drug to the patient.
