@@ -3,7 +3,7 @@
 This is the repository of the Python (3.7+) implementation of SW-CASPAR (Semantic Web-Cognitive Architecture System Planned and Reactive), which
 is an alternative version of [CASPAR](https://github.com/fabiuslongo/pycaspar) able to make reasoning on the Semantic Web.
 
-![Image 1](https://github.com/fabiuslongo/pycaspar/blob/master/images/Caspar.JPG)
+![Image 1](https://github.com/fabiuslongo/sw-caspar/blob/master/images/sw-caspar.JPG)
 
 # Installation
 
