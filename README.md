@@ -167,4 +167,8 @@ eShell: main > +FEED("the Colonel West sells missiles to Cuba")
 eShell: main > +FEED("When an American sells weapons to a hostile nation, that American is a criminal")
 ```
 
+Here is all taxonomic relations (by opening the ontology file with Protege) after the such assertions:
+ 
+![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-taxo.JPG)
+
 
