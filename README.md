@@ -172,15 +172,15 @@ Here is all taxonomic relations (by opening the ontology file with Protege) afte
  
 ![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-taxo.JPG)
 
-Individuals. The number related to each sentence will always be different depending on the timestamp:
+Here is all individuals. The number related to each sentence will always be different depending on the timestamp:
  
 ![Image 3](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-ind.JPG)
 
-Non-taxonomic relations related to the individual "Be.426837":
+Here is all non-taxonomic relations related to the individual "Be.426837":
  
 ![Image 4](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-nontaxo.JPG)
 
-Rules:
+Here's all axioms:
  
 ![Image 5](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-rules.JPG)
 
