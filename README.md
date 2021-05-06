@@ -174,3 +174,7 @@ Here is all taxonomic relations (by opening the ontology file with Protege) afte
 Here is all individuals:
  
 ![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-ind.JPG)
+
+Non-taxonomic relations related to the individual "Be.426837":
+ 
+![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-nontaxo.JPG)
