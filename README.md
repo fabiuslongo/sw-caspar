@@ -174,16 +174,16 @@ Here is all taxonomic relations (by opening the ontology file with Protege) afte
 
 Individuals:
  
-![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-ind.JPG)
+![Image 3](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-ind.JPG)
 
 Non-taxonomic relations related to the individual "Be.426837":
  
-![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-nontaxo.JPG)
+![Image 4](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-nontaxo.JPG)
 
 Rules:
  
-![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-rules.JPG)
+![Image 5](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-rules.JPG)
 
 Thanks of all relations, we can make reasoning (with Hermit/Pellet) and infer the following further relations:
 
-![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-criminal.JPG)
+![Image 5](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-criminal.JPG)
