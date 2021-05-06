@@ -14,7 +14,7 @@ This repository has been tested on Python 3.7.3 64bit on Windows 10, with the fo
 * [Phidias](https://github.com/corradosantoro/phidias) (release 1.3.4.alpha) 
 * [spaCy](https://spacy.io/) (ver. 2.2.4)
 * [Natural Language Toolkit](https://www.nltk.org/) (ver. 3.5)
-* [Owlready2](https://pypi.org/project/Owlready2/) (ver. 0.30)
+* [Owlready2](https://pypi.org/project/Owlready2/) (ver. 0.26)
 * [pyttsx3 (Text-to-Speech)](https://pyttsx3.readthedocs.io/en/latest/) 
 
 ### Phidias
@@ -172,7 +172,7 @@ Here is all taxonomic relations (by opening the ontology file with Protege) afte
  
 ![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-taxo.JPG)
 
-Individuals:
+Individuals. The number related to each sentence will always be different depending on the timestamp:
  
 ![Image 3](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-ind.JPG)
 
@@ -184,6 +184,40 @@ Rules:
  
 ![Image 5](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-rules.JPG)
 
-Thanks of all relations, we can make reasoning (with Hermit/Pellet) and infer the following further relations:
+### Reasoning
 
-![Image 5](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-criminal.JPG)
+---------------
+
+Thanks to all relations, we can make reasoning (with Hermit/Pellet) and infer the following further
+relations referred to the individual "Colonel_West.791305":
+
+![Image 6](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-criminal.JPG)
+
+
+### Meta-Reasoning
+
+---------------
+
+The IoT SW-Caspar's reasoning capabilities are utterly expressed by the production rules system in the Smart Environment Interface (smart_env_int.py). 
+Each rule can be also subordinated by further conditions (Active beliefs), whom will make the Beliefs KB and the Ontology interact with each other through a Meta-Reasoning process.
+For instance, considering another ontology (changing FILE_NAME as "health.owl" in config.ini):
+
+```sh
+eShell: main > +FEED("Robinson Crusoe is a patient")
+eShell: main > +FEED("Robinson Crusoe has diastolic blood pressure equal to 150")
+eShell: main > +FEED("When a patient has diastolic blood pressure greater than 140, the patient is hypertensive")
+```
+Here's ontology details like seen previously:
+
+![Image 7](https://github.com/fabiuslongo/sw-caspar/blob/master/images/health-taxo.JPG)
+![Image 8](https://github.com/fabiuslongo/sw-caspar/blob/master/images/health-ind.JPG)
+![Image 9](https://github.com/fabiuslongo/sw-caspar/blob/master/images/health-nontaxo1.JPG)
+![Image 10](https://github.com/fabiuslongo/sw-caspar/blob/master/images/health-nontaxo2.JPG)
+![Image 11](https://github.com/fabiuslongo/sw-caspar/blob/master/images/health-rules.JPG)
+
+The triggering conditions of the rule in line 21-22 of smart_env_int.py:
+
+```sh
++INTENT(X, "Rinazina", Z, T) / (lemma_in_syn(X, "give.v.19") & eval_sem(T, "Hypertensive")) >> [show_ct(), say("I cannot execute the task. The patient is hypertensive")]
++INTENT(X, "Rinazina", Z, T) / lemma_in_syn(X, "give.v.19") >> [exec_cmd(X, "Rinazina", Z, T), show_ct(), say("execution successful")]
+```

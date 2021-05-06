@@ -14,8 +14,8 @@ check_conds() / SENSOR(V, X, Y) >> [show_line("\nbelief sensor not more needed..
 
 
 # after:
-# +FEED("Woody Allen is a patient")
-# +FEED("Woody Allen has diastolic blood pressure equal to 150")
+# +FEED("Robinson Crusoe is a patient")
+# +FEED("Robinson Crusoe has diastolic blood pressure equal to 150")
 # +FEED("When a patient has diastolic blood pressure greater than 140, the patient is hypertensive")
 # d2()
 +INTENT(X, "Rinazina", Z, T) / (lemma_in_syn(X, "give.v.19") & eval_sem(T, "Hypertensive")) >> [show_ct(), say("I cannot execute the task. The patient is hypertensive")]
