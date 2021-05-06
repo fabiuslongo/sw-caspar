@@ -158,6 +158,7 @@ SW-Caspar will model the ontology in order to infer the further natural language
 
 * _Colonel West is a criminal_
 
+To let the agent model the ontology on this basis, you must execute the following lines:
 
 ```sh
 eShell: main > +FEED("Colonel West is American")
@@ -171,10 +172,14 @@ Here is all taxonomic relations (by opening the ontology file with Protege) afte
  
 ![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-taxo.JPG)
 
-Here is all individuals:
+Individuals:
  
 ![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-ind.JPG)
 
 Non-taxonomic relations related to the individual "Be.426837":
  
 ![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-nontaxo.JPG)
+
+Rules:
+ 
+![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-rules.JPG)
