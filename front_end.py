@@ -33,7 +33,7 @@ q() >> [+FEED("Most of these therapeutic agents require intracellular uptake for
 
 
 # Start agent command
-go() >> [show_line("Starting Caspar..."), set_wait(), HotwordDetect().start, say("system ready")]
+go() >> [show_line("Starting SW-Caspar..."), set_wait(), HotwordDetect().start, say("system ready")]
 
 
 # simulating sensors
