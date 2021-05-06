@@ -14,6 +14,7 @@ This repository has been tested on Python 3.7.3 64bit on Windows 10, with the fo
 * [Phidias](https://github.com/corradosantoro/phidias) (release 1.3.4.alpha) 
 * [spaCy](https://spacy.io/) (ver. 2.2.4)
 * [Natural Language Toolkit](https://www.nltk.org/) (ver. 3.5)
+* [Owlready2](https://pypi.org/project/Owlready2/) (ver. 0.30)
 * [pyttsx3 (Text-to-Speech)](https://pyttsx3.readthedocs.io/en/latest/) 
 
 ### Phidias
@@ -50,6 +51,17 @@ from python console:
 > import nltk
 > nltk.download('wordnet')
 ```
+
+### Owlready2 
+
+---------------
+
+from prompt:
+```sh
+> python -m pip install owlready2
+```
+
+
 
 ### pyttsx3 (Text-to-Speech)
 
@@ -120,4 +132,39 @@ eShell: main >
 
 Now sw-caspar is ready.
 Unless you delete the owl file or choose to create another ontology, the agent will try to load every time the file specified in confi.ini.
+
+
+### IoT commands and routines
+
+---------------
+
+For this section the developer is referred to [CASPAR](https://github.com/fabiuslongo/pycaspar).
+
+
+
+### Ontology Learning
+
+---------------
+
+Considering the following sentences:
+
+* _Colonel West is American_
+* _Cuba is a hostile nation_
+* _missiles are weapons_
+* _the Colonel West sells missiles to Cuba_
+* _When an American sells weapons to a hostile nation, that American is a criminal_
+
+SW-Caspar will model the ontology in order to infer the further natural language assertion:
+
+* _Colonel West is a criminal_
+
+
+```sh
+eShell: main > +FEED("Colonel West is American")
+eShell: main > +FEED("Cuba is a hostile nation")
+eShell: main > +FEED("missiles are weapons")
+eShell: main > +FEED("the Colonel West sells missiles to Cuba")
+eShell: main > +FEED("When an American sells weapons to a hostile nation, that American is a criminal")
+```
+
 
