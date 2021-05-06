@@ -188,7 +188,7 @@ Here's all axioms:
 
 ---------------
 
-Thanks to all relations, we can make reasoning (with Hermit/Pellet) and infer the following further
+Thanks to all relations and axioms, we can make reasoning (with Hermit/Pellet) and infer the following further
 relations referred to the individual "Colonel_West.791305":
 
 ![Image 6](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-criminal.JPG)
