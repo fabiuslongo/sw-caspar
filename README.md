@@ -234,7 +234,7 @@ Then, give te agent the following vocal command:
 eShell: main > +STT("Give Rinazina to Robinson Crusoe")]
 ```
 
-In such case, together with the evaluation of the ActiveBelief *(lemma_in_syn(X, "give.v.19")* (which will check the proper verb), the ActiveBelief *eval_sem(T, "Hypertensive")* will invoke the reasoner pellet and check for membership
+In such case, together with the evaluation of the ActiveBelief *lemma_in_syn(X, "give.v.19")* (which will check a proper verb), the ActiveBelief *eval_sem(T, "Hypertensive")* will invoke the reasoner pellet and check for membership
 of *Robinson Crusoe* to the class *Hypertensive*.
 
 ![Image 12](https://github.com/fabiuslongo/sw-caspar/blob/master/images/health-hypertensive.JPG)
