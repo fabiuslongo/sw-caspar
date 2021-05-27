@@ -1,7 +1,7 @@
 # sw-caspar
 
 This is the repository of the Python (3.7+) implementation of SW-CASPAR (Semantic Web-Cognitive Architecture System Planned and Reactive), which
-is an alternative version of [CASPAR](https://github.com/fabiuslongo/pycaspar) able to make reasoning on the Semantic Web.
+is a transposition of [CASPAR](https://github.com/fabiuslongo/pycaspar) able to make reasoning on the Semantic Web.
 
 ![Image 1](https://github.com/fabiuslongo/sw-caspar/blob/master/images/sw-caspar.JPG)
 
@@ -9,7 +9,7 @@ is an alternative version of [CASPAR](https://github.com/fabiuslongo/pycaspar) a
 
 ---------------
 
-This repository has been tested on Python 3.7.3 64bit on Windows 10, with the following packages versions:
+This repository has been tested with Python 3.7.3 64 bit on Windows 10, with the following packages versions:
 
 * [Phidias](https://github.com/corradosantoro/phidias) (release 1.3.4.alpha) 
 * [spaCy](https://spacy.io/) (ver. 2.2.4)
@@ -75,8 +75,8 @@ from prompt:
 
 
 # Testing
-This cognitive architecture is designed to implement more intelligent agents and also 
-is an agent itself. Before starting the agent, Entities and Speech-To-Text Interfaces must be defined.
+This cognitive architecture is designed to implement intelligent agents and also 
+is an agent itself. Before running, Entities and Speech-To-Text Interfaces must be defined.
 
 ### Entities definition
 
@@ -96,7 +96,7 @@ STT Interfaces (for both hotword and utterances) must be defined inside the Inst
 
 ---------------
 
-First of all, you must create the ontology. In order to do that, you must follow three preliminar steps:
+Before all, you must create the ontology. In order to do that, you must follow three preliminar steps:
 
 * Choose the owl file name, by setting the variable FILE_NAME (within AGENT) in the config.ini (test.owl for instance)
 * Execute sw-caspar.py
@@ -130,8 +130,8 @@ Starting Hotword detection...
 eShell: main > 
 ```
 
-Now sw-caspar is ready.
-Unless you delete the owl file or choose to create another ontology, the agent will try to load every time the file specified in confi.ini.
+Now sw-caspar is ready for running.
+Unless you delete the OWL 2 file or choose to create another ontology, the agent will try to load every time the file specified in config.ini.
 
 
 ### IoT commands and routines
@@ -154,7 +154,7 @@ Considering the following sentences:
 * _the Colonel West sells missiles to Cuba_
 * _When an American sells weapons to a hostile nation, that American is a criminal_
 
-SW-Caspar will model the ontology in order to infer the further natural language assertion:
+SW-Caspar will model the ontology in order to infer the encoding of further natural language assertion:
 
 * _Colonel West is a criminal_
 
@@ -168,7 +168,7 @@ eShell: main > +FEED("the Colonel West sells missiles to Cuba")
 eShell: main > +FEED("When an American sells weapons to a hostile nation, that American is a criminal")
 ```
 
-Here is all taxonomic relations (by opening the ontology file with Protege) after the such assertions:
+Here is all taxonomic relations (by opening the ontology file with Protégé) after the such assertions:
  
 ![Image 2](https://github.com/fabiuslongo/sw-caspar/blob/master/images/west-taxo.JPG)
 
@@ -228,13 +228,13 @@ Let's suppose to simulate the agent awakening from its idle state with the follo
 eShell: main > +WAKE("TEST")
 ```
 
-Then, give te agent the following vocal command:
+Then, let's suppose to give the agent the following vocal command:
 
 ```sh
 eShell: main > +STT("Give Rinazina to Robinson Crusoe")]
 ```
 
-In such case, together with the evaluation of the ActiveBelief *lemma_in_syn(X, "give.v.19")* (which will check a proper verb), the ActiveBelief *eval_sem(T, "Hypertensive")* will invoke the reasoner pellet and check for membership
+In a such case, together with the evaluation of the ActiveBelief *lemma_in_syn(X, "give.v.19")* (which will check for a proper verb), the ActiveBelief *eval_sem(T, "Hypertensive")* will invoke the reasoner Pellet and check for the membership
 of *Robinson Crusoe* to the class *Hypertensive*.
 
 ![Image 12](https://github.com/fabiuslongo/sw-caspar/blob/master/images/health-hypertensive.JPG)
